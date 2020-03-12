@@ -9,6 +9,7 @@ setup(
         'progs' : ['progs/*.py']},
     install_requires=[
         'jp_proxy_widget',
+        'nest_asyncio',
         'pandas',
         'seaborn'
     ],

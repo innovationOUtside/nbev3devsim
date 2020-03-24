@@ -496,14 +496,13 @@ var plotly_cnt = 0;
 
 '''
 
-# + persistent_id="eefb285c-b41b-4971-9fc0-84b21cdd1930" last_executed_text="from IPython.core.magic import register_cell_magic\n\n@register_cell_magic\ndef sim_magic(line, cell):\n    \"Send code to simulator.\"\n    eval(line).set_element(\"prog\", cell)" execution_event_id="8ca9373c-b7be-4ebf-84f1-611d4f5c1c6d"
-from IPython.core.magic import register_cell_magic
-
-@register_cell_magic
-def sim_magic(line, cell):
-    "Send code to simulator."
-    eval(line).set_element("prog", cell)
-
+# + persistent_id="eefb285c-b41b-4971-9fc0-84b21cdd1930" last_executed_text="from IPython.core.magic import register_cell_magic\n\n@register_cell_magic\ndef sim_magic(line, cell):\n    \"Send code to simulator.\"\n    eval(line).set_element(\"prog\", cell)" execution_event_id="8ca9373c-b7be-4ebf-84f1-611d4f5c1c6d" tags=["active-ipynb"]
+# from IPython.core.magic import register_cell_magic
+#
+# @register_cell_magic
+# def sim_magic(line, cell):
+#     "Send code to simulator."
+#     eval(line).set_element("prog", cell)
 
 # + persistent_id="e2f3757d-50bb-4492-9f98-16426f3837c7" last_executed_text="prog='''\n# Demo of a simple proportional line follower using two sensors\n# It's deliberately flawed and will exit with errors in some circumstances;\n# try fixing it!\n\nfrom ev3dev2.motor import MoveSteering, OUTPUT_B, OUTPUT_C\nfrom ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4\nfrom ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor\n\nsteering_drive = MoveSteering(OUTPUT_B, OUTPUT_C)\n\ncolorLeft = ColorSensor(INPUT_2)\ncolorRight = ColorSensor(INPUT_3)\ngyro = GyroSensor(INPUT_4)\nultrasonic = UltrasonicSensor(INPUT_1)\n\nGAIN = 0.5\n\nwhile True:\n    print('Gyro: ' + str(gyro.angle_and_rate))\n    print('Ultrasonic: ' + str(ultrasonic.distance_centimeters))\n    print('Color: ' + str(colorRight.color))\n    error = colorLeft.reflected_light_intensity - colorRight.reflected_light_intensity\n    correction = error * GAIN\n    steering_drive.on(correction, 20)\n        \n'''" execution_event_id="9091bdb4-00cd-4fc8-a8c6-f96ff267bd1c"
 prog='''

@@ -541,6 +541,21 @@ while True:
 # + tags=["active-ipynb"] persistent_id="82a10062-b362-4595-b88f-da4d16342526"
 # myprint = Print_Repr()
 
+# +
+from pkg_resources import resource_exists, resource_filename
+
+def get_file_path(fn):
+    """Get file content from local store."""
+    # This should work locally or in package
+    try:
+        resource_exists(__name__, fn)
+        return resource_filename(__name__, fn)
+    except:
+        pass
+    return fn
+
+
+
 # + persistent_id="faecb100-d28c-442b-b204-0906c1dc105e" last_executed_text="class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):\n    \"\"\"Class to define an Ev3DevSim IPywidget.\"\"\"\n    def __init__(self, *pargs, **kwargs):\n        super(Ev3DevWidget, self).__init__(*pargs, **kwargs)\n        e = self.element\n\n        # Call some standard jQuery method on the widget element:\n        e.empty()\n        # This is for the controls as well as the simulator\n        e.width(\"1000\") # 1181px 2362\n        e.height(\"1000\") # 551px 1143\n        # self.require_js(\"ace\", \"ace-src-min/ace.js\")\n        self.load_js_files([\"js/skulpt.min.js\", \"js/skulpt-stdlib.js\",\n                            \"js/EV3devSim.js\", \"js/plotly.min.js\"])\n        self.load_css(\"css/main.css\")\n        e.html(html)\n        #self.require_js(\"saveAs\", \"js/FileSaver.js\")\n\n        self.js_init(\"ready();\", ready=self.ready)\n        \n        self.results_log = []\n        self.count = 0\n    \n    def print_repr(self, obj):\n        # TO DO\n        # - log all sensor channels\n        # - add timestamp\n        if obj.startswith('Ultrasonic') or obj.startswith('Color'):\n            typ = obj.split(': ')[0]\n            val = float(obj.split(': ')[1])\n            self.results_log.append({'index': datetime.utcnow(), typ: val})\n            self.count += 1\n\n    def ready(self):\n        \"Initialise the simulator.\"\n        #self.js_init(script_built, report_callback=print_repr)\n        self.js_init(script_built, report_callback=self.print_repr)" execution_event_id="b3c3671c-7611-487f-b26f-c5be088143ad"
 class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
     """Class to define an Ev3DevSim IPywidget."""
@@ -554,9 +569,9 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         e.width("1000") # 1181px 2362
         e.height("1000") # 551px 1143
         # self.require_js("ace", "ace-src-min/ace.js")
-        self.load_js_files(["js/skulpt.min.js", "js/skulpt-stdlib.js",
-                            "js/EV3devSim.js", "js/plotly.min.js"])
-        self.load_css("css/main.css")
+        self.load_js_files([get_file_path("js/skulpt.min.js"), get_file_path("js/skulpt-stdlib.js"),
+                            get_file_path("js/EV3devSim.js"), get_file_path("js/plotly.min.js")])
+        self.load_css(get_file_path("css/main.css"))
         e.html(html)
         #self.require_js("saveAs", "js/FileSaver.js")
 

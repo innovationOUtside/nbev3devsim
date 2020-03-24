@@ -6,10 +6,7 @@ setup(
     version='0.0.1',
     include_package_data=True,
     package_data = {
-        'progs' : ['progs/*.py'],
-        'js' : ['js/*.js'],
-        'css': ['css/*.css'],
-        'images': ['images/*']},
+        'nbev3devsim' : ['progs/*.py', 'js/*.js','css/*.css', 'images/*']},
     install_requires=[
         'jp_proxy_widget',
         'nest_asyncio',

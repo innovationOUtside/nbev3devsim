@@ -1,5 +1,6 @@
 /* exported EV3devSim */
 
+// +
 function EV3devSim (id) {
   var self = this;
 
@@ -39,16 +40,24 @@ function EV3devSim (id) {
 
   // Create the canvas and load into provided element
   this.loadCanvas = function(id) {
-    self.background = document.createElement('canvas');
+    self.background = document.createElement('canvas');      
     self.obstaclesLayer = document.createElement('canvas');
     self.foreground = document.createElement('canvas');
     self.measurementLayer = document.createElement('canvas');
-
     self.background.setAttribute('id', 'background');
     self.obstaclesLayer.setAttribute('id', 'obstaclesLayer');
     self.foreground.setAttribute('id', 'foreground');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
 
+    // TH - TO DO - 
+    // For pen down drawing, should we define a trailLayer and then draw onto that?
+    // how is canvas layering ordered? Is it precedence? So need measurement layer w/ mouse events on top?
+    //self.trailLayer = document.createElement('canvas');
+    //self.trailLayer.setAttribute('id', 'trailLayer');
+    //self.trailLayer.width = WIDTH;
+    //self.trailLayer.height = HEIGHT;
+    // TO DO - style and ctx for trailLayer
+      
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
     self.obstaclesLayer.width = WIDTH;
@@ -58,20 +67,23 @@ function EV3devSim (id) {
     self.measurementLayer.width = WIDTH;
     self.measurementLayer.height = HEIGHT;
 
+    self.scale = 0.4
+    scaler =  'scale('+self.scale+')'
+      
     self.background.style.position = 'absolute';
-    self.background.style.transform = 'scale(0.5)';
+    self.background.style.transform = scaler;
     self.background.style.transformOrigin = '0 0';
 
     self.obstaclesLayer.style.position = 'absolute';
-    self.obstaclesLayer.style.transform = 'scale(0.5)';
+    self.obstaclesLayer.style.transform = scaler;
     self.obstaclesLayer.style.transformOrigin = '0 0';
 
     self.foreground.style.position = 'absolute';
-    self.foreground.style.transform = 'scale(0.5)';
+    self.foreground.style.transform = scaler;
     self.foreground.style.transformOrigin = '0 0';
 
     self.measurementLayer.style.position = 'absolute';
-    self.measurementLayer.style.transform = 'scale(0.5)';
+    self.measurementLayer.style.transform = scaler;
     self.measurementLayer.style.transformOrigin = '0 0';
     self.measurementLayer.style.cursor = 'crosshair';
 
@@ -91,12 +103,25 @@ function EV3devSim (id) {
     self.parent.appendChild(self.background);
     self.parent.appendChild(self.obstaclesLayer);
     self.parent.appendChild(self.foreground);
+      
+    // TO DO
+    //self.parent.appendChild(self.trailLayer);
+      
     self.parent.appendChild(self.measurementLayer);
     self.parent.style.width = WIDTH / 2;
     self.parent.style.height = HEIGHT / 2;
 
     self.measurementLayer.addEventListener('click', self.measurementClick);
-    self.measurementLayer.addEventListener('mousemove', self.measurementMove);
+    //self.measurementLayer.addEventListener('mousemove', self.measurementMove);
+
+    /// TH TEST START 
+    // listen for mouse events
+    self.measurementLayer.addEventListener('mousedown', self.myDown);
+    self.measurementLayer.addEventListener('mouseup', self.myUp);
+    self.measurementLayer.addEventListener('mousemove', self.myMove);
+       
+    /// TH TEST END
+      
   };
 
   this.measurementClick = function(e) {
@@ -310,6 +335,8 @@ function EV3devSim (id) {
     self.robotCanvas = document.createElement('canvas');
     self.robotCanvas.width = width;
     self.robotCanvas.height = height;
+  
+                               
     var ctx = self.robotCanvas.getContext('2d');
 
     // Robot Body
@@ -734,6 +761,121 @@ function EV3devSim (id) {
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 
+    
+  /// TH TEST START
+    
+    // BROKEN
+    // The co-ordinate system seems to be somewhat broken?
+    // I can't work out the relationship between mouse co-ords and robot co-ords
+    // But given that, dragging of the object works, albeit not very controllably
+    
+    // handle mousedown events
+this.myDown = function (e){
+ console.log('a')
+  // tell the browser we're handling this mouse event
+  e.preventDefault();
+  e.stopPropagation();
+
+   var cursorCoords = self.cursorCanvasCoords(e)
+    var mx = cursorCoords.mx
+    var my = cursorCoords.my
+    // TO DO find the size in the sim coord schem of the robot?
+    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
+      var rW = 100 / 2
+      var rH = 100 / 2
+      if (mx>(self.robotStates.x-rW) && mx<(self.robotStates.x+rW) && my>(self.robotStates.y-rH) && my<(self.robotStates.y+rH)) 
+    {
+      console.log('Drag enable...');
+      self.dragok=true;
+      self.isDragging=true;
+  }
+
+  // save the current mouse position
+  self.drag_startX=mx;
+  self.drag_startY=my;
+}
+
+
+// handle mouseup events
+this.myUp = function (e){
+     console.log('b')
+  // tell the browser we're handling this mouse event
+  e.preventDefault();
+  e.stopPropagation();
+
+  // clear the dragging flag
+  self.dragok = false;
+  self.isDragging=false;
+}
+    
+//TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
+this.cursorCanvasCoords = function (e) {
+    bound_rect =  self.measurementLayer.getBoundingClientRect();
+    br_x = parseInt(bound_rect.left);
+    br_y = parseInt(bound_rect.bottom);
+    var cursorCoords = {
+      "mx": parseInt((e.pageX - br_x) * (WIDTH / self.measurementLayer.width) / self.scale),
+      "my": -parseInt((e.pageY - br_y) * (HEIGHT / self.measurementLayer.height) / self.scale ),
+      "pageX": e.pageX,
+      "pageY": e.pageY
+    }
+    return cursorCoords
+}
+    
+// handle mouse moves
+this.myMove = function (e){
+    var cursorCoords = self.cursorCanvasCoords(e)
+    var mx = cursorCoords.mx
+    var my = cursorCoords.my
+    // TO DO find the size in the sim coord schem of the robot?
+    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
+      var rW = 100 / 2
+      var rH = 100 / 2
+      if (mx>(self.robotStates.x-rW) && mx<(self.robotStates.x+rW) && my>(self.robotStates.y-rH) && my<(self.robotStates.y+rH)) 
+      {
+        console.log('Over the robot, ish...');
+      }
+  // if we're dragging anything...
+  if (self.dragok){
+
+    // tell the browser we're handling this mouse event
+    e.preventDefault();
+    e.stopPropagation();
+
+    // get the current mouse position
+    //var mx=parseInt(e.clientX-self.offsetLeft);
+    //var my=parseInt(e.clientY-self.offsetTop);
+
+    // calculate the distance the mouse has moved
+    // since the last mousemove
+    var dx=mx-self.drag_startX;
+    var dy=my-self.drag_startY;
+
+    // move the robot that isDragging 
+    // by the distance the mouse has moved
+    // since the last mousemove
+    
+    self.robotStates.x += dx;
+    self.robotStates.y += dy;
+
+    // redraw the scene with the new rect positions
+    self.drawAll();
+
+    // reset the starting mouse position for the next mousemove
+    self.drag_startX=mx;
+    self.drag_startY=my;
+
+  }
+}
+    
+  /// TH TEST END  
+    
+    
+    
+    
+    
+    
+    
   self.loadCanvas(id);
   self.setWallsPresent(true);
   self.clearBackground();

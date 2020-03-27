@@ -8,4 +8,7 @@ class NbEv3DevSimMagic(Magics):
   @line_cell_magic
   def sim_magic(self, line, cell):
     "Send code to simulator."
-    self.shell.user_ns[line].set_element("prog", cell)
+    try:
+      self.shell.user_ns[line].set_element("prog", cell)
+    except:
+      print(f'Is {line} defined?')

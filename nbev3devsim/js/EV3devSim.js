@@ -36,6 +36,8 @@ function EV3devSim (id) {
   self.obstaclesPresent = true;
   self.drawUltrasonic = false;
 
+  self.previousChartTraces = [];
+
   self.measurePts = [null, null];
 
   // Create the canvas and load into provided element

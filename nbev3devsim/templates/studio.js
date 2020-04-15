@@ -321,11 +321,13 @@ document.getElementById('obstacles').checked = true;
             if ((document.getElementById(chart_sensor_traces[j].id).checked) && (_text[0] == chart_sensor_traces[j].tag)) {
               _chart_vals.push([parseFloat(_text[1])]);
             } else {
-                _chart_vals.push([parseFloat(0)])
+                //_chart_vals.push([parseFloat(0)])
+                var _val = sim.previousChartTraces[j] || [0];
+                _chart_vals.push([parseFloat(_val[0])]);
             }
             _chart_traces.push(j)
         }
-
+        sim.previousChartTraces = _chart_vals;
         Plotly.extendTraces('plotlyDiv', {
               y: _chart_vals
         }, _chart_traces)

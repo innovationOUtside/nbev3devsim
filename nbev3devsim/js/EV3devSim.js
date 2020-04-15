@@ -36,6 +36,9 @@ function EV3devSim (id) {
   self.obstaclesPresent = true;
   self.drawUltrasonic = false;
 
+  //
+  self.sensorNoiseLight = 50;
+
   self.previousChartTraces = [];
 
   self.measurePts = [null, null];
@@ -734,7 +737,22 @@ function EV3devSim (id) {
     }
   };
 
+  this.addLightSensorNoise = function(raw, noise=0) {
+    // Based on Jyro noise model
+    if (noise > 0) {
+        if (Math.random() > 0.5)
+            raw += noise * Math.random()
+        else
+            raw -= noise * Math.random()
+      // Keep it in range:
+      raw = Math.min(Math.max(Math.round(raw), 0), 255)
+    }
+    return raw;
+  }
+
   this.getSensorValues = function(x, y) {
+    // Image data is an array of values, in sequence RGBA for each pixel
+    // Values are in range 0..255
     var sensorBox = self.backgroundCtx.getImageData(
       x - SENSOR_DIAMETER / 2,
       y - SENSOR_DIAMETER / 2,
@@ -753,13 +771,12 @@ function EV3devSim (id) {
         if (((row - radius)**2 + (col - radius)**2) < radiusSquare) {
           let offset = row * (SENSOR_DIAMETER * 4) + col * 4;
           count++;
-          redTotal += sensorBox.data[offset];
-          greenTotal += sensorBox.data[offset + 1];
-          blueTotal += sensorBox.data[offset + 2];
+          redTotal += self.addLightSensorNoise(sensorBox.data[offset], self.sensorNoiseLight);
+          greenTotal += self.addLightSensorNoise(sensorBox.data[offset + 1], self.sensorNoiseLight);
+          blueTotal += self.addLightSensorNoise(sensorBox.data[offset + 2], self.sensorNoiseLight);
         }
       }
     }
-
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 

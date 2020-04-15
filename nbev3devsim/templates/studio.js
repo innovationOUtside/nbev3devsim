@@ -19,9 +19,9 @@ var sim = new EV3devSim('field');
 
 setPos(1181, 571, 0);
 
-var light_sensor_noise_slider = document.getElementById("lightSensorNoiseSlider");
-light_sensor_noise_slider.oninput = function() {
-  sim.sensorNoiseLight = parseFloat(this.value);
+var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
+lightSensorNoiseSlider.oninput = function() {
+  sim.robotSpecs.sensorNoise = parseFloat(this.value);
 }
 document.getElementById('map').value = 'Empty Map';
 document.getElementById('walls').checked = true;

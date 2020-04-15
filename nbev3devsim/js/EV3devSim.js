@@ -261,6 +261,7 @@ function EV3devSim (id) {
       robotSpecs = {
         wheeldiameter: 56,
         wheelSpacing: 180,
+        wheelNoise: 0,
         back: -120,
         weight: 'medium',
         // This is a covenience generic to sensor1 and sensor2
@@ -495,6 +496,10 @@ function EV3devSim (id) {
         wheel.speed = wheel.speed_sp;
       }
     }
+    // The max speed seems to be set to 1050 in motor.py 
+    // Can we access it programmatically?
+    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise)
+    wheel.speed = Math.min(Math.max(Math.round(_tmp), 0), 1050)
   };
 
   this.animate = function() {

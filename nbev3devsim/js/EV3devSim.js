@@ -36,9 +36,7 @@ function EV3devSim (id) {
   self.obstaclesPresent = true;
   self.drawUltrasonic = false;
 
-  
-  self.sensorNoiseLight = 0;
-
+  //Should this be part of robotStates?
   self.previousChartTraces = [];
 
   self.measurePts = [null, null];
@@ -265,6 +263,8 @@ function EV3devSim (id) {
         wheelSpacing: 180,
         back: -120,
         weight: 'medium',
+        // This is a covenience generic to sensor1 and sensor2
+        sensorNoise: 0,
         sensor1: {
           x: -20,
           y: 30
@@ -737,16 +737,20 @@ function EV3devSim (id) {
     }
   };
 
+  //Create a simple noise component in range +/-1
+  this.simpleNoise = function(noise=1) {
+    if (noise > 0) {
+      noise = noise * (Math.random() - 0.5) * 2;
+    }
+    return noise;
+  }
+
   this.addLightSensorNoise = function(raw, noise=0) {
     // Based on Jyro noise model
-    if (noise > 0) {
-        if (Math.random() > 0.5)
-            raw += noise * Math.random()
-        else
-            raw -= noise * Math.random()
-      // Keep it in range:
-      raw = Math.min(Math.max(Math.round(raw), 0), 255)
-    }
+    raw += self.simpleNoise(noise)
+    // Keep it in range:
+    raw = Math.min(Math.max(Math.round(raw), 0), 255)
+
     return raw;
   }
 
@@ -771,9 +775,9 @@ function EV3devSim (id) {
         if (((row - radius)**2 + (col - radius)**2) < radiusSquare) {
           let offset = row * (SENSOR_DIAMETER * 4) + col * 4;
           count++;
-          redTotal += self.addLightSensorNoise(sensorBox.data[offset], self.sensorNoiseLight);
-          greenTotal += self.addLightSensorNoise(sensorBox.data[offset + 1], self.sensorNoiseLight);
-          blueTotal += self.addLightSensorNoise(sensorBox.data[offset + 2], self.sensorNoiseLight);
+          redTotal += self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
+          greenTotal += self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
+          blueTotal += self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotSpecs.sensorNoise);
         }
       }
     }

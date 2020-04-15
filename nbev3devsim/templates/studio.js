@@ -23,6 +23,12 @@ var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function() {
   sim.robotSpecs.sensorNoise = parseFloat(this.value);
 }
+
+var wheelNoiseSlider = document.getElementById("wheelNoiseSlider");
+wheelNoiseSlider.oninput = function() {
+  sim.robotSpecs.wheelNoise = parseFloat(this.value);
+}
+
 document.getElementById('map').value = 'Empty Map';
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;

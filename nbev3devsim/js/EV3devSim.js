@@ -36,8 +36,8 @@ function EV3devSim (id) {
   self.obstaclesPresent = true;
   self.drawUltrasonic = false;
 
-  //
-  self.sensorNoiseLight = 50;
+  
+  self.sensorNoiseLight = 0;
 
   self.previousChartTraces = [];
 

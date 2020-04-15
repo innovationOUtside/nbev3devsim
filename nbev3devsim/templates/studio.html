@@ -1,7 +1,7 @@
     <div class="row">
       <div>
         <select id="map">
-          <option>Empty Map</tion>
+          <option>Empty Map</option>
           <option>WRO 2019 Regular Junior</option>
           <option>WRO 2018 Regular Junior</option>
           <option>FLL 2019 - City Shaper</option>
@@ -38,7 +38,20 @@
             <button id="download">Save</button>
           </div>
         </div>
-        <div id="plotlyDiv"></div>
+        <div id="noise_controls">
+          <label for="lightSensorNoiseSlider">Light sensor noise:</label>
+          <input type="range" id="lightSensorNoiseSlider" name="lightSensorNoiseSlider" min="0" max="50">
+        </div>
+        <div id="charter">
+            <div id="chartTraces">
+                <input type="checkbox" id="chart_colour">Colour
+                <input type="checkbox" id="chart_left_light">Left light
+                <input type="checkbox" id="chart_right_light">Right light
+                <input type="checkbox" id="chart_ultrasound">Ultrasonic
+                <input type="checkbox" id="chart_gyro">Gyro
+            </div>
+            <div id="plotlyDiv"></div>
+        </div>
       </div>
       <pre id="output"></pre>
     </div>

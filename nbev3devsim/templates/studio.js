@@ -18,6 +18,11 @@ function setPos(x, y, angle) {
 var sim = new EV3devSim('field');
 
 setPos(1181, 571, 0);
+
+var light_sensor_noise_slider = document.getElementById("lightSensorNoiseSlider");
+light_sensor_noise_slider.oninput = function() {
+  sim.sensorNoiseLight = this.value;
+}
 document.getElementById('map').value = 'Empty Map';
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;
@@ -220,7 +225,7 @@ document.getElementById('obstacles').checked = true;
       
       
       
-            document.getElementById('robotConfiguratorOpen').addEventListener('click', function() {
+        document.getElementById('robotConfiguratorOpen').addEventListener('click', function() {
         document.getElementById('robotConfiguratorEditor').value = JSON.stringify(sim.robotSpecs, null, 2);
         document.getElementById('robotConfigurator').classList.remove('closed');
       });
@@ -275,7 +280,31 @@ document.getElementById('obstacles').checked = true;
       function rand() {
           return Math.random();
         }
-      
+     
+
+      var chart_sensor_traces = [
+          {id: "chart_ultrasound", tag: "Ultrasonic:" , color: "#FF0000"},
+          {id: "chart_left_light", tag: "Light_left:" , color: "#CA80F6"},
+          {id: "chart_right_light", tag: "Light_right:" , color: "#CAF680"},
+          {id: "chart_colour", tag: "Colour:" , color: "#00FF00"},
+          {id: "chart_gyro", tag: "Gyro:" , color: "#0000FF"}
+      ]
+
+    var chart_lines = [];
+    for (var j = 0; j < chart_sensor_traces.length; j++){
+      _tmp = {
+        y: [],
+        mode: 'lines',
+        line: {color: chart_sensor_traces[j].color}
+      }
+      chart_lines.push(_tmp);
+    }
+
+    //Plotly.newPlot('plotlyDiv', chart_lines);
+
+    // What's the following for?
+    var plotly_cnt = 0;
+
 
       // Output something to the display window
       function outf(text) {
@@ -286,12 +315,27 @@ document.getElementById('obstacles').checked = true;
         
         // Try updating the chart
         // TO DO - more chart trace updates
-        _text = text.split(" ") 
-        if (_text[0] == "Ultrasonic:") {
-          Plotly.extendTraces('plotlyDiv', {
-                y: [[parseFloat(_text[1])]]
-          }, [0])
+        _text = text.split(" ")
+        var _chart_vals = []
+        var _chart_traces = []
+        // What we need to do is pass all sensor vals in a single message
+        // If there is a message, decode it in one go and push the values to the trace
+        // Create some sort of logger function in robot control programme at start
+        // andd then call that as required.
+        for (var j = 0; j < chart_sensor_traces.length; j++){
+            if ((document.getElementById(chart_sensor_traces[j].id).checked) && (_text[0] == chart_sensor_traces[j].tag)) {
+              _chart_vals.push([parseFloat(_text[1])]);
+            } else {
+                //_chart_vals.push([parseFloat(0)])
+                var _val = sim.previousChartTraces[j] || [0];
+                _chart_vals.push([parseFloat(_val[0])]);
+            }
+            _chart_traces.push(j)
         }
+        sim.previousChartTraces = _chart_vals;
+        Plotly.extendTraces('plotlyDiv', {
+              y: _chart_vals
+        }, _chart_traces)
         mypre.innerHTML = mypre.innerHTML + text;
         mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
       }
@@ -315,6 +359,7 @@ document.getElementById('obstacles').checked = true;
       };
 
       function runit() {
+        // This function runs when the simulator Run button is clicked 
         if (typeof Sk.hardInterrupt != 'undefined') {
           delete Sk.hardInterrupt;
         }
@@ -322,6 +367,7 @@ document.getElementById('obstacles').checked = true;
           return;
         }
         Sk.running = true;
+        Plotly.newPlot('plotlyDiv', chart_lines);
 
         sim.reset();
         sim.startAnimation();
@@ -364,11 +410,3 @@ document.getElementById('obstacles').checked = true;
       }
 
 document.getElementById('runCode').addEventListener('click', runit);
-
-Plotly.newPlot('plotlyDiv', [{
-  y: [],
-  mode: 'lines',
-  line: {color: '#80CAF6'}
-}]);
-
-var plotly_cnt = 0;

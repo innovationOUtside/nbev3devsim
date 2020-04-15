@@ -276,7 +276,8 @@ function EV3devSim (id) {
         ultrasonic: {
           x: 0,
           y: 20,
-          angle: 0
+          angle: 0,
+          noise: 0
         }
       };
     }
@@ -587,11 +588,15 @@ function EV3devSim (id) {
       }
     }
 
+    // The ultrasonic sensor just returns a single value (distance)
     if (self.clock % 3 == 0) {
       let minDist = Math.min(...dists);
       if (minDist == Infinity) {
         self.robotStates.ultrasonic = ULTRASONIC_RANGE;
       } else {
+        // Use a really lazy noise model
+        minDist += self.simpleNoise(self.robotSpecs.ultrasonic.noise)
+        minDist = Math.min(Math.max(Math.round(minDist), 0), ULTRASONIC_RANGE)
         self.robotStates.ultrasonic = minDist;
       }
     }

@@ -1,104 +1,104 @@
-    <div class="row">
-      <div>
-        <select id="map">
-          <option>Empty Map</option>
-          <option>WRO 2019 Regular Junior</option>
-          <option>WRO 2018 Regular Junior</option>
-          <option>FLL 2019 - City Shaper</option>
-          <option>FLL 2018 - Into Orbit</option>
-          <option>Line Following Test</option>
-          <option>Junction Handling Test</option>
-          <option>Obstacles Test</option>
-          <option>Upload Image (2362x1143px)...</option>
-          <option hidden>Custom Image</option>
-        </select>
-        <button id="robotConfiguratorOpen">Configure Robot</button>
-        <button id="configureObstacles">Obstacles...</button>
+<div class="row">
+  <div>
+    <select id="map">
+      <option>Empty Map</option>
+      <option>WRO 2019 Regular Junior</option>
+      <option>WRO 2018 Regular Junior</option>
+      <option>FLL 2019 - City Shaper</option>
+      <option>FLL 2018 - Into Orbit</option>
+      <option>Line Following Test</option>
+      <option>Junction Handling Test</option>
+      <option>Obstacles Test</option>
+      <option>Upload Image (2362x1143px)...</option>
+      <option hidden>Custom Image</option>
+    </select>
+    <button id="robotConfiguratorOpen">Configure Robot</button>
+    <button id="configureObstacles">Obstacles...</button>
+  </div>
+  <div class="right">
+    <div>X : <input type="number" id="xPos"></div>
+    <div>Y : <input type="number" id="yPos"></div>
+    <div>Angle : <input type="number" id="angle"></div>
+    <div><button id="move">Move</button></div>
+  </div>
+</div>
+<div class="row">
+  <div id="editor">
+    <div class="row buttons">
+      <div class="leftFlex">
+        <button id="runCode">Run</button>
+        <button id="stop">Stop</button>
       </div>
-      <div class="right">
-        <div>X : <input type="number" id="xPos"></div>
-        <div>Y : <input type="number" id="yPos"></div>
-        <div>Angle : <input type="number" id="angle"></div>
-        <div><button id="move">Move</button></div>
+      <div class="center">
+        <input type="checkbox" id="largeFont">Large Font
+        <input type="checkbox" id="longWindow">Long Window
+        <input type="checkbox" id="penDown">Pen Down
+      </div>
+      <div class="rightFlex">
+        <button id="upload">Load</button>
+        <button id="download">Save</button>
       </div>
     </div>
-    <div class="row">
-      <div id="editor">
-        <div class="row buttons">
-          <div class="leftFlex">
-            <button id="runCode">Run</button>
-            <button id="stop">Stop</button>
-          </div>
-          <div class="center">
-            <input type="checkbox" id="largeFont">Large Font
-            <input type="checkbox" id="longWindow">Long Window
-            <input type="checkbox" id="penDown">Pen Down
-          </div>
-          <div class="rightFlex">
-            <button id="upload">Load</button>
-            <button id="download">Save</button>
-          </div>
-        </div>
-        <div id="noise_controls">
-          <label for="lightSensorNoiseSlider">Light sensor noise:</label>
-          <input type="range" id="lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="50">
-        
-          <label for="wheelNoiseSlider">Wheel noise:</label>
-          <input type="range" id="wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500">
-        </div>
-        <div id="charter">
-            <div id="chartTraces">
-                <input type="checkbox" id="chart_colour">Colour
-                <input type="checkbox" id="chart_left_light">Left light
-                <input type="checkbox" id="chart_right_light">Right light
-                <input type="checkbox" id="chart_ultrasound">Ultrasonic
-                <input type="checkbox" id="chart_gyro">Gyro
-            </div>
-            <div id="plotlyDiv"></div>
-        </div>
-      </div>
-      <pre id="output"></pre>
-    </div>
+    <div id="noise_controls">
+      <label for="lightSensorNoiseSlider">Light sensor noise:</label>
+      <input type="range" id="lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="50">
 
-    <div id="robotConfigurator" class="closed">
-      <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>
-      <i>* Dimensions are in mm and degrees.</i>
-      <div class="buttons">
-        <div class="leftFlex">
-          <button id="robotConfiguratorApply">Apply</button>
-          <button id="robotConfiguratorCancel">Cancel</button>
-        </div>
-        <div class="rightFlex">
-          <button id="robotConfiguratorupload">Load</button>
-          <button id="robotConfiguratordownload">Save</button>
-        </div>
-      </div>
+      <label for="wheelNoiseSlider">Wheel noise:</label>
+      <input type="range" id="wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500">
     </div>
+    <div id="charter">
+      <div id="chartTraces">
+        <input type="checkbox" id="chart_colour">Colour
+        <input type="checkbox" id="chart_left_light">Left light
+        <input type="checkbox" id="chart_right_light">Right light
+        <input type="checkbox" id="chart_ultrasound">Ultrasonic
+        <input type="checkbox" id="chart_gyro">Gyro
+      </div>
+      <div id="plotlyDiv"></div>
+    </div>
+  </div>
+  <pre id="output"></pre>
+</div>
 
-    <div id="obstaclesConfigurator" class="closed">
-      <div class="content">
-        <div><input type="checkbox" id="showRays">Show ultrasonic rays</div>
-        <div><input type="checkbox" id="walls" checked>Walls around map</div>
-        <div><input type="checkbox" id="obstacles" checked>Obstacles</div>
-        <textarea id="obstaclesConfiguratorEditor" spellcheck="false"></textarea>
-      </div>
-      <div class="buttons">
-        <div class="leftFlex">
-          <button id="obstaclesConfiguratorApply">Apply</button>
-          <button id="obstaclesConfiguratorClose">Close</button>
-        </div>
-        <div class="rightFlex">
-          <button id="obstaclesConfiguratorupload">Upload File</button>
-          <button id="obstaclesConfiguratordownload">Download to File</button>
-        </div>
-      </div>
+<div id="robotConfigurator" class="closed">
+  <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>
+  <i>* Dimensions are in mm and degrees.</i>
+  <div class="buttons">
+    <div class="leftFlex">
+      <button id="robotConfiguratorApply">Apply</button>
+      <button id="robotConfiguratorCancel">Cancel</button>
     </div>
+    <div class="rightFlex">
+      <button id="robotConfiguratorupload">Load</button>
+      <button id="robotConfiguratordownload">Save</button>
+    </div>
+  </div>
+</div>
 
-    <div id="window" class="closed">
-      <div class="content"></div>
-      <div class="windowRow">
-        <button id="closeWindow">Close</button>
-      </div>
+<div id="obstaclesConfigurator" class="closed">
+  <div class="content">
+    <div><input type="checkbox" id="showRays">Show ultrasonic rays</div>
+    <div><input type="checkbox" id="walls" checked>Walls around map</div>
+    <div><input type="checkbox" id="obstacles" checked>Obstacles</div>
+    <textarea id="obstaclesConfiguratorEditor" spellcheck="false"></textarea>
+  </div>
+  <div class="buttons">
+    <div class="leftFlex">
+      <button id="obstaclesConfiguratorApply">Apply</button>
+      <button id="obstaclesConfiguratorClose">Close</button>
     </div>
-    
-    <div id="field"></div>
+    <div class="rightFlex">
+      <button id="obstaclesConfiguratorupload">Upload File</button>
+      <button id="obstaclesConfiguratordownload">Download to File</button>
+    </div>
+  </div>
+</div>
+
+<div id="window" class="closed">
+  <div class="content"></div>
+  <div class="windowRow">
+    <button id="closeWindow">Close</button>
+  </div>
+</div>
+
+<div id="field"></div>

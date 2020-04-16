@@ -1,7 +1,7 @@
 /* exported EV3devSim */
 
 // +
-function EV3devSim (id) {
+function EV3devSim(id) {
   var self = this;
 
   const WIDTH = 2362;
@@ -16,17 +16,17 @@ function EV3devSim (id) {
   const ULTRASONIC_RANGE = 2550;
 
   var ULTRASONIC_RAYS = [-21, -14, -7, 0, 7, 14, 21];
-  for (let i=0; i<ULTRASONIC_RAYS.length; i++) {
+  for (let i = 0; i < ULTRASONIC_RAYS.length; i++) {
     ULTRASONIC_RAYS[i] = ULTRASONIC_RAYS[i] / 180 * Math.PI;
   }
   const ULTRASONIC_INCIDENT_LOWER_LIMITS = 40 / 180 * Math.PI;
   const ULTRASONIC_INCIDENT_UPPER_LIMITS = 140 / 180 * Math.PI;
 
   const WALLS = [
-    [[0, 0],      [WIDTH, 0]],
-    [[0, 0],      [0, HEIGHT]],
+    [[0, 0], [WIDTH, 0]],
+    [[0, 0], [0, HEIGHT]],
     [[0, HEIGHT], [WIDTH, HEIGHT]],
-    [[WIDTH, 0],  [WIDTH, HEIGHT]]
+    [[WIDTH, 0], [WIDTH, HEIGHT]]
   ];
 
   self.obstacles = [];
@@ -44,8 +44,8 @@ function EV3devSim (id) {
   self.measurePts = [null, null];
 
   // Create the canvas and load into provided element
-  this.loadCanvas = function(id) {
-    self.background = document.createElement('canvas');      
+  this.loadCanvas = function (id) {
+    self.background = document.createElement('canvas');
     self.obstaclesLayer = document.createElement('canvas');
     self.foreground = document.createElement('canvas');
     self.penLayer = document.createElement('canvas');
@@ -57,7 +57,7 @@ function EV3devSim (id) {
     self.penLayer.setAttribute('id', 'penLayer');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
 
-      
+
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
     self.obstaclesLayer.width = WIDTH;
@@ -71,8 +71,8 @@ function EV3devSim (id) {
     self.penLayer.height = HEIGHT;
 
     self.scale = 0.4
-    scaler =  'scale('+self.scale+')'
-      
+    scaler = 'scale(' + self.scale + ')'
+
     self.background.style.position = 'absolute';
     self.background.style.transform = scaler;
     self.background.style.transformOrigin = '0 0';
@@ -107,7 +107,7 @@ function EV3devSim (id) {
     self.penLayerCtx = self.penLayer.getContext('2d');
     self.penLayerCtx.translate(0, HEIGHT);
     self.penLayerCtx.scale(1, -1);
-    
+
     self.measurementLayerCtx = self.measurementLayer.getContext('2d');
 
     self.parent = document.getElementById(id);
@@ -115,7 +115,7 @@ function EV3devSim (id) {
     self.parent.appendChild(self.obstaclesLayer);
     self.parent.appendChild(self.foreground);
     self.parent.appendChild(self.penLayer);
-      
+
     self.parent.appendChild(self.measurementLayer);
     self.parent.style.width = WIDTH / 2;
     self.parent.style.height = HEIGHT / 2;
@@ -128,12 +128,14 @@ function EV3devSim (id) {
     self.measurementLayer.addEventListener('mousedown', self.myDown);
     self.measurementLayer.addEventListener('mouseup', self.myUp);
     self.measurementLayer.addEventListener('mousemove', self.myMove);
-       
+
     /// TH TEST END
-      
+
   };
 
-  this.measurementClick = function(e) {
+
+
+  this.measurementClick = function (e) {
     var x = (e.pageX - this.offsetLeft) * 2;
     var y = (e.pageY - this.offsetTop) * 2;
 
@@ -149,7 +151,7 @@ function EV3devSim (id) {
     }
   };
 
-  this.measurementMove = function(e) {
+  this.measurementMove = function (e) {
     var x = (e.pageX - this.offsetLeft) * 2;
     var y = (e.pageY - this.offsetTop) * 2;
 
@@ -159,11 +161,11 @@ function EV3devSim (id) {
     }
   };
 
-  this.clearMeasurementLayer = function() {
+  this.clearMeasurementLayer = function () {
     self.measurementLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
 
-  this.drawMeasurementLayer = function(pt1, pt2) {
+  this.drawMeasurementLayer = function (pt1, pt2) {
     var dx = pt2[0] - pt1[0];
     var dy = pt2[1] - pt1[1];
     var dist = (dx ** 2 + dy ** 2) ** 0.5;
@@ -212,7 +214,7 @@ function EV3devSim (id) {
     self.measurementLayerCtx.restore();
   };
 
-  this.setWallsPresent = function(value) {
+  this.setWallsPresent = function (value) {
     if (value) {
       self.parent.style.border = 'solid 4px black';
       self.wallsPresent = true;
@@ -223,20 +225,20 @@ function EV3devSim (id) {
   };
 
   // Set the background
-  this.loadBackground = function(imgURL) {
+  this.loadBackground = function (imgURL) {
     var img = new Image();   // Create new img element
-    img.addEventListener('load', function() {
+    img.addEventListener('load', function () {
       self.backgroundCtx.drawImage(img, 0, 0);
     }, false);
     img.src = imgURL;
   };
 
-  this.clearPenLayer = function() {
+  this.clearPenLayer = function () {
     self.penLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   }
 
   // Clear the background
-  this.clearBackground = function() {
+  this.clearBackground = function () {
     self.backgroundCtx.save();
     self.backgroundCtx.fillStyle = 'white';
     self.backgroundCtx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -244,7 +246,7 @@ function EV3devSim (id) {
   };
 
   // Get robot acceleration
-  this.getAcceleration = function() {
+  this.getAcceleration = function () {
     var weight;
 
     if (typeof self.robotSpecs.weight == 'undefined' || self.robotSpecs.weight === null || self.robotSpecs.weight === '') {
@@ -265,7 +267,7 @@ function EV3devSim (id) {
   };
 
   // Create robot on off-screen canvas
-  this.loadRobot = function(robotSpecs) {
+  this.loadRobot = function (robotSpecs) {
     // Load default robot specs if not provided
     if (typeof robotSpecs === 'undefined') {
       robotSpecs = {
@@ -326,9 +328,9 @@ function EV3devSim (id) {
         command: '',
         state: ''
       },
-      sensor1: [0,0,0],
-      sensor2: [0,0,0],
-      gyro: [0,0], // angle, rate
+      sensor1: [0, 0, 0],
+      sensor2: [0, 0, 0],
+      gyro: [0, 0], // angle, rate
       ultrasonic: 0
     };
 
@@ -359,8 +361,8 @@ function EV3devSim (id) {
     self.robotCanvas = document.createElement('canvas');
     self.robotCanvas.width = width;
     self.robotCanvas.height = height;
-  
-                               
+
+
     var ctx = self.robotCanvas.getContext('2d');
 
     // Robot Body
@@ -427,13 +429,13 @@ function EV3devSim (id) {
     }
   };
 
-  this.setRobotPos = function(x, y, angle) {
+  this.setRobotPos = function (x, y, angle) {
     self.robotStates.x = x;
     self.robotStates.y = y;
     self.robotStates.angle = angle;
   };
 
-  this.resetWheel = function(side) {
+  this.resetWheel = function (side) {
     var wheel;
 
     if (side == 'left') {
@@ -451,15 +453,15 @@ function EV3devSim (id) {
     wheel.polarity = 'normal';
   };
 
-  this.reset = function() {
+  this.reset = function () {
     self.resetWheel('left');
     self.resetWheel('right');
     self.getColorSensorsValues();
     self.calcUltrasonic();
-    self.robotStates.gyro = [0,0];
+    self.robotStates.gyro = [0, 0];
   };
 
-  this.calcWheelDist = function(wheel) {
+  this.calcWheelDist = function (wheel) {
     var period = 1 / self.fps;
     var dist = 0;
     var degrees = wheel.speed * period;
@@ -501,7 +503,7 @@ function EV3devSim (id) {
     }
   };
 
-  this.setWheelSpeed = function(wheel) {
+  this.setWheelSpeed = function (wheel) {
     if (wheel.speed < wheel.speed_sp) {
       wheel.speed += self.getAcceleration();
       if (wheel.speed > wheel.speed_sp) {
@@ -519,7 +521,7 @@ function EV3devSim (id) {
     wheel.speed = Math.min(Math.max(Math.round(_tmp), 0), 1050)
   };
 
-  this.animate = function() {
+  this.animate = function () {
     self.clock++;
 
     self.setWheelSpeed(self.robotStates.leftWheel);
@@ -546,7 +548,7 @@ function EV3devSim (id) {
     self.getColorSensorsValues();
   };
 
-  this.drawAll = function() {
+  this.drawAll = function () {
     self.clearForeground();
     self.drawRobot();
     if (self.robotStates.penDown) {
@@ -555,11 +557,11 @@ function EV3devSim (id) {
     self.calcUltrasonic();
   };
 
-  this.clearForeground = function() {
+  this.clearForeground = function () {
     self.foregroundCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
 
-  this.calcUltrasonic = function() {
+  this.calcUltrasonic = function () {
     var dists = [];
     var offsetAngle = self.robotSpecs.ultrasonic.angle / 180 * Math.PI;
     var primaryAngle = self.robotStates.angle + offsetAngle;
@@ -629,7 +631,7 @@ function EV3devSim (id) {
     self.foregroundCtx.restore();
   };
 
-  this.incidentAngle = function(line, angle) {
+  this.incidentAngle = function (line, angle) {
     let lineAngle;
     if (line[0][0] == line[1][0]) {
       lineAngle = Math.PI / 2;
@@ -646,21 +648,21 @@ function EV3devSim (id) {
     return incidentAngle;
   };
 
-  this.calcDist = function(p1, p2) {
+  this.calcDist = function (p1, p2) {
     let dx = p1[0] - p2[0];
     let dy = p1[1] - p2[1];
-    return (dx**2 + dy**2)**0.5;
+    return (dx ** 2 + dy ** 2) ** 0.5;
   };
 
-  this.calcIntercept = function(l1, l2) {
-    let denominator = (l1[0][0] - l1[1][0]) * (l2[0][1] - l2[1][1]) - (l1[0][1] -l1[1][1]) * (l2[0][0] - l2[1][0]);
+  this.calcIntercept = function (l1, l2) {
+    let denominator = (l1[0][0] - l1[1][0]) * (l2[0][1] - l2[1][1]) - (l1[0][1] - l1[1][1]) * (l2[0][0] - l2[1][0]);
 
     if (denominator == 0) {
       return null;
     }
 
-    let x1y2y1x2 = l1[0][0]*l1[1][1] - l1[0][1]*l1[1][0];
-    let x3y4y3x4 = l2[0][0]*l2[1][1] - l2[0][1]*l2[1][0];
+    let x1y2y1x2 = l1[0][0] * l1[1][1] - l1[0][1] * l1[1][0];
+    let x3y4y3x4 = l2[0][0] * l2[1][1] - l2[0][1] * l2[1][0];
 
     let x = (x1y2y1x2 * (l2[0][0] - l2[1][0]) - (l1[0][0] - l1[1][0]) * x3y4y3x4) / denominator;
     if (
@@ -685,21 +687,21 @@ function EV3devSim (id) {
     return [x, y];
   };
 
-  this.loadObstacles = function(obstacles) {
+  this.loadObstacles = function (obstacles) {
     self.clearObstacles();
     self.obstacles = obstacles;
     self.clearObstaclesLayer();
     self.drawObstacles();
   };
 
-  this.clearObstacles = function() {
+  this.clearObstacles = function () {
     self.obstacles = [];
   };
 
-  this.obstacleToLines = function(obstacle) {
-    let p1 = [obstacle[0],               obstacle[1]];
+  this.obstacleToLines = function (obstacle) {
+    let p1 = [obstacle[0], obstacle[1]];
     let p2 = [obstacle[0] + obstacle[2], obstacle[1]];
-    let p3 = [obstacle[0],               obstacle[1] + obstacle[3]];
+    let p3 = [obstacle[0], obstacle[1] + obstacle[3]];
     let p4 = [obstacle[0] + obstacle[2], obstacle[1] + obstacle[3]];
 
     let lines = [
@@ -712,7 +714,7 @@ function EV3devSim (id) {
     return lines;
   };
 
-  this.startAnimation = function() {
+  this.startAnimation = function () {
     if (self.timer == null) {
       //console.log('start animation');
       self.clock = 0;
@@ -720,13 +722,13 @@ function EV3devSim (id) {
     }
   };
 
-  this.stopAnimation = function() {
+  this.stopAnimation = function () {
     //console.log('stop animation');
     clearInterval(self.timer);
     self.timer = null;
   };
 
-  this.drawRobot = function() {
+  this.drawRobot = function () {
     self.foregroundCtx.save();
     self.foregroundCtx.translate(self.robotStates.x, self.robotStates.y);
     self.foregroundCtx.rotate(self.robotStates.angle - Math.PI / 2);
@@ -738,7 +740,7 @@ function EV3devSim (id) {
     self.foregroundCtx.restore();
   };
 
-  this.drawObstacles = function() {
+  this.drawObstacles = function () {
     self.obstaclesLayerCtx.fillStyle = 'Magenta';
     self.obstaclesLayerCtx.strokeStyle = 'purple';
     self.obstaclesLayerCtx.lineWidth = 8;
@@ -748,11 +750,11 @@ function EV3devSim (id) {
     }
   };
 
-  this.clearObstaclesLayer = function() {
+  this.clearObstaclesLayer = function () {
     self.obstaclesLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
 
-  this.drawPen = function() {
+  this.drawPen = function () {
     // Reflect the orientation of the robot
     var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
     var sin = Math.sin(self.robotStates.angle - Math.PI / 2);
@@ -761,27 +763,27 @@ function EV3devSim (id) {
     var x = cos * self.robotSpecs.pen.x - sin * self.robotSpecs.pen.y + self.robotStates.x;
     var y = sin * self.robotSpecs.pen.x + cos * self.robotSpecs.pen.y + self.robotStates.y;
 
-  // We need to draw a line from the previous location to the current location
-  // So what was the previous pen position?
-  // Create some new robotState in the form of:
-   // self.robotStates.pen_prev_x and self.robotStates.pen_prev_y ?
-  if (typeof self.robotStates.pen_prev_x == 'undefined') {
-    self.robotStates.pen_prev_x = x;
-   self.robotStates.pen_prev_y = y;
-  }
+    // We need to draw a line from the previous location to the current location
+    // So what was the previous pen position?
+    // Create some new robotState in the form of:
+    // self.robotStates.pen_prev_x and self.robotStates.pen_prev_y ?
+    if (typeof self.robotStates.pen_prev_x == 'undefined') {
+      self.robotStates.pen_prev_x = x;
+      self.robotStates.pen_prev_y = y;
+    }
     // need to set pen color according to spec
     self.penLayerCtx.strokeStyle = self.robotSpecs.pen.color;
     self.penLayerCtx.lineWidth = self.robotSpecs.pen.width;
     self.penLayerCtx.beginPath();
-   self.penLayerCtx.moveTo( self.robotStates.pen_prev_x,  self.robotStates.pen_prev_y);
-   self.penLayerCtx.lineTo(x, y);
-   self.penLayerCtx.stroke();
+    self.penLayerCtx.moveTo(self.robotStates.pen_prev_x, self.robotStates.pen_prev_y);
+    self.penLayerCtx.lineTo(x, y);
+    self.penLayerCtx.stroke();
 
-  self.robotStates.pen_prev_x = x;
-  self.robotStates.pen_prev_y= y;
-}
+    self.robotStates.pen_prev_x = x;
+    self.robotStates.pen_prev_y = y;
+  }
 
-  this.getColorSensorsValues = function() {
+  this.getColorSensorsValues = function () {
     var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
     var sin = Math.sin(self.robotStates.angle - Math.PI / 2);
 
@@ -797,14 +799,14 @@ function EV3devSim (id) {
   };
 
   //Create a simple noise component in range +/-1
-  this.simpleNoise = function(noise=1) {
+  this.simpleNoise = function (noise = 1) {
     if (noise > 0) {
       noise = noise * (Math.random() - 0.5) * 2;
     }
     return noise;
   }
 
-  this.addLightSensorNoise = function(raw, noise=0) {
+  this.addLightSensorNoise = function (raw, noise = 0) {
     // Based on Jyro noise model
     raw += self.simpleNoise(noise)
     // Keep it in range:
@@ -813,7 +815,7 @@ function EV3devSim (id) {
     return raw;
   }
 
-  this.getSensorValues = function(x, y) {
+  this.getSensorValues = function (x, y) {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
     var sensorBox = self.backgroundCtx.getImageData(
@@ -831,7 +833,7 @@ function EV3devSim (id) {
     var radiusSquare = radius ** 2;
     for (let row = 0; row < SENSOR_DIAMETER; row++) {
       for (let col = 0; col < SENSOR_DIAMETER; col++) {
-        if (((row - radius)**2 + (col - radius)**2) < radiusSquare) {
+        if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
           let offset = row * (SENSOR_DIAMETER * 4) + col * 4;
           count++;
           redTotal += self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
@@ -843,121 +845,119 @@ function EV3devSim (id) {
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 
-    
+
   /// TH TEST START
-    
-    // BROKEN
-    // The co-ordinate system seems to be somewhat broken?
-    // I can't work out the relationship between mouse co-ords and robot co-ords
-    // But given that, dragging of the object works, albeit not very controllably
-    
-    // handle mousedown events
-this.myDown = function (e){
-  //console.log('Mousedown')
-  // tell the browser we're handling this mouse event
-  e.preventDefault();
-  e.stopPropagation();
 
-   var cursorCoords = self.cursorCanvasCoords(e)
-    var mx = cursorCoords.mx
-    var my = cursorCoords.my
-    // TO DO find the size in the sim coord schem of the robot?
-    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
-      var rW = 100 / 2
-      var rH = 100 / 2
-      if (mx>(self.robotStates.x-rW) && mx<(self.robotStates.x+rW) && my>(self.robotStates.y-rH) && my<(self.robotStates.y+rH)) 
-    {
-      //console.log('Drag enable...');
-      self.dragok=true;
-      self.isDragging=true;
-  }
+  // BROKEN
+  // The co-ordinate system seems to be somewhat broken?
+  // I can't work out the relationship between mouse co-ords and robot co-ords
+  // But given that, dragging of the object works, albeit not very controllably
 
-  // save the current mouse position
-  self.drag_startX=mx;
-  self.drag_startY=my;
-}
+  // handle mousedown events
+  this.myDown = function (e) {
+    //console.log('Mousedown')
+    // tell the browser we're handling this mouse event
+    e.preventDefault();
+    e.stopPropagation();
 
-
-// handle mouseup events
-this.myUp = function (e){
-  // console.log('Mouse up')
-  // tell the browser we're handling this mouse event
-  e.preventDefault();
-  e.stopPropagation();
-
-  // clear the dragging flag
-  self.dragok = false;
-  self.isDragging=false;
-}
-    
-//TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
-this.cursorCanvasCoords = function (e) {
-    bound_rect =  self.measurementLayer.getBoundingClientRect();
-    br_x = parseInt(bound_rect.left);
-    br_y = parseInt(bound_rect.bottom);
-    var cursorCoords = {
-      "mx": parseInt((e.pageX - br_x) * (WIDTH / self.measurementLayer.width) / self.scale),
-      "my": -parseInt((e.pageY - br_y) * (HEIGHT / self.measurementLayer.height) / self.scale ),
-      "pageX": e.pageX,
-      "pageY": e.pageY
-    }
-    return cursorCoords
-}
-    
-// handle mouse moves
-this.myMove = function (e){
     var cursorCoords = self.cursorCanvasCoords(e)
     var mx = cursorCoords.mx
     var my = cursorCoords.my
     // TO DO find the size in the sim coord schem of the robot?
     //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
-      var rW = 100 / 2
-      var rH = 100 / 2
-      if (mx>(self.robotStates.x-rW) && mx<(self.robotStates.x+rW) && my>(self.robotStates.y-rH) && my<(self.robotStates.y+rH)) 
-      {
-        console.log('Over the robot, ish...');
-      }
-  // if we're dragging anything...
-  if (self.dragok){
+    var rW = 100 / 2
+    var rH = 100 / 2
+    if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
+      //console.log('Drag enable...');
+      self.dragok = true;
+      self.isDragging = true;
+    }
 
+    // save the current mouse position
+    self.drag_startX = mx;
+    self.drag_startY = my;
+  }
+
+
+  // handle mouseup events
+  this.myUp = function (e) {
+    // console.log('Mouse up')
     // tell the browser we're handling this mouse event
     e.preventDefault();
     e.stopPropagation();
 
-    // get the current mouse position
-    //var mx=parseInt(e.clientX-self.offsetLeft);
-    //var my=parseInt(e.clientY-self.offsetTop);
-
-    // calculate the distance the mouse has moved
-    // since the last mousemove
-    var dx=mx-self.drag_startX;
-    var dy=my-self.drag_startY;
-
-    // move the robot that isDragging 
-    // by the distance the mouse has moved
-    // since the last mousemove
-    
-    self.robotStates.x += dx;
-    self.robotStates.y += dy;
-
-    // redraw the scene with the new rect positions
-    self.drawAll();
-
-    // reset the starting mouse position for the next mousemove
-    self.drag_startX=mx;
-    self.drag_startY=my;
-
+    // clear the dragging flag
+    self.dragok = false;
+    self.isDragging = false;
   }
-}
-    
+
+  //TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
+  this.cursorCanvasCoords = function (e) {
+    bound_rect = self.measurementLayer.getBoundingClientRect();
+    br_x = parseInt(bound_rect.left);
+    br_y = parseInt(bound_rect.bottom);
+    var cursorCoords = {
+      "mx": parseInt((e.pageX - br_x) * (WIDTH / self.measurementLayer.width) / self.scale),
+      "my": -parseInt((e.pageY - br_y) * (HEIGHT / self.measurementLayer.height) / self.scale),
+      "pageX": e.pageX,
+      "pageY": e.pageY
+    }
+    return cursorCoords
+  }
+
+  // handle mouse moves
+  this.myMove = function (e) {
+    var cursorCoords = self.cursorCanvasCoords(e)
+    var mx = cursorCoords.mx
+    var my = cursorCoords.my
+    // TO DO find the size in the sim coord schem of the robot?
+    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
+    var rW = 100 / 2
+    var rH = 100 / 2
+    if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
+      console.log('Over the robot, ish...');
+    }
+    // if we're dragging anything...
+    if (self.dragok) {
+
+      // tell the browser we're handling this mouse event
+      e.preventDefault();
+      e.stopPropagation();
+
+      // get the current mouse position
+      //var mx=parseInt(e.clientX-self.offsetLeft);
+      //var my=parseInt(e.clientY-self.offsetTop);
+
+      // calculate the distance the mouse has moved
+      // since the last mousemove
+      var dx = mx - self.drag_startX;
+      var dy = my - self.drag_startY;
+
+      // move the robot that isDragging 
+      // by the distance the mouse has moved
+      // since the last mousemove
+
+      self.robotStates.x += dx;
+      self.robotStates.y += dy;
+
+      // redraw the scene with the new rect positions
+      self.drawAll();
+
+      // reset the starting mouse position for the next mousemove
+      self.drag_startX = mx;
+      self.drag_startY = my;
+
+    }
+  }
+
   /// TH TEST END  
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
   self.loadCanvas(id);
   self.setWallsPresent(true);
   self.clearBackground();

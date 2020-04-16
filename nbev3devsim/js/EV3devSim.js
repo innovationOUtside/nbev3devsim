@@ -7,6 +7,8 @@ function EV3devSim (id) {
   const WIDTH = 2362;
   const HEIGHT = 1143;
 
+  const BACK = -120;
+
   const WHEEL_WIDTH = 20;
   const SENSOR_WIDTH = 30;
   const SENSOR_DIAMETER = 20;
@@ -46,20 +48,15 @@ function EV3devSim (id) {
     self.background = document.createElement('canvas');      
     self.obstaclesLayer = document.createElement('canvas');
     self.foreground = document.createElement('canvas');
+    self.penLayer = document.createElement('canvas');
     self.measurementLayer = document.createElement('canvas');
+
     self.background.setAttribute('id', 'background');
     self.obstaclesLayer.setAttribute('id', 'obstaclesLayer');
     self.foreground.setAttribute('id', 'foreground');
+    self.penLayer.setAttribute('id', 'penLayer');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
 
-    // TH - TO DO - 
-    // For pen down drawing, should we define a trailLayer and then draw onto that?
-    // how is canvas layering ordered? Is it precedence? So need measurement layer w/ mouse events on top?
-    //self.trailLayer = document.createElement('canvas');
-    //self.trailLayer.setAttribute('id', 'trailLayer');
-    //self.trailLayer.width = WIDTH;
-    //self.trailLayer.height = HEIGHT;
-    // TO DO - style and ctx for trailLayer
       
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
@@ -69,6 +66,9 @@ function EV3devSim (id) {
     self.foreground.height = HEIGHT;
     self.measurementLayer.width = WIDTH;
     self.measurementLayer.height = HEIGHT;
+    // pen down
+    self.penLayer.width = WIDTH;
+    self.penLayer.height = HEIGHT;
 
     self.scale = 0.4
     scaler =  'scale('+self.scale+')'
@@ -76,6 +76,10 @@ function EV3devSim (id) {
     self.background.style.position = 'absolute';
     self.background.style.transform = scaler;
     self.background.style.transformOrigin = '0 0';
+
+    self.penLayer.style.position = 'absolute';
+    self.penLayer.style.transform = scaler;
+    self.penLayer.style.transformOrigin = '0 0';
 
     self.obstaclesLayer.style.position = 'absolute';
     self.obstaclesLayer.style.transform = scaler;
@@ -100,15 +104,17 @@ function EV3devSim (id) {
     self.foregroundCtx.translate(0, HEIGHT);
     self.foregroundCtx.scale(1, -1);
 
+    self.penLayerCtx = self.penLayer.getContext('2d');
+    self.penLayerCtx.translate(0, HEIGHT);
+    self.penLayerCtx.scale(1, -1);
+    
     self.measurementLayerCtx = self.measurementLayer.getContext('2d');
 
     self.parent = document.getElementById(id);
     self.parent.appendChild(self.background);
     self.parent.appendChild(self.obstaclesLayer);
     self.parent.appendChild(self.foreground);
-      
-    // TO DO
-    //self.parent.appendChild(self.trailLayer);
+    self.parent.appendChild(self.penLayer);
       
     self.parent.appendChild(self.measurementLayer);
     self.parent.style.width = WIDTH / 2;
@@ -225,6 +231,10 @@ function EV3devSim (id) {
     img.src = imgURL;
   };
 
+  this.clearPenLayer = function() {
+    self.penLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  }
+
   // Clear the background
   this.clearBackground = function() {
     self.backgroundCtx.save();
@@ -262,7 +272,13 @@ function EV3devSim (id) {
         wheeldiameter: 56,
         wheelSpacing: 180,
         wheelNoise: 0,
-        back: -120,
+        back: BACK,
+        pen: {
+          x: 0,
+          y: BACK,
+          color: 'red',
+          width: 6
+        },
         weight: 'medium',
         // This is a covenience generic to sensor1 and sensor2
         sensorNoise: 0,
@@ -289,6 +305,7 @@ function EV3devSim (id) {
       x: WIDTH / 2,
       y: HEIGHT / 2,
       angle: 0,
+      penDown: false,
       leftWheel: {
         polarity: 'normal',
         pos: 0,
@@ -532,6 +549,9 @@ function EV3devSim (id) {
   this.drawAll = function() {
     self.clearForeground();
     self.drawRobot();
+    if (self.robotStates.penDown) {
+      self.drawPen()
+    }
     self.calcUltrasonic();
   };
 
@@ -694,14 +714,14 @@ function EV3devSim (id) {
 
   this.startAnimation = function() {
     if (self.timer == null) {
-      console.log('start animation');
+      //console.log('start animation');
       self.clock = 0;
       self.timer = setInterval(self.animate, 1000 / self.fps);
     }
   };
 
   this.stopAnimation = function() {
-    console.log('stop animation');
+    //console.log('stop animation');
     clearInterval(self.timer);
     self.timer = null;
   };
@@ -731,6 +751,35 @@ function EV3devSim (id) {
   this.clearObstaclesLayer = function() {
     self.obstaclesLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
+
+  this.drawPen = function() {
+    // Reflect the orientation of the robot
+    var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
+    var sin = Math.sin(self.robotStates.angle - Math.PI / 2);
+
+    //Co-ords of the pen
+    var x = cos * self.robotSpecs.pen.x - sin * self.robotSpecs.pen.y + self.robotStates.x;
+    var y = sin * self.robotSpecs.pen.x + cos * self.robotSpecs.pen.y + self.robotStates.y;
+
+  // We need to draw a line from the previous location to the current location
+  // So what was the previous pen position?
+  // Create some new robotState in the form of:
+   // self.robotStates.pen_prev_x and self.robotStates.pen_prev_y ?
+  if (typeof self.robotStates.pen_prev_x == 'undefined') {
+    self.robotStates.pen_prev_x = x;
+   self.robotStates.pen_prev_y = y;
+  }
+    // need to set pen color according to spec
+    self.penLayerCtx.strokeStyle = self.robotSpecs.pen.color;
+    self.penLayerCtx.lineWidth = self.robotSpecs.pen.width;
+    self.penLayerCtx.beginPath();
+   self.penLayerCtx.moveTo( self.robotStates.pen_prev_x,  self.robotStates.pen_prev_y);
+   self.penLayerCtx.lineTo(x, y);
+   self.penLayerCtx.stroke();
+
+  self.robotStates.pen_prev_x = x;
+  self.robotStates.pen_prev_y= y;
+}
 
   this.getColorSensorsValues = function() {
     var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
@@ -804,7 +853,7 @@ function EV3devSim (id) {
     
     // handle mousedown events
 this.myDown = function (e){
- console.log('a')
+  //console.log('Mousedown')
   // tell the browser we're handling this mouse event
   e.preventDefault();
   e.stopPropagation();
@@ -818,7 +867,7 @@ this.myDown = function (e){
       var rH = 100 / 2
       if (mx>(self.robotStates.x-rW) && mx<(self.robotStates.x+rW) && my>(self.robotStates.y-rH) && my<(self.robotStates.y+rH)) 
     {
-      console.log('Drag enable...');
+      //console.log('Drag enable...');
       self.dragok=true;
       self.isDragging=true;
   }
@@ -831,7 +880,7 @@ this.myDown = function (e){
 
 // handle mouseup events
 this.myUp = function (e){
-     console.log('b')
+  // console.log('Mouse up')
   // tell the browser we're handling this mouse event
   e.preventDefault();
   e.stopPropagation();

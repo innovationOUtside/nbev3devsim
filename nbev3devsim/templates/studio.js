@@ -125,6 +125,15 @@ document.getElementById('obstacles').checked = true;
         }
         window.dispatchEvent(new Event('resize'));
       });
+
+      document.getElementById('penDown').addEventListener('change', function(e) {
+        if (e.target.checked) {
+          sim.robotStates.penDown = true;;
+        } else {
+          sim.robotStates.penDown = false;;
+        }
+      });
+
       document.getElementById('download').addEventListener('click', function() {
         var hiddenElement = document.createElement('a');
         hiddenElement.href = 'data:text/x-python;base64,' + btoa(element.prog);

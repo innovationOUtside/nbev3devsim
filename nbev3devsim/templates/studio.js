@@ -112,27 +112,22 @@ document.getElementById('stop').addEventListener('click', function () {
   sim.stopAnimation();
   Sk.hardInterrupt = true;
 });
-document.getElementById('largeFont').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    document.getElementById('editor').classList.add('large');
-  } else {
-    document.getElementById('editor').classList.remove('large');
-  }
-});
-document.getElementById('longWindow').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    document.getElementById('editor').classList.add('long');
-  } else {
-    document.getElementById('editor').classList.remove('long');
-  }
-  window.dispatchEvent(new Event('resize'));
-});
 
 document.getElementById('penDown').addEventListener('change', function (e) {
   if (e.target.checked) {
     sim.robotStates.penDown = true;;
   } else {
     sim.robotStates.penDown = false;;
+  }
+});
+
+document.getElementById('showChart').addEventListener('change', function (e) {
+  if (e.target.checked) {
+    sim.showChart = true;
+    document.getElementById("charter").style.display = 'block';
+  } else {
+    sim.showChart = false;
+    document.getElementById("charter").style.display = 'none';
   }
 });
 
@@ -157,7 +152,7 @@ document.getElementById('upload').addEventListener('click', function () {
     reader.readAsText(e.target.files[0]);
   });
 });
-var imagepath = 'images/'
+var imagepath = 'backgrounds/'
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('input', function () {
   var map = document.getElementById('map').value;
@@ -167,6 +162,18 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(2215, 150, 90);
+
+  } else if (map == 'Loop') {
+    sim.loadBackground(imagepath + '_loop.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(1000, 500, 90);
+
+  } else if (map == 'Grey bands') {
+    sim.loadBackground(imagepath + '_greys.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(400, 500, 0);
 
   } else if (map == 'WRO 2018 Regular Junior') {
     sim.loadBackground(imagepath + 'WRO-2018-Regular-Junior.png');
@@ -239,9 +246,6 @@ document.getElementById('map').addEventListener('input', function () {
   }
 });
 
-
-
-
 document.getElementById('robotConfiguratorOpen').addEventListener('click', function () {
   document.getElementById('robotConfiguratorEditor').value = JSON.stringify(sim.robotSpecs, null, 2);
   document.getElementById('robotConfigurator').classList.remove('closed');
@@ -292,12 +296,9 @@ function openWindow(url) {
     })
 }
 
-
-
 function rand() {
   return Math.random();
 }
-
 
 var chart_sensor_traces = [
   { id: "chart_ultrasound", tag: "Ultrasonic:", color: "#FF0000" },
@@ -330,33 +331,35 @@ function outf(text) {
   // Can we somehow stream data back to py context?
   report_callback(text)
 
-  // Try updating the chart
-  // TO DO - more chart trace updates
-  _text = text.split(" ")
-  var _chart_vals = []
-  var _chart_traces = []
-  // What we need to do is pass all sensor vals in a single message
-  // If there is a message, decode it in one go and push the values to the trace
-  // Create some sort of logger function in robot control programme at start
-  // andd then call that as required.
-  for (var j = 0; j < chart_sensor_traces.length; j++) {
-    if ((document.getElementById(chart_sensor_traces[j].id).checked) && (_text[0] == chart_sensor_traces[j].tag)) {
-      _chart_vals.push([parseFloat(_text[1])]);
-    } else {
-      //_chart_vals.push([parseFloat(0)])
-      var _val = sim.previousChartTraces[j] || [0];
-      _chart_vals.push([parseFloat(_val[0])]);
+  if (sim.showChart) {
+    // Try updating the chart
+    // TO DO - more chart trace updates
+    _text = text.split(" ")
+    var _chart_vals = []
+    var _chart_traces = []
+    // What we need to do is pass all sensor vals in a single message
+    // If there is a message, decode it in one go and push the values to the trace
+    // Create some sort of logger function in robot control programme at start
+    // andd then call that as required.
+    for (var j = 0; j < chart_sensor_traces.length; j++) {
+      if ((document.getElementById(chart_sensor_traces[j].id).checked) && (_text[0] == chart_sensor_traces[j].tag)) {
+        _chart_vals.push([parseFloat(_text[1])]);
+      } else {
+        //_chart_vals.push([parseFloat(0)])
+        var _val = sim.previousChartTraces[j] || [0];
+        _chart_vals.push([parseFloat(_val[0])]);
+      }
+      _chart_traces.push(j)
     }
-    _chart_traces.push(j)
+    sim.previousChartTraces = _chart_vals;
+    Plotly.extendTraces('plotlyDiv', {
+      y: _chart_vals
+    }, _chart_traces)
   }
-  sim.previousChartTraces = _chart_vals;
-  Plotly.extendTraces('plotlyDiv', {
-    y: _chart_vals
-  }, _chart_traces)
+
   mypre.innerHTML = mypre.innerHTML + text;
   mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
 }
-
 
 function builtinRead(x) {
 
@@ -394,7 +397,6 @@ function runit() {
       prog = element.prog;
     }
   }
-
 
   Sk.builtins.sim = sim
 

@@ -433,3 +433,5 @@ function stopit() {
 }
 
 document.getElementById('stop').addEventListener('click', stopit );
+
+document.getElementById('clearTrace').addEventListener('click', function() {sim.clearPenLayer()} )

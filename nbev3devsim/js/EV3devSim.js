@@ -52,9 +52,9 @@ function EV3devSim(id) {
     self.measurementLayer = document.createElement('canvas');
 
     self.background.setAttribute('id', 'background');
+    self.penLayer.setAttribute('id', 'penLayer');
     self.obstaclesLayer.setAttribute('id', 'obstaclesLayer');
     self.foreground.setAttribute('id', 'foreground');
-    self.penLayer.setAttribute('id', 'penLayer');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
 
 

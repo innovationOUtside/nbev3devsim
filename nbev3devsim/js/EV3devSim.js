@@ -285,18 +285,24 @@ function EV3devSim(id) {
         // This is a covenience generic to sensor1 and sensor2
         sensorNoise: 0,
         sensor1: {
+          enabled: true,
           x: -20,
           y: 30
         },
         sensor2: {
+          enabled: true,
           x: 20,
           y: 30
         },
         ultrasonic: {
+          enabled: true,
           x: 0,
           y: 20,
           angle: 0,
           noise: 0
+        },
+        gyro: {
+          enabled: true
         }
       };
     }

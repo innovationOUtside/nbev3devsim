@@ -108,10 +108,7 @@ document.getElementById('move').addEventListener('click', function () {
     document.getElementById('angle').value
   );
 });
-document.getElementById('stop').addEventListener('click', function () {
-  sim.stopAnimation();
-  Sk.hardInterrupt = true;
-});
+
 
 document.getElementById('penDown').addEventListener('change', function (e) {
   if (e.target.checked) {
@@ -429,3 +426,10 @@ function runit() {
 }
 
 document.getElementById('runCode').addEventListener('click', runit);
+
+function stopit() {
+  sim.stopAnimation();
+  Sk.hardInterrupt = true;
+}
+
+document.getElementById('stop').addEventListener('click', stopit );

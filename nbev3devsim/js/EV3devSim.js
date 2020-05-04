@@ -277,7 +277,8 @@ function EV3devSim(id) {
         back: BACK,
         pen: {
           x: 0,
-          y: BACK,
+          //y: BACK,
+          y: 0,
           color: 'red',
           width: 6
         },
@@ -945,6 +946,9 @@ function EV3devSim(id) {
 
       self.robotStates.x += dx;
       self.robotStates.y += dy;
+
+      document.getElementById('xPos').value = self.robotStates.x;
+      document.getElementById('yPos').value = self.robotStates.y;
 
       // redraw the scene with the new rect positions
       self.drawAll();

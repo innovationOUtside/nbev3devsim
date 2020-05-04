@@ -1,4 +1,7 @@
 from IPython.core.magic import (magics_class, line_cell_magic, Magics)
+from IPython.display import Javascript, clear_output
+
+import time
 
 @magics_class
 class NbEv3DevSimMagic(Magics):
@@ -46,5 +49,26 @@ gyro = GyroSensor(INPUT_4)
     try:
       cell = preload + cell
       self.shell.user_ns[line].set_element("prog", cell)
+
+      # The following fragment is an example of how to 
+      # get a confirmatory beep after downloading code to the simulator
+      # However, if we copy and paste the cell that has been run
+      # the javascript ping will also be replayed unless we clear it?
+      display(Javascript('console.log("here")'))
+      display(Javascript('''var context = new AudioContext();
+      var o = null;
+var g = null;
+      function bright_sound(type="square", x=1.5) {
+    o = context.createOscillator()
+    g = context.createGain()
+    o.connect(g)
+    o.type = type
+    g.connect(context.destination)
+    o.start(0)
+    g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + x)
+};
+bright_sound('square', 1.5);'''))
+      clear_output()
     except:
+
       print(f'Is {line} defined?')

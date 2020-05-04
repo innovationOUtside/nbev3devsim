@@ -946,6 +946,9 @@ function EV3devSim(id) {
       self.robotStates.x += dx;
       self.robotStates.y += dy;
 
+      document.getElementById('xPos').value = self.robotStates.x;
+      document.getElementById('yPos').value = self.robotStates.y;
+
       // redraw the scene with the new rect positions
       self.drawAll();
 

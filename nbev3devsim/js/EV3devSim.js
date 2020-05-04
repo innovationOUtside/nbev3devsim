@@ -277,7 +277,8 @@ function EV3devSim(id) {
         back: BACK,
         pen: {
           x: 0,
-          y: BACK,
+          //y: BACK,
+          y: 0,
           color: 'red',
           width: 6
         },

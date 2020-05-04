@@ -1,0 +1,9 @@
+#This repo
+.
+
+#For demos
+pandas
+
+#Workflow
+jupytext
+nbgitpuller

@@ -172,6 +172,18 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstaclesLayer();
     setPos(400, 500, 0);
 
+  } else if (map == 'Grey and black') {
+    sim.loadBackground(imagepath + '_grey_and_black.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(500, 250, 90);
+
+  } else if (map == 'Square') {
+    sim.loadBackground(imagepath + '_square.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(775, 500, -90);
+
   } else if (map == 'WRO 2018 Regular Junior') {
     sim.loadBackground(imagepath + 'WRO-2018-Regular-Junior.png');
     sim.clearObstacles();

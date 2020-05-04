@@ -133,10 +133,12 @@ document.getElementById('penDown').addEventListener('change', function (e) {
 document.getElementById('showChart').addEventListener('change', function (e) {
   if (e.target.checked) {
     sim.showChart = true;
+    if (!($( "#plotlyDiv" ).length )) Plotly.newPlot('plotlyDiv', chart_lines);
     document.getElementById("charter").style.display = 'block';
   } else {
     sim.showChart = false;
     document.getElementById("charter").style.display = 'none';
+    //$("#charter").empty();
   }
 });
 
@@ -329,15 +331,22 @@ var chart_sensor_traces = [
   { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" }
 ]
 
+
+
 var chart_lines = [];
-for (var j = 0; j < chart_sensor_traces.length; j++) {
-  _tmp = {
-    y: [],
-    mode: 'lines',
-    line: { color: chart_sensor_traces[j].color }
+
+function set_chartlines(){
+  chart_lines = []
+  for (var j = 0; j < chart_sensor_traces.length; j++) {
+    _tmp = {
+      y: [],
+      mode: 'lines',
+      line: { color: chart_sensor_traces[j].color }
+    }
+    chart_lines.push(_tmp);
   }
-  chart_lines.push(_tmp);
 }
+set_chartlines()
 
 //Plotly.newPlot('plotlyDiv', chart_lines);
 
@@ -408,7 +417,8 @@ function runit() {
     return;
   }
   Sk.running = true;
-  Plotly.newPlot('plotlyDiv', chart_lines);
+  
+  if (sim.showChart) Plotly.newPlot('plotlyDiv', chart_lines);
 
   sim.reset();
   sim.startAnimation();
@@ -459,3 +469,8 @@ function stopit() {
 document.getElementById('stop').addEventListener('click', stopit );
 
 document.getElementById('clearTrace').addEventListener('click', function() {sim.clearPenLayer()} )
+
+document.getElementById('clearChart').addEventListener('click', function() {
+  set_chartlines()
+  Plotly.newPlot('plotlyDiv', chart_lines);
+} )

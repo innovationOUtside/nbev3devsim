@@ -313,7 +313,10 @@ function EV3devSim(id) {
     self.robotStates = {
       x: WIDTH / 2,
       y: HEIGHT / 2,
+      _x: WIDTH / 2,
+      _y: HEIGHT / 2,
       angle: 0,
+      _angle: 0,
       penDown: false,
       leftWheel: {
         polarity: 'normal',

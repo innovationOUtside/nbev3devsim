@@ -1,4 +1,4 @@
-function setPos(x, y, angle) {
+function setPos(x, y, angle, init=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
   var angleRadian = parseFloat(angle) / 180 * Math.PI;
@@ -10,6 +10,12 @@ function setPos(x, y, angle) {
   document.getElementById('xPos').value = x;
   document.getElementById('yPos').value = y;
   document.getElementById('angle').value = angle;
+
+  if (init) {
+    sim.robotStates._x = x;
+    sim.robotStates._y = y;
+    sim.robotStates._angle = angle;
+  }
 
   sim.setRobotPos(x, y, angleRadian);
   sim.drawAll();
@@ -108,7 +114,13 @@ document.getElementById('move').addEventListener('click', function () {
     document.getElementById('angle').value
   );
 });
-
+document.getElementById('reset').addEventListener('click', function () {
+  setPos(
+    sim.robotStates._x,
+    sim.robotStates._y,
+    sim.robotStates._angle
+  );
+});
 
 document.getElementById('penDown').addEventListener('change', function (e) {
   if (e.target.checked) {
@@ -158,65 +170,65 @@ document.getElementById('map').addEventListener('input', function () {
     sim.loadBackground(imagepath + 'WRO-2019-Regular-Junior.jpg');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(2215, 150, 90);
+    setPos(2215, 150, 90, true);
 
   } else if (map == 'Loop') {
     sim.loadBackground(imagepath + '_loop.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(1000, 500, 90);
+    setPos(1000, 500, 90, true);
 
   } else if (map == 'Grey bands') {
     sim.loadBackground(imagepath + '_greys.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(400, 500, 0);
+    setPos(400, 500, 0, true);
 
   } else if (map == 'Grey and black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(500, 250, 90);
+    setPos(500, 250, 90, true);
 
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(775, 500, -90);
+    setPos(775, 500, -90, true);
 
   } else if (map == 'WRO 2018 Regular Junior') {
     sim.loadBackground(imagepath + 'WRO-2018-Regular-Junior.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(1181, 150, 90);
+    setPos(1181, 150, 90, true);
 
   } else if (map == 'FLL 2019 - City Shaper') {
     sim.loadBackground(imagepath + 'FLL2019.jpg');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(500, 150, 90);
+    setPos(500, 150, 90, true);
 
   } else if (map == 'FLL 2018 - Into Orbit') {
     sim.loadBackground(imagepath + 'FLL2018.jpg');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(150, 150, 90);
+    setPos(150, 150, 90, true);
 
   } else if (map == 'Line Following Test') {
     sim.loadBackground(imagepath + 'Line_Following_Test.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(141, 125, 90);
+    setPos(141, 125, 90, true);
 
   } else if (map == 'Junction Handling Test') {
     sim.loadBackground(imagepath + 'Junction_Handling_Test.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(698, 130, 90);
+    setPos(698, 130, 90, true);
 
   } else if (map == 'Obstacles Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
-    setPos(121, 125, 90);
+    setPos(121, 125, 90, true);
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     sim.loadObstacles([
@@ -251,7 +263,7 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearBackground();
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(2362 / 2, 1143 / 2, 0);
+    setPos(2362/2, 1143/2, 0, true);
   }
 });
 

@@ -467,6 +467,11 @@ function runit() {
       sim.stopAnimation();
       Sk.running = false;
     },
+    // The following handles errors that arise when executing
+    // a robot control program in the simulator.
+    // Is there a way we can get error messages displayed in the output area
+    // of the code cell whose downloaded code we are running?
+    // Related issue: https://github.com/innovationOUtside/nbev3devsim/issues/49
     function (err) {
       Sk.running = false;
       sim.stopAnimation();

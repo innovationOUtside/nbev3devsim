@@ -29,6 +29,7 @@ class NbEv3DevSimMagic(Magics):
     )
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
+    args = magic_arguments.parse_argstring(self.sim_magic, line)
     preload='''
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4

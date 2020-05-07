@@ -185,7 +185,11 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(400, 500, 0, true);
-
+  } else if (map == 'Radial grey') {
+    sim.loadBackground(imagepath + '_radial_grey.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(100, 400, 0, true);
   } else if (map == 'Grey and black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();

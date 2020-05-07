@@ -1,4 +1,4 @@
-function setPos(x, y, angle, init=false) {
+function setPos(x, y, angle, init=false, reset=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
   var angleRadian = parseFloat(angle) / 180 * Math.PI;
@@ -18,6 +18,10 @@ function setPos(x, y, angle, init=false) {
   }
 
   sim.setRobotPos(x, y, angleRadian);
+  if (reset) {
+    delete sim.robotStates.pen_prev_x;
+    delete sim.robotStates.pen_prev_y;
+  }
   sim.drawAll();
 }
 
@@ -108,18 +112,28 @@ document.getElementById('obstacles').addEventListener('click', function () {
   }
 });
 document.getElementById('move').addEventListener('click', function () {
-  setPos(
-    document.getElementById('xPos').value,
-    document.getElementById('yPos').value,
-    document.getElementById('angle').value
-  );
+  var tmp = sim.robotStates.penDown;
+  sim.robotStates.penDown = false;
+
+  var x = document.getElementById('xPos').value;
+  var y = document.getElementById('yPos').value;
+  var angle = document.getElementById('angle').value;
+
+  setPos(x, y, angle, reset=true);
+  sim.robotStates.penDown = tmp;
 });
 document.getElementById('reset').addEventListener('click', function () {
+  // Don't draw the trace when we reset the robot position
+  var tmp = sim.robotStates.penDown;
+  sim.robotStates.penDown = false;
+  
   setPos(
     sim.robotStates._x,
     sim.robotStates._y,
-    sim.robotStates._angle
+    sim.robotStates._angle,
+    reset=true
   );
+  sim.robotStates.penDown = tmp;
 });
 
 document.getElementById('penDown').addEventListener('change', function (e) {

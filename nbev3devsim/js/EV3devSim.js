@@ -469,6 +469,8 @@ function EV3devSim(id) {
     self.getColorSensorsValues();
     self.calcUltrasonic();
     self.robotStates.gyro = [0, 0];
+    delete self.robotStates.pen_prev_x;
+    delete self.robotStates.pen_prev_y;
   };
 
   this.calcWheelDist = function (wheel) {
@@ -764,7 +766,7 @@ function EV3devSim(id) {
     self.obstaclesLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
 
-  this.drawPen = function () {
+  this.setPenCoords = function() {
     // Reflect the orientation of the robot
     var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
     var sin = Math.sin(self.robotStates.angle - Math.PI / 2);
@@ -773,11 +775,24 @@ function EV3devSim(id) {
     var x = cos * self.robotSpecs.pen.x - sin * self.robotSpecs.pen.y + self.robotStates.x;
     var y = sin * self.robotSpecs.pen.x + cos * self.robotSpecs.pen.y + self.robotStates.y;
 
+    self.robotStates.pen_x = x;
+    self.robotStates.pen_y = y;
+  }
+
+  this.drawPen = function () {
+
+    if (self.isDragging) return;
+
+    self.setPenCoords()
+    x = self.robotStates.pen_x;
+    y = self.robotStates.pen_y;
+
     // We need to draw a line from the previous location to the current location
     // So what was the previous pen position?
     // Create some new robotState in the form of:
     // self.robotStates.pen_prev_x and self.robotStates.pen_prev_y ?
     if (typeof self.robotStates.pen_prev_x == 'undefined') {
+      console.log('no pen')
       self.robotStates.pen_prev_x = x;
       self.robotStates.pen_prev_y = y;
     }
@@ -899,6 +914,10 @@ function EV3devSim(id) {
     // clear the dragging flag
     self.dragok = false;
     self.isDragging = false;
+
+    self.setPenCoords()
+    self.robotStates.pen_prev_x = self.robotStates.pen_x;
+    self.robotStates.pen_prev_y = self.robotStates.pen_y;
   }
 
   //TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates

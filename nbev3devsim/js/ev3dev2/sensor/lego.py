@@ -3,6 +3,9 @@ import ev3dev2_glue, time
 # Needed to prevent loops from locking up the javascript thread
 SENSOR_DELAY = 0.01
 
+#cm to inches conversion
+CM_TO_INCHES = 2.54
+
 class ColorSensor:
   _DRIVER_NAME = 'lego-ev3-color'
 
@@ -213,15 +216,15 @@ class UltrasonicSensor:
 
   @property
   def distance_inches_continuous(self):
-    return self.distance_centimeters / 2.54
+    return self.distance_centimeters / CM_TO_INCHES
 
   @property
   def distance_inches_ping(self):
-    return self.distance_centimeters / 2.54
+    return self.distance_centimeters / CM_TO_INCHES
 
   @property
   def distance_inches(self):
-    return self.distance_centimeters / 2.54
+    return self.distance_centimeters / CM_TO_INCHES
 
   @property
   def other_sensor_present(self):

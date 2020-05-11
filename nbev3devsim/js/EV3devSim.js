@@ -12,6 +12,7 @@ function EV3devSim(id) {
   const WHEEL_WIDTH = 20;
   const SENSOR_WIDTH = 30;
   const SENSOR_DIAMETER = 20;
+  const LIGHT_SENSOR_DEFAULT_ABS = 20;
 
   const ULTRASONIC_RANGE = 2550;
 
@@ -287,12 +288,12 @@ function EV3devSim(id) {
         sensorNoise: 0,
         sensor1: {
           enabled: true,
-          x: -20,
+          x: -LIGHT_SENSOR_DEFAULT_ABS,
           y: 30
         },
         sensor2: {
           enabled: true,
-          x: 20,
+          x: LIGHT_SENSOR_DEFAULT_ABS,
           y: 30
         },
         ultrasonic: {

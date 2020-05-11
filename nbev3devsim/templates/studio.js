@@ -200,9 +200,18 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstaclesLayer();
     setPos(400, 500, 0, true);
   } else if (map == 'Radial grey') {
+    //Load background
     sim.loadBackground(imagepath + '_radial_grey.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
+    
+    //Update robot config
+    sim.robotSpecs.sensor1.x = -60;
+    sim.robotSpecs.sensor2.x = 60;
+    sim.loadRobot(sim.robotSpecs);
+    sim.drawAll();
+    
+    //Set initial location
     setPos(100, 400, 0, true);
   } else if (map == 'Grey and black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');

@@ -142,7 +142,7 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         # TO DO
         # - log all sensor channels
         # - add timestamp
-        if obj.startswith('Ultrasonic') or obj.startswith('Colour'):
+        if obj.startswith(('Ultrasonic:', 'Colour:', 'Light_left:', 'Light_right:', 'Gyro:')):
             typ = obj.split(': ')[0]
             val = float(obj.split(': ')[1])
             self.results_log.append({'index': datetime.utcnow(), typ: val})

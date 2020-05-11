@@ -1,6 +1,6 @@
 from IPython.core.magic import (magics_class, line_cell_magic, Magics)
 from IPython.core import magic_arguments
-from IPython.display import Javascript, clear_output
+from IPython.display import Javascript, clear_output, display
 
 import time
 

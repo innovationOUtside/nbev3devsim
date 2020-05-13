@@ -47,6 +47,7 @@ function EV3devSim(id) {
   self.wallsPresent = true;
   self.obstaclesPresent = true;
   self.drawUltrasonic = false;
+  self.collaborative = false;
 
   //Should this be part of robotStates?
   self.previousChartTraces = [];

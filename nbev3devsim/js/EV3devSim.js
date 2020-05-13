@@ -8,6 +8,7 @@ function EV3devSim(id) {
   const HEIGHT = 1143;
 
   const BACK = -120;
+  const DRAG_DIAMETER = 150;
 
   const WHEEL_WIDTH = 20;
   const SENSOR_WIDTH = 30;
@@ -32,9 +33,17 @@ function EV3devSim(id) {
 
   self.obstacles = [];
 
+  // Simulator scheduling:
+  //
+  // A timer calls the animate function every (1000 / fps) seconds
+  // The fps rate is therefore the frame period in ms(?)
   self.fps = 30;
+  // The clock is a counter that increments for every call of the animate function
   self.clock = 0;
+  // The timer is used by setInterval / clearInterval to manage
+  // a recurring timer that is used to trigger animation frame updates
   self.timer = null;
+
   self.wallsPresent = true;
   self.obstaclesPresent = true;
   self.drawUltrasonic = false;
@@ -289,12 +298,14 @@ function EV3devSim(id) {
         sensor1: {
           enabled: true,
           x: -LIGHT_SENSOR_DEFAULT_ABS,
-          y: 30
+          y: 30,
+          diameter: SENSOR_DIAMETER
         },
         sensor2: {
           enabled: true,
           x: LIGHT_SENSOR_DEFAULT_ABS,
-          y: 30
+          y: 30,
+          diameter: SENSOR_DIAMETER
         },
         ultrasonic: {
           enabled: true,
@@ -421,7 +432,7 @@ function EV3devSim(id) {
     ctx.arc(
       self.ROBOT_X_CENTER + robotSpecs.sensor1.x,
       self.ROBOT_Y_CENTER + robotSpecs.sensor1.y,
-      SENSOR_DIAMETER / 2,
+      robotSpecs.sensor1.diameter / 2,
       0, 2 * Math.PI
     );
     ctx.fill();
@@ -432,7 +443,7 @@ function EV3devSim(id) {
       ctx.arc(
         self.ROBOT_X_CENTER + robotSpecs.sensor2.x,
         self.ROBOT_Y_CENTER + robotSpecs.sensor2.y,
-        SENSOR_DIAMETER / 2,
+        robotSpecs.sensor2.diameter / 2,
         0, 2 * Math.PI
       );
       ctx.fill();
@@ -815,12 +826,12 @@ function EV3devSim(id) {
 
     var x1 = cos * self.robotSpecs.sensor1.x - sin * self.robotSpecs.sensor1.y + self.robotStates.x;
     var y1 = -(sin * self.robotSpecs.sensor1.x + cos * self.robotSpecs.sensor1.y) + (HEIGHT - self.robotStates.y);
-    self.robotStates.sensor1 = self.getSensorValues(x1, y1);
+    self.robotStates.sensor1 = self.getSensorValues(x1, y1, self.robotStates.sensor1.diameter);
 
     if (typeof self.robotSpecs.sensor2 != 'undefined') {
       var x2 = cos * self.robotSpecs.sensor2.x - sin * self.robotSpecs.sensor2.y + self.robotStates.x;
       var y2 = -(sin * self.robotSpecs.sensor2.x + cos * self.robotSpecs.sensor2.y) + (HEIGHT - self.robotStates.y);
-      self.robotStates.sensor2 = self.getSensorValues(x2, y2);
+      self.robotStates.sensor2 = self.getSensorValues(x2, y2, self.robotStates.sensor2.diameter);
     }
   };
 
@@ -841,26 +852,28 @@ function EV3devSim(id) {
     return raw;
   }
 
-  this.getSensorValues = function (x, y) {
+  this.getSensorValues = function (x, y, diameter=SENSOR_DIAMETER) {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
+
+    //The following assumes that both sensors have the same diameter
     var sensorBox = self.backgroundCtx.getImageData(
-      x - SENSOR_DIAMETER / 2,
-      y - SENSOR_DIAMETER / 2,
-      SENSOR_DIAMETER,
-      SENSOR_DIAMETER
+      x - diameter / 2,
+      y - diameter / 2,
+      diameter,
+      diameter
     );
 
     var redTotal = 0;
     var greenTotal = 0;
     var blueTotal = 0;
     var count = 0;
-    var radius = SENSOR_DIAMETER / 2;
+    var radius = diameter / 2;
     var radiusSquare = radius ** 2;
-    for (let row = 0; row < SENSOR_DIAMETER; row++) {
-      for (let col = 0; col < SENSOR_DIAMETER; col++) {
+    for (let row = 0; row < diameter; row++) {
+      for (let col = 0; col < diameter; col++) {
         if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
-          let offset = row * (SENSOR_DIAMETER * 4) + col * 4;
+          let offset = row * (diameter * 4) + col * 4;
           count++;
           redTotal += self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
           greenTotal += self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
@@ -871,13 +884,6 @@ function EV3devSim(id) {
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 
-
-  /// TH TEST START
-
-  // BROKEN
-  // The co-ordinate system seems to be somewhat broken?
-  // I can't work out the relationship between mouse co-ords and robot co-ords
-  // But given that, dragging of the object works, albeit not very controllably
 
   // handle mousedown events
   this.myDown = function (e) {
@@ -942,8 +948,9 @@ function EV3devSim(id) {
     var my = cursorCoords.my
     // TO DO find the size in the sim coord schem of the robot?
     //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
-    var rW = 100 / 2
-    var rH = 100 / 2
+
+    var rW = DRAG_DIAMETER / 2;
+    var rH = DRAG_DIAMETER / 2;
     if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
       console.log('Over the robot, ish...');
     }

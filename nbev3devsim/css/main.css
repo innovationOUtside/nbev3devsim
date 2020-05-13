@@ -55,7 +55,7 @@
 }
 
 #output > .error {
-  color: red;
+  color: pink;
 }
 
 #editor {
@@ -91,10 +91,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  top: 200px;
-  left: 200;
-  width: 681;
-  height: 400;
+  top: 50px;
+  /* left: 200px; */
+  width: 80%;
+  height: 80%;
   border: solid 2px black;
   border-radius: 0.5em;
   padding: 0.5em;
@@ -189,3 +189,9 @@
 .closed {
   top: -1000px !important;
 }
+
+#run {
+  background-color: yellow;
+}
+
+/* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */

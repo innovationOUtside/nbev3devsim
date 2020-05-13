@@ -1,4 +1,4 @@
-function setPos(x, y, angle, init=false) {
+function setPos(x, y, angle, init=false, reset=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
   var angleRadian = parseFloat(angle) / 180 * Math.PI;
@@ -18,6 +18,10 @@ function setPos(x, y, angle, init=false) {
   }
 
   sim.setRobotPos(x, y, angleRadian);
+  if (reset) {
+    delete sim.robotStates.pen_prev_x;
+    delete sim.robotStates.pen_prev_y;
+  }
   sim.drawAll();
 }
 
@@ -108,18 +112,28 @@ document.getElementById('obstacles').addEventListener('click', function () {
   }
 });
 document.getElementById('move').addEventListener('click', function () {
-  setPos(
-    document.getElementById('xPos').value,
-    document.getElementById('yPos').value,
-    document.getElementById('angle').value
-  );
+  var tmp = sim.robotStates.penDown;
+  sim.robotStates.penDown = false;
+
+  var x = document.getElementById('xPos').value;
+  var y = document.getElementById('yPos').value;
+  var angle = document.getElementById('angle').value;
+
+  setPos(x, y, angle, reset=true);
+  sim.robotStates.penDown = tmp;
 });
 document.getElementById('reset').addEventListener('click', function () {
+  // Don't draw the trace when we reset the robot position
+  var tmp = sim.robotStates.penDown;
+  sim.robotStates.penDown = false;
+  
   setPos(
     sim.robotStates._x,
     sim.robotStates._y,
-    sim.robotStates._angle
+    sim.robotStates._angle,
+    reset=true
   );
+  sim.robotStates.penDown = tmp;
 });
 
 document.getElementById('penDown').addEventListener('change', function (e) {
@@ -185,7 +199,20 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(400, 500, 0, true);
-
+  } else if (map == 'Radial grey') {
+    //Load background
+    sim.loadBackground(imagepath + '_radial_grey.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    
+    //Update robot config
+    sim.robotSpecs.sensor1.x = -60;
+    sim.robotSpecs.sensor2.x = 60;
+    sim.loadRobot(sim.robotSpecs);
+    sim.drawAll();
+    
+    //Set initial location
+    setPos(100, 400, 0, true);
   } else if (map == 'Grey and black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();
@@ -449,6 +476,11 @@ function runit() {
       sim.stopAnimation();
       Sk.running = false;
     },
+    // The following handles errors that arise when executing
+    // a robot control program in the simulator.
+    // Is there a way we can get error messages displayed in the output area
+    // of the code cell whose downloaded code we are running?
+    // Related issue: https://github.com/innovationOUtside/nbev3devsim/issues/49
     function (err) {
       Sk.running = false;
       sim.stopAnimation();

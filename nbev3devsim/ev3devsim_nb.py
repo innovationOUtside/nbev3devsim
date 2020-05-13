@@ -25,6 +25,8 @@ from IPython.display import HTML, display
 from IPython import get_ipython
 from datetime import datetime
 
+import pandas as pd
+
 # +
 from pkg_resources import resource_exists, resource_filename
 
@@ -142,7 +144,7 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         # TO DO
         # - log all sensor channels
         # - add timestamp
-        if obj.startswith('Ultrasonic') or obj.startswith('Colour'):
+        if obj.startswith(('Ultrasonic:', 'Colour:', 'Light_left:', 'Light_right:', 'Gyro:')):
             typ = obj.split(': ')[0]
             val = float(obj.split(': ')[1])
             self.results_log.append({'index': datetime.utcnow(), typ: val})
@@ -174,6 +176,20 @@ def sim_report(retval=False):
     print("Python thinks the sim data is: " + repr(SimInformation.data))
     if retval:
         return SimInformation.data
+
+
+def get_dataframe_from_datalog(datalog):
+    """Generate a dataframe from datalog."""
+    df = pd.DataFrame(datalog)
+    if not df.empty:
+        df = df.melt(id_vars='index').dropna()
+        df['index'] = pd.to_timedelta(df['index']-df['index'].min())
+    return df
+
+def get_dataframe_from_widget(widget):
+    """Generate a dataframe from retrieved simulator datalog."""
+    return get_dataframe_from_datalog(widget.results_log)
+
 
 # + tags=["active-ipynb"]
 # import asyncio

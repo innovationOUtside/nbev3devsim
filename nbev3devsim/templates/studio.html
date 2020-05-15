@@ -7,6 +7,7 @@
       <option>Grey bands</option>
       <option>Grey and black</option>
       <option>Radial grey</option>
+      <option>Lollipop</option>
       <option>WRO 2019 Regular Junior</option>
       <option>WRO 2018 Regular Junior</option>
       <option>FLL 2019 - City Shaper</option>
@@ -34,9 +35,10 @@
       <div class="leftFlex">
         <button id="runCode">Run</button>
         <button id="stop">Stop</button>
+        <input type="checkbox" id="collaborative">Collaborative
       </div>
       <div class="center">
-        
+
         <input type="checkbox" id="showChart">Show chart
         <input type="checkbox" id="penDown">Pen Down
       </div>
@@ -45,6 +47,15 @@
         <button id="clearChart">Clear Chart</button>
         <button id="upload">Load</button>
         <button id="download">Save</button>
+
+        <div id="readings">Sensor readings:
+          <div>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
+          </div>
+          <div>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>
+          </div>
+          <div>Ultrasonic: <span id="ultrasonic_value"></span></div>
+          <div>Gyro: <span id="gyro_value"></span></div>
+        </div>
       </div>
     </div>
     <div id="noise_controls">
@@ -69,6 +80,7 @@
 </div>
 
 <div id="field"></div>
+
 
 <div id="robotConfigurator" class="closed">
   <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>

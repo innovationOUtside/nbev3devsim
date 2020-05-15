@@ -22,7 +22,12 @@ function setPos(x, y, angle, init=false, reset=false) {
     delete sim.robotStates.pen_prev_x;
     delete sim.robotStates.pen_prev_y;
   }
+
+  // Render scene
   sim.drawAll();
+
+  //Update sensor reading display
+  sim.displaySensorValues();
 }
 
 var sim = new EV3devSim('field');
@@ -83,6 +88,14 @@ document.getElementById('obstaclesConfiguratorupload').addEventListener('click',
     };
     reader.readAsText(e.target.files[0]);
   });
+});
+
+document.getElementById('collaborative').addEventListener('click', function () {
+  if (document.getElementById('collaborative').checked) {
+    sim.collaborative = true;
+  } else {
+    sim.collaborative = false;
+  }
 });
 
 document.getElementById('showRays').addEventListener('click', function () {
@@ -210,7 +223,7 @@ document.getElementById('map').addEventListener('input', function () {
     sim.robotSpecs.sensor2.x = 60;
     sim.loadRobot(sim.robotSpecs);
     sim.drawAll();
-    
+
     //Set initial location
     setPos(100, 400, 0, true);
   } else if (map == 'Grey and black') {
@@ -218,6 +231,11 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(500, 250, 90, true);
+  } else if (map == 'Lollipop') {
+    sim.loadBackground(imagepath + '_line_follower_track.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(750, 375, -180, true);
 
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');
@@ -386,7 +404,10 @@ function outf(text) {
   var mypre = document.getElementById("output");
 
   // Can we somehow stream data back to py context?
-  report_callback(text)
+  report_callback(text);
+
+  // Can we also send something back to py context and then get something back from py in return?
+  if (sim.collaborative) report_callback_responder(text);
 
   if (sim.showChart) {
     // Try updating the chart
@@ -416,6 +437,19 @@ function outf(text) {
 
   mypre.innerHTML = mypre.innerHTML + text;
   mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+  if (sim.collaborative) {
+    if (typeof element !== 'undefined') {
+      if (typeof element.response !== 'undefined') {
+        var response = element.response;
+        if (response != '') { 
+          mypre.innerHTML = mypre.innerHTML + response;
+          mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+        }
+        element.response = '';
+      }
+    }
+  }
+
 }
 
 function builtinRead(x) {

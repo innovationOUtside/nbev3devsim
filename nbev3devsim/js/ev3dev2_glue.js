@@ -3,284 +3,284 @@
 
 var $builtinmodule = function(name) {
 
-  // TH - hack
-  //sim = Sk.builtins.sim
+    // TH - hack
+    sim = Sk.builtins.sim;
 
-  var mod = {};
+    var mod = {};
 
-  mod.showme = new Sk.builtin.func(function() {
-    return 'okay?'
-  });
-
-  mod.get_clock = new Sk.builtin.func(function() {
-    return sim.clock / sim.fps;
-  });
-
-  mod.Motor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-    var self = this;
-
-    $loc.__init__ = new Sk.builtin.func(function(self, address) {
-      if (address.v == 'outB') {
-        self.side = 'left';
-        self.wheel = sim.robotStates.leftWheel;
-      } else if (address.v == 'outC') {
-        self.side = 'right';
-        self.wheel = sim.robotStates.rightWheel;
-      } else {
-        throw new Sk.builtin.TypeError('No motor connected to ' + String(address.v));
-      }
+    mod.showme = new Sk.builtin.func(function() {
+        return "okay?";
     });
 
-    $loc.command = new Sk.builtin.func(function(self, command) {
-      if (command.v == 'run-timed') {
-        self.wheel.time_target = sim.clock + self.wheel.time_sp * sim.fps;
-        self.wheel.state = 'running';
-
-      } else if (command.v == 'run-to-rel-pos') {
-        self.wheel.position_target = self.wheel.pos + self.wheel.position_sp;
-        self.wheel.state = 'running';
-
-      } else if (command.v == 'run-to-abs-pos') {
-        self.wheel.position_target = self.wheel.position_sp;
-        self.wheel.state = 'running';
-
-      } else if (command.v == 'run-forever') {
-        self.wheel.state = 'running';
-      }
-
-      self.wheel.command = command.v;
+    mod.get_clock = new Sk.builtin.func(function() {
+        return sim.clock / sim.fps;
     });
 
-    $loc.state = new Sk.builtin.func(function(self) {
-      return self.wheel.state;
-    });
+    mod.Motor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        var self = this;
 
-    $loc.speed_sp = new Sk.builtin.func(function(self, speed_sp) {
-      if (typeof speed_sp != 'undefined') {
-        self.wheel.speed_sp = speed_sp.v;
-      } else {
-        return self.wheel.speed_sp;
-      }
-    });
+        $loc.__init__ = new Sk.builtin.func(function(self, address) {
+            if (address.v == "outB") {
+                self.side = "left";
+                self.wheel = sim.robotStates.leftWheel;
+            } else if (address.v == "outC") {
+                self.side = "right";
+                self.wheel = sim.robotStates.rightWheel;
+            } else {
+                throw new Sk.builtin.TypeError("No motor connected to " + String(address.v));
+            }
+        });
 
-    $loc.time_sp = new Sk.builtin.func(function(self, time_sp) {
-      if (typeof time_sp != 'undefined') {
-        self.wheel.time_sp = time_sp.v;
-      } else {
-        return self.wheel.time_sp;
-      }
-    });
+        $loc.command = new Sk.builtin.func(function(self, command) {
+            if (command.v == "run-timed") {
+                self.wheel.time_target = sim.clock + self.wheel.time_sp * sim.fps;
+                self.wheel.state = "running";
 
-    $loc.pos = new Sk.builtin.func(function(self, pos) {
-      if (typeof pos != 'undefined') {
-        self.wheel.pos = pos.v;
-      } else {
-        return self.wheel.pos;
-      }
-    });
+            } else if (command.v == "run-to-rel-pos") {
+                self.wheel.position_target = self.wheel.pos + self.wheel.position_sp;
+                self.wheel.state = "running";
 
-    $loc.polarity = new Sk.builtin.func(function(self, polarity) {
-      if (typeof polarity != 'undefined') {
-        self.wheel.polarity = polarity.v;
-      } else {
-        return self.wheel.polarity;
-      }
-    });
+            } else if (command.v == "run-to-abs-pos") {
+                self.wheel.position_target = self.wheel.position_sp;
+                self.wheel.state = "running";
 
-    $loc.position_sp = new Sk.builtin.func(function(self, position_sp) {
-      if (typeof position_sp != 'undefined') {
-        self.wheel.position_sp = position_sp.v;
-      } else {
-        return self.wheel.position_sp;
-      }
-    });
+            } else if (command.v == "run-forever") {
+                self.wheel.state = "running";
+            }
 
-    $loc.speed = new Sk.builtin.func(function(self) {
-      return self.wheel.speed;
-    });
+            self.wheel.command = command.v;
+        });
 
-  }, 'Motor', []);
+        $loc.state = new Sk.builtin.func(function(self) {
+            return self.wheel.state;
+        });
 
-  mod.ColorSensor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-    var self = this;
+        $loc.speed_sp = new Sk.builtin.func(function(self, speed_sp) {
+            if (typeof speed_sp != "undefined") {
+                self.wheel.speed_sp = speed_sp.v;
+            } else {
+                return self.wheel.speed_sp;
+            }
+        });
 
-    $loc.__init__ = new Sk.builtin.func(function(self, address) {
-      if (address.v == 'in2') {
-        self.side = 'left';
-      } else if (address.v == 'in3') {
-        self.side = 'right';
-      } else {
-        throw new Sk.builtin.TypeError('No color sensor connected to ' + String(address.v));
-      }
-    });
+        $loc.time_sp = new Sk.builtin.func(function(self, time_sp) {
+            if (typeof time_sp != "undefined") {
+                self.wheel.time_sp = time_sp.v;
+            } else {
+                return self.wheel.time_sp;
+            }
+        });
 
-    $loc.value = new Sk.builtin.func(function(self) {
-      if (self.side == 'left') {
-        return sim.robotStates.sensor1;
-      } else if (self.side == 'right') {
-        return sim.robotStates.sensor2;
-      }
-      return [0,0,0];
-    });
+        $loc.pos = new Sk.builtin.func(function(self, pos) {
+            if (typeof pos != "undefined") {
+                self.wheel.pos = pos.v;
+            } else {
+                return self.wheel.pos;
+            }
+        });
 
-    $loc.valueLAB = new Sk.builtin.func(function(self) {
-      var rgb = [0, 0, 0];
-      var xyz = [0, 0, 0];
-      var lab = [0, 0, 0];
+        $loc.polarity = new Sk.builtin.func(function(self, polarity) {
+            if (typeof polarity != "undefined") {
+                self.wheel.polarity = polarity.v;
+            } else {
+                return self.wheel.polarity;
+            }
+        });
 
-      if (self.side == 'left') {
-        rgb = sim.robotStates.sensor1;
-      } else if (self.side == 'right') {
-        rgb = sim.robotStates.sensor2;
-      }
+        $loc.position_sp = new Sk.builtin.func(function(self, position_sp) {
+            if (typeof position_sp != "undefined") {
+                self.wheel.position_sp = position_sp.v;
+            } else {
+                return self.wheel.position_sp;
+            }
+        });
 
-      for (let i=0; i<3; i++) {
-        let c = rgb[i] / 255;
-        if (c > 0.04045) {
-          rgb[i] = Math.pow((c + 0.055) / 1.055, 2.4);
-        } else {
-          rgb[i] = c / 12.92;
-        }
-      }
+        $loc.speed = new Sk.builtin.func(function(self) {
+            return self.wheel.speed;
+        });
 
-      xyz[0] = (rgb[0] * 0.4124 + rgb[1] * 0.3576 + rgb[2] * 0.1805) / 0.95047;
-      xyz[1] = (rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722) / 1.00000;
-      xyz[2] = (rgb[0] * 0.0193 + rgb[1] * 0.1192 + rgb[2] * 0.9505) / 1.08883;
+    }, "Motor", []);
 
-      for (let i=0; i<3; i++) {
-        if (xyz[i] > 0.008856) {
-          xyz[i] = Math.pow(xyz[i], 1/3);
-        } else {
-          xyz[i] = (7.787 * xyz[i]) + 16/116;
-        }
-      }
+    mod.ColorSensor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        var self = this;
 
-      lab[0] = (116 * xyz[1]) - 16;
-      lab[1] = 500 * (xyz[0] - xyz[1]);
-      lab[2] = 200 * (xyz[1] - xyz[2]);
+        $loc.__init__ = new Sk.builtin.func(function(self, address) {
+            if (address.v == "in2") {
+                self.side = "left";
+            } else if (address.v == "in3") {
+                self.side = "right";
+            } else {
+                throw new Sk.builtin.TypeError("No color sensor connected to " + String(address.v));
+            }
+        });
 
-      return lab;
-    });
+        $loc.value = new Sk.builtin.func(function(self) {
+            if (self.side == "left") {
+                return sim.robotStates.sensor1;
+            } else if (self.side == "right") {
+                return sim.robotStates.sensor2;
+            }
+            return [0,0,0];
+        });
 
-    $loc.valueHSV = new Sk.builtin.func(function(self) {
-      var rgb = [0, 0, 0];
-      var hsv = [0, 0, 0];
+        $loc.valueLAB = new Sk.builtin.func(function(self) {
+            var rgb = [0, 0, 0];
+            var xyz = [0, 0, 0];
+            var lab = [0, 0, 0];
 
-      if (self.side == 'left') {
-        rgb = sim.robotStates.sensor1;
-      } else if (self.side == 'right') {
-        rgb = sim.robotStates.sensor2;
-      }
-      for (let i=0; i<3; i++) {
-        rgb[i] = rgb[i] / 255;
-      }
+            if (self.side == "left") {
+                rgb = sim.robotStates.sensor1;
+            } else if (self.side == "right") {
+                rgb = sim.robotStates.sensor2;
+            }
 
-      var cMax = Math.max(...rgb);
-      var cMin = Math.min(...rgb);
-      var diff = cMax - cMin;
+            for (let i=0; i<3; i++) {
+                let c = rgb[i] / 255;
+                if (c > 0.04045) {
+                    rgb[i] = Math.pow((c + 0.055) / 1.055, 2.4);
+                } else {
+                    rgb[i] = c / 12.92;
+                }
+            }
 
-      if (cMax == cMin) {
-        hsv[0] = 0;
-      } else if (cMax == rgb[0]) {
-        hsv[0] = 60 * (rgb[1] - rgb[2]) / diff;
-      } else if (cMax == rgb[1]) {
-        hsv[0] = 60 * (2 + (rgb[2] - rgb[0]) / diff);
-      } else {
-        hsv[0] = 60 * (4 + (rgb[0] - rgb[1]) / diff);
-      }
-      if (hsv[0] < 0) {
-        hsv[0] += 360;
-      }
+            xyz[0] = (rgb[0] * 0.4124 + rgb[1] * 0.3576 + rgb[2] * 0.1805) / 0.95047;
+            xyz[1] = (rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722) / 1.00000;
+            xyz[2] = (rgb[0] * 0.0193 + rgb[1] * 0.1192 + rgb[2] * 0.9505) / 1.08883;
 
-      if (cMax == 0) {
-        hsv[1] = 0;
-      } else {
-        hsv[1] = diff / cMax * 100;
-      }
+            for (let i=0; i<3; i++) {
+                if (xyz[i] > 0.008856) {
+                    xyz[i] = Math.pow(xyz[i], 1/3);
+                } else {
+                    xyz[i] = (7.787 * xyz[i]) + 16/116;
+                }
+            }
 
-      hsv[2] = cMax * 100;
+            lab[0] = (116 * xyz[1]) - 16;
+            lab[1] = 500 * (xyz[0] - xyz[1]);
+            lab[2] = 200 * (xyz[1] - xyz[2]);
 
-      return hsv;
-    });
+            return lab;
+        });
 
-    $loc.valueHLS = new Sk.builtin.func(function(self) {
-      var rgb = [0, 0, 0];
-      var hls = [0, 0, 0];
+        $loc.valueHSV = new Sk.builtin.func(function(self) {
+            var rgb = [0, 0, 0];
+            var hsv = [0, 0, 0];
 
-      if (self.side == 'left') {
-        rgb = sim.robotStates.sensor1;
-      } else if (self.side == 'right') {
-        rgb = sim.robotStates.sensor2;
-      }
-      for (let i=0; i<3; i++) {
-        rgb[i] = rgb[i] / 255;
-      }
+            if (self.side == "left") {
+                rgb = sim.robotStates.sensor1;
+            } else if (self.side == "right") {
+                rgb = sim.robotStates.sensor2;
+            }
+            for (let i=0; i<3; i++) {
+                rgb[i] = rgb[i] / 255;
+            }
 
-      var cMax = Math.max(...rgb);
-      var cMin = Math.min(...rgb);
-      var diff = cMax - cMin;
+            var cMax = Math.max(...rgb);
+            var cMin = Math.min(...rgb);
+            var diff = cMax - cMin;
 
-      if (cMax == cMin) {
-        hls[0] = 0;
-      } else if (cMax == rgb[0]) {
-        hls[0] = 60 * (rgb[1] - rgb[2]) / diff;
-      } else if (cMax == rgb[1]) {
-        hls[0] = 60 * (2 + (rgb[2] - rgb[0]) / diff);
-      } else {
-        hls[0] = 60 * (4 + (rgb[0] - rgb[1]) / diff);
-      }
-      if (hls[0] < 0) {
-        hls[0] += 360;
-      }
+            if (cMax == cMin) {
+                hsv[0] = 0;
+            } else if (cMax == rgb[0]) {
+                hsv[0] = 60 * (rgb[1] - rgb[2]) / diff;
+            } else if (cMax == rgb[1]) {
+                hsv[0] = 60 * (2 + (rgb[2] - rgb[0]) / diff);
+            } else {
+                hsv[0] = 60 * (4 + (rgb[0] - rgb[1]) / diff);
+            }
+            if (hsv[0] < 0) {
+                hsv[0] += 360;
+            }
 
-      if (cMax == 0 || cMin == 255) {
-        hls[2] = 0;
-      } else {
-        hls[2] = diff / (1 - Math.abs(cMax + cMin - 1)) * 100;
-      }
+            if (cMax == 0) {
+                hsv[1] = 0;
+            } else {
+                hsv[1] = diff / cMax * 100;
+            }
 
-      hls[1] = (cMax + cMin) / 2 * 100;
+            hsv[2] = cMax * 100;
 
-      return hls;
-    });
+            return hsv;
+        });
 
-  }, 'ColorSensor', []);
+        $loc.valueHLS = new Sk.builtin.func(function(self) {
+            var rgb = [0, 0, 0];
+            var hls = [0, 0, 0];
 
-  mod.GyroSensor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-    var self = this;
+            if (self.side == "left") {
+                rgb = sim.robotStates.sensor1;
+            } else if (self.side == "right") {
+                rgb = sim.robotStates.sensor2;
+            }
+            for (let i=0; i<3; i++) {
+                rgb[i] = rgb[i] / 255;
+            }
 
-    $loc.__init__ = new Sk.builtin.func(function(self, address) {
-      if (address.v != 'in4') {
-        throw new Sk.builtin.TypeError('No gyro sensor connected to ' + String(address.v));
-      }
-    });
+            var cMax = Math.max(...rgb);
+            var cMin = Math.min(...rgb);
+            var diff = cMax - cMin;
 
-    $loc.angleAndRate = new Sk.builtin.func(function(self) {
-      var gyro = [];
+            if (cMax == cMin) {
+                hls[0] = 0;
+            } else if (cMax == rgb[0]) {
+                hls[0] = 60 * (rgb[1] - rgb[2]) / diff;
+            } else if (cMax == rgb[1]) {
+                hls[0] = 60 * (2 + (rgb[2] - rgb[0]) / diff);
+            } else {
+                hls[0] = 60 * (4 + (rgb[0] - rgb[1]) / diff);
+            }
+            if (hls[0] < 0) {
+                hls[0] += 360;
+            }
 
-      gyro[0] = Math.round(sim.robotStates.gyro[0]);
-      gyro[1] = Math.round(sim.robotStates.gyro[1]);
+            if (cMax == 0 || cMin == 255) {
+                hls[2] = 0;
+            } else {
+                hls[2] = diff / (1 - Math.abs(cMax + cMin - 1)) * 100;
+            }
 
-      return gyro;
-    });
+            hls[1] = (cMax + cMin) / 2 * 100;
 
-  }, 'GyroSensor', []);
+            return hls;
+        });
 
-  mod.UltrasonicSensor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-    var self = this;
+    }, "ColorSensor", []);
 
-    $loc.__init__ = new Sk.builtin.func(function(self, address) {
-      if (address.v != 'in1') {
-        throw new Sk.builtin.TypeError('No ultrasonic sensor connected to ' + String(address.v));
-      }
-    });
+    mod.GyroSensor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        var self = this;
 
-    $loc.dist = new Sk.builtin.func(function(self) {
-      return Math.round(sim.robotStates.ultrasonic);
-    });
+        $loc.__init__ = new Sk.builtin.func(function(self, address) {
+            if (address.v != "in4") {
+                throw new Sk.builtin.TypeError("No gyro sensor connected to " + String(address.v));
+            }
+        });
 
-  }, 'UltrasonicSensor', []);
+        $loc.angleAndRate = new Sk.builtin.func(function(self) {
+            var gyro = [];
+
+            gyro[0] = Math.round(sim.robotStates.gyro[0]);
+            gyro[1] = Math.round(sim.robotStates.gyro[1]);
+
+            return gyro;
+        });
+
+    }, "GyroSensor", []);
+
+    mod.UltrasonicSensor = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        var self = this;
+
+        $loc.__init__ = new Sk.builtin.func(function(self, address) {
+            if (address.v != "in1") {
+                throw new Sk.builtin.TypeError("No ultrasonic sensor connected to " + String(address.v));
+            }
+        });
+
+        $loc.dist = new Sk.builtin.func(function(self) {
+            return Math.round(sim.robotStates.ultrasonic);
+        });
+
+    }, "UltrasonicSensor", []);
 
 
-  return mod;
+    return mod;
 };

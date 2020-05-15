@@ -22,7 +22,12 @@ function setPos(x, y, angle, init=false, reset=false) {
     delete sim.robotStates.pen_prev_x;
     delete sim.robotStates.pen_prev_y;
   }
+
+  // Render scene
   sim.drawAll();
+
+  //Update sensor reading display
+  sim.displaySensorValues();
 }
 
 var sim = new EV3devSim('field');

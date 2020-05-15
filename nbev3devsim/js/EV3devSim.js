@@ -571,6 +571,7 @@ function EV3devSim(id) {
 
     self.drawAll();
     self.getColorSensorsValues();
+    self.displaySensorValues();
   };
 
   this.drawAll = function () {
@@ -885,6 +886,25 @@ function EV3devSim(id) {
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 
+  //https://stackoverflow.com/a/14323127/454773
+  this.rgb = function (r,g,b) {
+    return 'rgb(' + [(r||0),(g||0),(b||0)].join(',') + ')';
+  }
+
+  this.getRGB = function(val){
+    return self.rgb(parseInt(val[0]), parseInt(val[1]), parseInt(val[2]));
+  }
+
+  //Update the sensor display panel
+  this.displaySensorValues = function () {
+    document.getElementById('sensor1_value').innerHTML = (self.robotStates.sensor1[0]/255).toFixed(2) + '('+self.robotStates.sensor1[0].toFixed(2) +', ' + self.robotStates.sensor1[1].toFixed(2) + ', ' + self.robotStates.sensor1[2].toFixed(2)+')';
+    document.getElementById('sensor2_value').innerHTML = (self.robotStates.sensor2[0]/255).toFixed(2) + '('+ self.robotStates.sensor2[0].toFixed(2) +', ' + self.robotStates.sensor2[1].toFixed(2) + ', ' + self.robotStates.sensor2[2].toFixed(2)+')';
+    document.getElementById('ultrasonic_value').innerHTML = self.robotStates.ultrasonic.toFixed(2);
+    document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) +", "+self.robotStates.gyro[1].toFixed(2) ;
+  
+    document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(self.robotStates.sensor1);
+    document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(self.robotStates.sensor2);
+  }
 
   // handle mousedown events
   this.myDown = function (e) {
@@ -926,6 +946,10 @@ function EV3devSim(id) {
     self.setPenCoords()
     self.robotStates.pen_prev_x = self.robotStates.pen_x;
     self.robotStates.pen_prev_y = self.robotStates.pen_y;
+
+    // Get and and display color sensor values
+    self.getColorSensorsValues();
+    self.displaySensorValues();
   }
 
   //TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
@@ -987,6 +1011,9 @@ function EV3devSim(id) {
       // reset the starting mouse position for the next mousemove
       self.drag_startX = mx;
       self.drag_startY = my;
+
+      //Update sensor reading display
+      //self.displaySensorValues();
 
     }
   }

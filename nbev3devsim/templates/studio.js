@@ -226,6 +226,11 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(500, 250, 90, true);
+  } else if (map == 'Lollipop') {
+    sim.loadBackground(imagepath + '_line_follower_track.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(750, 375, -180, true);
 
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');

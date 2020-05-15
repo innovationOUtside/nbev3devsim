@@ -2,16 +2,8 @@
 /* exported $builtinmodule */
 
 var $builtinmodule = function(name) {
-
-  // TH - hack
-  //sim = Sk.builtins.sim
-
   var mod = {};
-
-  mod.showme = new Sk.builtin.func(function() {
-    return 'okay?'
-  });
-
+    
   mod.get_clock = new Sk.builtin.func(function() {
     return sim.clock / sim.fps;
   });

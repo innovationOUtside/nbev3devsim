@@ -150,18 +150,13 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
             self.results_log.append({'index': datetime.utcnow(), typ: val})
             self.count += 1
 
-    def responder(self, obj):
-        """ Callback function that tries to respond to widget."""
-        response = f'pingpong {obj}'
-        self.set_element("response", response)
-
     def ready(self):
         "Initialise the simulator."
         # The report_callback function is called from the simulator code
         # whenever something is written to the output window.
         # At the moment, we use this as a basis for data logging.
         #self.js_init(script_built, report_callback=print_repr)
-        self.js_init(script_built, report_callback=self.print_repr, report_callback_responder=self.responder)
+        self.js_init(script_built, report_callback=self.print_repr)
 
 
 # + persistent_id="1177dc49-9ea2-471b-86ce-17980b192d1f" last_executed_text="class SimInformation:\n    data = \"unknown: apparently the callback hasn't been called yet.\"\n    \ndef sim_callback(data):\n    \"\"\"Set SimInformation class data value.\"\"\"\n    SimInformation.data = data\n\ndef sim_get_data(sim_widget, sim_var=\"sim.robotStates\"):\n    \"\"\"Run async data request on simulator widget.\"\"\"\n    sim_widget.get_value_async(sim_callback, sim_var)\n\ndef sim_report(retval=False):\n    \"\"\"Get simulator data value.\"\"\"\n    print(\"Python thinks the sim data is: \" + repr(SimInformation.data))\n    if retval:\n        return SimInformation.data" execution_event_id="eb4ffdfb-af16-4c0c-8309-f159a7303734"

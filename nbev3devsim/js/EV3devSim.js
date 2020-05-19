@@ -33,6 +33,44 @@ function EV3devSim(id) {
 
   self.obstacles = [];
 
+  self.default_robot_spec = {
+    wheeldiameter: 56,
+    wheelSpacing: 180,
+    wheelNoise: 0,
+    back: BACK,
+    pen: {
+      x: 0,
+      //y: BACK,
+      y: 0,
+      color: 'red',
+      width: 6
+    },
+    weight: 'medium',
+    // This is a covenience generic to sensor1 and sensor2
+    sensorNoise: 0,
+    sensor1: {
+      enabled: true,
+      x: -LIGHT_SENSOR_DEFAULT_ABS,
+      y: 30,
+      diameter: SENSOR_DIAMETER
+    },
+    sensor2: {
+      enabled: true,
+      x: LIGHT_SENSOR_DEFAULT_ABS,
+      y: 30,
+      diameter: SENSOR_DIAMETER
+    },
+    ultrasonic: {
+      enabled: true,
+      x: 0,
+      y: 20,
+      angle: 0,
+      noise: 0
+    },
+    gyro: {
+      enabled: true
+    }
+  };
   // Simulator scheduling:
   //
   // A timer calls the animate function every (1000 / fps) seconds
@@ -281,44 +319,7 @@ function EV3devSim(id) {
   this.loadRobot = function (robotSpecs) {
     // Load default robot specs if not provided
     if (typeof robotSpecs === 'undefined') {
-      robotSpecs = {
-        wheeldiameter: 56,
-        wheelSpacing: 180,
-        wheelNoise: 0,
-        back: BACK,
-        pen: {
-          x: 0,
-          //y: BACK,
-          y: 0,
-          color: 'red',
-          width: 6
-        },
-        weight: 'medium',
-        // This is a covenience generic to sensor1 and sensor2
-        sensorNoise: 0,
-        sensor1: {
-          enabled: true,
-          x: -LIGHT_SENSOR_DEFAULT_ABS,
-          y: 30,
-          diameter: SENSOR_DIAMETER
-        },
-        sensor2: {
-          enabled: true,
-          x: LIGHT_SENSOR_DEFAULT_ABS,
-          y: 30,
-          diameter: SENSOR_DIAMETER
-        },
-        ultrasonic: {
-          enabled: true,
-          x: 0,
-          y: 20,
-          angle: 0,
-          noise: 0
-        },
-        gyro: {
-          enabled: true
-        }
-      };
+      robotSpecs = self.default_robot_spec;
     }
     self.robotSpecs = robotSpecs;
 
@@ -891,14 +892,29 @@ function EV3devSim(id) {
     return 'rgb(' + [(r||0),(g||0),(b||0)].join(',') + ')';
   }
 
+  this.getRGBInt = function(val){
+    return [parseInt(val[0]), parseInt(val[1]), parseInt(val[2])]
+  }
+
   this.getRGB = function(val){
-    return self.rgb(parseInt(val[0]), parseInt(val[1]), parseInt(val[2]));
+    return self.rgb(self.getRGBInt(val));
+  }
+
+
+  // This follows the rerlfected light definition in ev3dev2/sensor/lego.py
+  this.getReflectedLight = function(val) {
+    var sum = 0;
+    for( var i = 0; i < val.length; i++ ){
+      sum += parseInt(val[i]); 
+    }
+    return 100.0 * sum / 765
+
   }
 
   //Update the sensor display panel
   this.displaySensorValues = function () {
-    document.getElementById('sensor1_value').innerHTML = (self.robotStates.sensor1[0]/255).toFixed(2) + '('+self.robotStates.sensor1[0].toFixed(2) +', ' + self.robotStates.sensor1[1].toFixed(2) + ', ' + self.robotStates.sensor1[2].toFixed(2)+')';
-    document.getElementById('sensor2_value').innerHTML = (self.robotStates.sensor2[0]/255).toFixed(2) + '('+ self.robotStates.sensor2[0].toFixed(2) +', ' + self.robotStates.sensor2[1].toFixed(2) + ', ' + self.robotStates.sensor2[2].toFixed(2)+')';
+    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLight(self.robotStates.sensor1)).toFixed(2) + ' ('+self.robotStates.sensor1[0].toFixed(2) +', ' + self.robotStates.sensor1[1].toFixed(2) + ', ' + self.robotStates.sensor1[2].toFixed(2)+')';
+    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLight(self.robotStates.sensor2)).toFixed(2) + ' ('+ self.robotStates.sensor2[0].toFixed(2) +', ' + self.robotStates.sensor2[1].toFixed(2) + ', ' + self.robotStates.sensor2[2].toFixed(2)+')';
     document.getElementById('ultrasonic_value').innerHTML = self.robotStates.ultrasonic.toFixed(2);
     document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) +", "+self.robotStates.gyro[1].toFixed(2) ;
   
@@ -1019,12 +1035,6 @@ function EV3devSim(id) {
   }
 
   /// TH TEST END  
-
-
-
-
-
-
 
   self.loadCanvas(id);
   self.setWallsPresent(true);

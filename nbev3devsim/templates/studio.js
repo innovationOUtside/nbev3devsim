@@ -498,6 +498,7 @@ function outf(text) {
         if (response != '') { 
           mypre.innerHTML = mypre.innerHTML + response;
           mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+          sim.pyState = response;
         }
         element.response = '';
       }

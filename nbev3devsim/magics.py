@@ -29,7 +29,7 @@ class NbEv3DevSimMagic(Magics):
     )
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
-    args = magic_arguments.parse_argstring(self.sim_magic, line)
+    args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
     preload='''
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
@@ -46,9 +46,11 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
   @magic_arguments.argument('--sim', '-s', default='roboSim',
      help='Simulator object.'
     )
+  @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
+  @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
-    args = magic_arguments.parse_argstring(self.sim_magic, line)
+    args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
     preload='''
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
@@ -64,6 +66,26 @@ gyro = GyroSensor(INPUT_4)
 '''
     try:
       cell = preload + cell
+
+      if args.robotSetup is not None:
+          self.shell.user_ns[args.sim].js_init(f'''
+            var bgSelector = document.getElementById("robotPreconfig")
+            bgSelector.value = "{args.robotSetup}";
+            var event = new Event('change');
+            bgSelector.dispatchEvent(event);
+          ''')
+  
+      if args.background is not None:
+        self.shell.user_ns[args.sim].js_init(f'''
+          var bgSelector = document.getElementById("map")
+          bgSelector.value = "{args.background}";
+          var event = new Event('change');
+          bgSelector.dispatchEvent(event);
+        ''')
+
+      # TO DO - support robot config; need to dispatch event and redraw;
+      # Also need to respect bg image default co-ords;
+
       self.shell.user_ns[args.sim].set_element("prog", cell)
 
       # The following fragment is an example of how to 

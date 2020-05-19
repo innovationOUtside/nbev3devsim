@@ -190,6 +190,55 @@ document.getElementById('upload').addEventListener('click', function () {
     reader.readAsText(e.target.files[0]);
   });
 });
+
+document.getElementById('robotPreconfig').addEventListener('change', function () {
+  var robotSpec = sim.default_robot_spec;
+  var preconfig = document.getElementById('robotPreconfig').value;
+  //TO DO - need to capture current robot location then reset to that
+  if (preconfig == 'Default_Robot'){
+    robotSpecs = sim.default_robot_spec;
+  } else if (preconfig == 'Small_Robot') {
+      robotSpecs = {
+        "wheeldiameter": 28,
+        "wheelSpacing": 90,
+        "wheelNoise": 0,
+        "back": -60,
+        "pen": {
+          "x": 0,
+          "y": 0,
+          "color": "red",
+          "width": 6
+        },
+        "weight": "medium",
+        "sensorNoise": 0,
+        "sensor1": {
+          "enabled": true,
+          "x": -10,
+          "y": 15,
+          "diameter": 10
+        },
+        "sensor2": {
+          "enabled": true,
+          "x": 10,
+          "y": 15,
+          "diameter": 10
+        },
+        "ultrasonic": {
+          "enabled": true,
+          "x": 0,
+          "y": 10,
+          "angle": 0,
+          "noise": 0
+        },
+        "gyro": {
+          "enabled": true
+        }
+      };
+  };
+  sim.loadRobot(robotSpecs);
+  sim.drawAll();
+});
+
 var imagepath = 'backgrounds/'
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('change', function () {

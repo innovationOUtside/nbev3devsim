@@ -189,6 +189,7 @@ def get_dataframe_from_datalog(datalog):
     if not df.empty:
         df = df.melt(id_vars='index').dropna()
         df['index'] = pd.to_timedelta(df['index']-df['index'].min())
+        df['time'] = df['index'].dt.total_seconds()
     return df
 
 def get_dataframe_from_widget(widget):

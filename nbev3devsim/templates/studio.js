@@ -195,7 +195,7 @@ var imagepath = 'backgrounds/'
 document.getElementById('map').addEventListener('input', function () {
   var map = document.getElementById('map').value;
 
-  if (map == 'WRO 2019 Regular Junior') {
+  if (map == 'WRO_2019_Regular_Junior') {
     sim.loadBackground(imagepath + 'WRO-2019-Regular-Junior.jpg');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
@@ -207,12 +207,12 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstaclesLayer();
     setPos(1000, 500, 90, true);
 
-  } else if (map == 'Grey bands') {
+  } else if (map == 'Grey_bands') {
     sim.loadBackground(imagepath + '_greys.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(400, 500, 0, true);
-  } else if (map == 'Radial grey') {
+  } else if (map == 'Radial_grey') {
     //Load background
     sim.loadBackground(imagepath + '_radial_grey.png');
     sim.clearObstacles();
@@ -248,37 +248,37 @@ document.getElementById('map').addEventListener('input', function () {
     sim.clearObstaclesLayer();
     setPos(775, 500, -90, true);
 
-  } else if (map == 'WRO 2018 Regular Junior') {
+  } else if (map == 'WRO_2018_Regular_Junior') {
     sim.loadBackground(imagepath + 'WRO-2018-Regular-Junior.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(1181, 150, 90, true);
 
-  } else if (map == 'FLL 2019 - City Shaper') {
+  } else if (map == 'FLL_2019_City_Shaper') {
     sim.loadBackground(imagepath + 'FLL2019.jpg');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(500, 150, 90, true);
 
-  } else if (map == 'FLL 2018 - Into Orbit') {
+  } else if (map == 'FLL_2018_Into_Orbit') {
     sim.loadBackground(imagepath + 'FLL2018.jpg');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(150, 150, 90, true);
 
-  } else if (map == 'Line Following Test') {
+  } else if (map == 'Line_Following_Test') {
     sim.loadBackground(imagepath + 'Line_Following_Test.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(141, 125, 90, true);
 
-  } else if (map == 'Junction Handling Test') {
+  } else if (map == 'Junction_Handling_Test') {
     sim.loadBackground(imagepath + 'Junction_Handling_Test.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(698, 130, 90, true);
 
-  } else if (map == 'Obstacles Test') {
+  } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);
     sim.clearObstacles();

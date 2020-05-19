@@ -192,7 +192,7 @@ document.getElementById('upload').addEventListener('click', function () {
 });
 var imagepath = 'backgrounds/'
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
-document.getElementById('map').addEventListener('input', function () {
+document.getElementById('map').addEventListener('change', function () {
   var map = document.getElementById('map').value;
 
   if (map == 'WRO_2019_Regular_Junior') {

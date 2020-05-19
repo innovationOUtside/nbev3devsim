@@ -226,7 +226,12 @@ document.getElementById('map').addEventListener('input', function () {
 
     //Set initial location
     setPos(100, 400, 0, true);
-  } else if (map == 'Grey and black') {
+  } else if (map == 'Coloured_bands') {
+    sim.loadBackground(imagepath + '_coloured_bands.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(500, 250, 90, true);
+  } else if (map == 'Grey_and_black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();

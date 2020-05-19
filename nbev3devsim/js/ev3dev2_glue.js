@@ -12,6 +12,11 @@ var $builtinmodule = function(name) {
         return "okay?";
     });
 
+    mod.pyState = new Sk.builtin.func(function() {
+        if (typeof sim.pyState == 'undefined') return {}
+        return sim.pyState;
+    });
+
     mod.get_clock = new Sk.builtin.func(function() {
         return sim.clock / sim.fps;
     });

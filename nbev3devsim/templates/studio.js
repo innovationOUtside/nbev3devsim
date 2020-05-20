@@ -32,7 +32,14 @@ function setPos(x, y, angle, init=false, reset=false) {
 
 var sim = new EV3devSim('field');
 
+// Set the default position from something?!
 setPos(1181, 571, 0);
+
+document.getElementById('codeFromClipboard').addEventListener('click', function () {
+  navigator.clipboard.readText().then(text => element.prog = text);
+  console.log('can we paste?')
+  navigator.clipboard.readText().then(text => console.log(text));
+});
 
 var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {

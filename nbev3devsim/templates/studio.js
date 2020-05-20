@@ -51,6 +51,17 @@ wheelNoiseSlider.oninput = function () {
   sim.robotSpecs.wheelNoise = parseFloat(this.value);
 }
 
+
+document.getElementById('showCode').addEventListener('click', function () {
+  console.log('showing code?')
+  document.getElementById('codeDisplayCode').value = element.prog;
+  document.getElementById('codeDisplay').classList.remove('closed');
+});
+document.getElementById('codeDisplayClose').addEventListener('click', function () {
+  document.getElementById('codeDisplay').classList.add('closed');
+});
+
+
 document.getElementById('map').value = 'Empty Map';
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;

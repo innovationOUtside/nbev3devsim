@@ -37,6 +37,7 @@
         <button id='codeFromClipboard'>Paste</button>
         <button id="runCode">Run</button>
         <button id="stop">Stop</button>
+        <button id="showCode">Show Code</button>
         <input type="checkbox" id="collaborative">Collaborative
       </div>
       <div class="center">
@@ -86,6 +87,7 @@
 
 <div id="field"></div>
 
+
 <div id="robotConfigurator" class="closed">
   <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>
   <i>* Dimensions are in mm and degrees.</i>
@@ -120,6 +122,15 @@
     </div>
   </div>
 </div>
+
+
+<div id='codeDisplay' class='closed'>
+  <textarea id='codeDisplayCode'></textarea>
+  <div class="buttons">
+    <div class="leftFlex"><button id="codeDisplayClose">Close</button></div>
+  <div>
+</div>
+
 
 <div id="window" class="closed">
   <div class="content"></div>

@@ -54,7 +54,11 @@ wheelNoiseSlider.oninput = function () {
 
 document.getElementById('showCode').addEventListener('click', function () {
   console.log('showing code?')
-  document.getElementById('codeDisplayCode').value = element.prog;
+  var _code = element.prog;
+  // Strip out any prefix magic line
+  _code = _code.split('\n').filter(function(line){ 
+    return line.indexOf( "%" ) != 0; }).join('\n')
+  document.getElementById('codeDisplayCode').value = _code;
   document.getElementById('codeDisplay').classList.remove('closed');
 });
 document.getElementById('codeDisplayClose').addEventListener('click', function () {

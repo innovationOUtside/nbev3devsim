@@ -52,6 +52,26 @@ bright_sound('square', 1.5);'''))
       document.getElementById("obstaclesConfiguratorApply").click();
       ''')
 
+    if args.xpos is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+        document.getElementById('xPos').value = {args.xpos};
+        document.getElementById('resetReset').click();
+        document.getElementById('reset').click();
+      ''')
+    if args.ypos is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+        document.getElementById('yPos').value = {args.ypos};
+        document.getElementById('resetReset').click();
+        document.getElementById('reset').click();
+      ''')
+    if args.angle is not None:
+      _js = f'''
+        document.getElementById('angle').value =  {args.angle};
+        document.getElementById('resetReset').click();
+        document.getElementById('reset').click();
+      '''
+      self.shell.user_ns[args.sim].js_init(_js)
+
   @line_cell_magic
   @magic_arguments.magic_arguments()
   @magic_arguments.argument('--sim', '-s', default='roboSim',
@@ -60,6 +80,9 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  @magic_arguments.argument('--xpos', '-x', default=None, help='x co-ord config')
+  @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
+  @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   def sim_magic(self, line, cell):
     "Send code to simulator."
     args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -81,6 +104,9 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  @magic_arguments.argument('--xpos', '-x', default=None, help='x co-ord config')
+  @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
+  @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -107,6 +133,9 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  @magic_arguments.argument('--xpos', '-x', default=None, help='x co-ord config')
+  @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
+  @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)

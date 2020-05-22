@@ -108,7 +108,7 @@
   <div class="content">
     <div><input type="checkbox" id="showRays">Show ultrasonic rays</div>
     <div><input type="checkbox" id="walls" checked>Walls around map</div>
-    <div><input type="checkbox" id="obstacles" checked>Obstacles</div>
+    <div><input type="checkbox" id="obstacles" checked>Obstacles (format [x, y, w, h]</div>
     <textarea id="obstaclesConfiguratorEditor" spellcheck="false"></textarea>
   </div>
   <div class="buttons">
@@ -117,6 +117,12 @@
       <button id="obstaclesConfiguratorClose">Close</button>
     </div>
     <div class="rightFlex">
+      <select id="obstaclesPreset">
+        <option>None</option>
+        <option>Central_post</option>
+        <option>Square_posts</option>
+        <option>Wall</option>
+      </select>
       <button id="obstaclesConfiguratorupload">Upload File</button>
       <button id="obstaclesConfiguratordownload">Download to File</button>
     </div>

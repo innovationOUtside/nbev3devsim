@@ -261,6 +261,27 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
   sim.drawAll();
 });
 
+document.getElementById('obstaclesPreset').addEventListener('change', function () {
+  var preset = document.getElementById('obstaclesPreset').value;
+  var obstacles = ''
+  if (preset=='Central_post') {
+    obstacles = '[[900, 500, 200, 200]]'
+  } else if (preset=='Square_posts') {
+    obstacles = '[[500, 200, 100, 100], [500, 700, 100, 100], [1500, 200, 100, 100], [1500, 700, 100, 100]]'
+  } else if (preset =='Wall'){
+    obstacles = '[[1500, 200, 200, 800]]'
+  } else if (preset == 'Square'){
+
+  } else if (preset == 'U') {
+
+  } else if (preset == 'L') {
+
+  } else if (preset=='maze') {
+    // TO DO
+  }
+  document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
+});
+
 var imagepath = 'backgrounds/'
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('change', function () {

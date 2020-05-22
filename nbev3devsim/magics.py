@@ -43,6 +43,14 @@ bright_sound('square', 1.5);'''))
         bgSelector.dispatchEvent(event);
       ''')
 
+    if args.obstacles is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+      var oSelector = document.getElementById("obstaclesPreset");
+      oSelector.value = "{args.obstacles}";
+      var event = new Event('change');
+      oSelector.dispatchEvent(event);
+      document.getElementById("obstaclesConfiguratorApply").click();
+      ''')
 
   @line_cell_magic
   @magic_arguments.magic_arguments()
@@ -51,6 +59,7 @@ bright_sound('square', 1.5);'''))
     )
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
+  @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
   def sim_magic(self, line, cell):
     "Send code to simulator."
     args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -71,6 +80,7 @@ bright_sound('square', 1.5);'''))
     )
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
+  @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -96,6 +106,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     )
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
+  @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)

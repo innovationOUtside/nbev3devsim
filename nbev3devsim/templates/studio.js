@@ -377,7 +377,7 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(698, 130, 90, true);
-
+  }
     else if (map == 'Thruxton_Circuit') {
       sim.loadBackground(imagepath + 'thruxton_track.png');
       sim.clearObstacles();

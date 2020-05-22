@@ -86,7 +86,7 @@
   width: 100%;
 }
 
-#robotConfigurator, #obstaclesConfigurator {
+#robotConfigurator, #obstaclesConfigurator, #codeDisplay {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -110,13 +110,17 @@
   background: lightsalmon;
 }
 
+#codeDisplay {
+  background: rgb(174, 231, 174);
+}
+
 #obstaclesConfigurator .content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
-#robotConfiguratorEditor,  #obstaclesConfiguratorEditor {
+#robotConfiguratorEditor,  #obstaclesConfiguratorEditor, #codeDisplayCode {
   background: white;
   width: 100%;
   height: 100%;

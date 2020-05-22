@@ -32,7 +32,14 @@ function setPos(x, y, angle, init=false, reset=false) {
 
 var sim = new EV3devSim('field');
 
+// Set the default position from something?!
 setPos(1181, 571, 0);
+
+document.getElementById('codeFromClipboard').addEventListener('click', function () {
+  navigator.clipboard.readText().then(text => element.prog = text);
+  console.log('can we paste?')
+  navigator.clipboard.readText().then(text => console.log(text));
+});
 
 var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {
@@ -43,6 +50,21 @@ var wheelNoiseSlider = document.getElementById("wheelNoiseSlider");
 wheelNoiseSlider.oninput = function () {
   sim.robotSpecs.wheelNoise = parseFloat(this.value);
 }
+
+
+document.getElementById('showCode').addEventListener('click', function () {
+  console.log('showing code?')
+  var _code = element.prog;
+  // Strip out any prefix magic line
+  _code = _code.split('\n').filter(function(line){ 
+    return line.indexOf( "%" ) != 0; }).join('\n')
+  document.getElementById('codeDisplayCode').value = _code;
+  document.getElementById('codeDisplay').classList.remove('closed');
+});
+document.getElementById('codeDisplayClose').addEventListener('click', function () {
+  document.getElementById('codeDisplay').classList.add('closed');
+});
+
 
 document.getElementById('map').value = 'Empty Map';
 document.getElementById('walls').checked = true;
@@ -237,6 +259,27 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
   };
   sim.loadRobot(robotSpecs);
   sim.drawAll();
+});
+
+document.getElementById('obstaclesPreset').addEventListener('change', function () {
+  var preset = document.getElementById('obstaclesPreset').value;
+  var obstacles = ''
+  if (preset=='Central_post') {
+    obstacles = '[[900, 500, 200, 200]]'
+  } else if (preset=='Square_posts') {
+    obstacles = '[[500, 200, 100, 100], [500, 700, 100, 100], [1500, 200, 100, 100], [1500, 700, 100, 100]]'
+  } else if (preset =='Wall'){
+    obstacles = '[[1500, 200, 200, 800]]'
+  } else if (preset == 'Square'){
+
+  } else if (preset == 'U') {
+
+  } else if (preset == 'L') {
+
+  } else if (preset=='maze') {
+    // TO DO
+  }
+  document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 });
 
 var imagepath = 'backgrounds/'

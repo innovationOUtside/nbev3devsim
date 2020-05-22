@@ -9,24 +9,78 @@ class NbEv3DevSimMagic(Magics):
   def __init__(self, shell, cache_display_data=False):
     super(NbEv3DevSimMagic, self).__init__(shell)
 
-  @line_cell_magic
-  @magic_arguments.magic_arguments()
-  @magic_arguments.argument('--sim', '-s', default='roboSim',
-     help='Simulator object.'
-    )
-  def sim_magic(self, line, cell):
-    "Send code to simulator."
-    args = magic_arguments.parse_argstring(self.sim_magic, line)
-    try:
-      self.shell.user_ns[args.sim].set_element("prog", cell)
-    except:
-      print(f'Is {args.sim} defined?')
+  def download_ping(self):
+    display(Javascript('''var context = new AudioContext();
+      var o = null;
+var g = null;
+      function bright_sound(type="square", x=1.5) {
+    o = context.createOscillator()
+    g = context.createGain()
+    o.connect(g)
+    o.type = type
+    g.connect(context.destination)
+    o.start(0)
+    g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + x)
+};
+bright_sound('square', 1.5);'''))
+    clear_output()
+
+  def handle_args(self, args):
+    """Handle arguments passed in via magic."""
+    if args.robotSetup is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+        var bgSelector = document.getElementById("robotPreconfig");
+        bgSelector.value = "{args.robotSetup}";
+        var event = new Event('change');
+        bgSelector.dispatchEvent(event);
+      ''')
+
+    if args.background is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+        var bgSelector = document.getElementById("map");
+        bgSelector.value = "{args.background}";
+        var event = new Event('change');
+        bgSelector.dispatchEvent(event);
+      ''')
+
+    if args.obstacles is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+      var oSelector = document.getElementById("obstaclesPreset");
+      oSelector.value = "{args.obstacles}";
+      var event = new Event('change');
+      oSelector.dispatchEvent(event);
+      document.getElementById("obstaclesConfiguratorApply").click();
+      ''')
 
   @line_cell_magic
   @magic_arguments.magic_arguments()
   @magic_arguments.argument('--sim', '-s', default='roboSim',
      help='Simulator object.'
     )
+  @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
+  @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
+  @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  def sim_magic(self, line, cell):
+    "Send code to simulator."
+    args = magic_arguments.parse_argstring(self.sim_magic, line)
+    
+    try:
+      self.shell.user_ns[args.sim].set_element("prog", cell)
+      self.handle_args(args)
+    except:
+      print(f'Is {args.sim} defined?')
+      return
+    self.download_ping()
+
+
+  @line_cell_magic
+  @magic_arguments.magic_arguments()
+  @magic_arguments.argument('--sim', '-s', default='roboSim',
+     help='Simulator object.'
+    )
+  @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
+  @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
+  @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -38,8 +92,12 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     try:
       cell = preload + cell
       self.shell.user_ns[args.sim].set_element("prog", cell)
+      self.handle_args(args)
     except:
       print(f'Is {args.sim} defined?')
+      return
+    self.download_ping()
+
 
   @line_cell_magic
   @magic_arguments.magic_arguments()
@@ -48,6 +106,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     )
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
+  @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
@@ -67,21 +126,7 @@ gyro = GyroSensor(INPUT_4)
     try:
       cell = preload + cell
 
-      if args.robotSetup is not None:
-          self.shell.user_ns[args.sim].js_init(f'''
-            var bgSelector = document.getElementById("robotPreconfig")
-            bgSelector.value = "{args.robotSetup}";
-            var event = new Event('change');
-            bgSelector.dispatchEvent(event);
-          ''')
-  
-      if args.background is not None:
-        self.shell.user_ns[args.sim].js_init(f'''
-          var bgSelector = document.getElementById("map")
-          bgSelector.value = "{args.background}";
-          var event = new Event('change');
-          bgSelector.dispatchEvent(event);
-        ''')
+      self.handle_args(args)
 
       # TO DO - support robot config; need to dispatch event and redraw;
       # Also need to respect bg image default co-ords;
@@ -93,20 +138,9 @@ gyro = GyroSensor(INPUT_4)
       # However, if we copy and paste the cell that has been run
       # the javascript ping will also be replayed unless we clear it?
       display(Javascript('console.log("here")'))
-      display(Javascript('''var context = new AudioContext();
-      var o = null;
-var g = null;
-      function bright_sound(type="square", x=1.5) {
-    o = context.createOscillator()
-    g = context.createGain()
-    o.connect(g)
-    o.type = type
-    g.connect(context.destination)
-    o.start(0)
-    g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + x)
-};
-bright_sound('square', 1.5);'''))
-      clear_output()
+      self.download_ping()
+
     except:
 
       print(f'Is {args.sim} defined?')
+      return

@@ -378,6 +378,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstaclesLayer();
     setPos(698, 130, 90, true);
 
+    else if (map == 'Thruxton_Circuit') {
+      sim.loadBackground(imagepath + 'thruxton_track.png');
+      sim.clearObstacles();
+      sim.clearObstaclesLayer();
+      setPos(698, 130, 90, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);

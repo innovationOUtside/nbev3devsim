@@ -52,6 +52,45 @@ bright_sound('square', 1.5);'''))
       document.getElementById("obstaclesConfiguratorApply").click();
       ''')
 
+    if args.xpos is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+        document.getElementById('xPos').value = {args.xpos};
+        document.getElementById('resetReset').click();
+        document.getElementById('reset').click();
+      ''')
+    if args.ypos is not None:
+      self.shell.user_ns[args.sim].js_init(f'''
+        document.getElementById('yPos').value = {args.ypos};
+        document.getElementById('resetReset').click();
+        document.getElementById('reset').click();
+      ''')
+    if args.angle is not None:
+      _js = f'''
+        document.getElementById('angle').value = {args.angle};
+        document.getElementById('resetReset').click();
+        document.getElementById('reset').click();
+      '''
+      self.shell.user_ns[args.sim].js_init(_js)
+
+    if args.ultrasound:
+      _js = f'''
+        var raySelector = document.getElementById('showRays');
+        raySelector.checked = false;
+        // The click toggles the status which is why we previously set it false
+        raySelector.click();
+      '''
+      self.shell.user_ns[args.sim].js_init(_js)
+
+    if args.pendown:
+      _js = f'''
+        var penSelector = document.getElementById('penDown');
+        penSelector.checked = true;
+        var event = new Event('change');
+        penSelector.dispatchEvent(event);
+      '''
+      self.shell.user_ns[args.sim].js_init(_js)
+      
+
   @line_cell_magic
   @magic_arguments.magic_arguments()
   @magic_arguments.argument('--sim', '-s', default='roboSim',
@@ -60,6 +99,12 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  @magic_arguments.argument('--xpos', '-x', default=None, help='x co-ord config')
+  @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
+  @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
+  @magic_arguments.argument('--ultrasound', '-u', action='store_true', help='Show ultrasound rays')
+  @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
+  @magic_arguments.argument('--quiet', '-q', action='store_true', help='No audio confirmation')
   def sim_magic(self, line, cell):
     "Send code to simulator."
     args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -70,7 +115,8 @@ bright_sound('square', 1.5);'''))
     except:
       print(f'Is {args.sim} defined?')
       return
-    self.download_ping()
+    if not args.quiet:
+      self.download_ping()
 
 
   @line_cell_magic
@@ -81,6 +127,12 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  @magic_arguments.argument('--xpos', '-x', default=None, help='x co-ord config')
+  @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
+  @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
+  @magic_arguments.argument('--ultrasound', '-u', action='store_true', help='Show ultrasound rays')
+  @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
+  @magic_arguments.argument('--quiet', '-q', action='store_true', help='No audio confirmation')
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -96,7 +148,8 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     except:
       print(f'Is {args.sim} defined?')
       return
-    self.download_ping()
+    if not args.quiet:
+      self.download_ping()
 
 
   @line_cell_magic
@@ -107,6 +160,12 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
   @magic_arguments.argument('--background', '-b', default=None, help='Background selection')
   @magic_arguments.argument('--robotSetup', '-r', default=None, help='Robot config selection')
   @magic_arguments.argument('--obstacles', '-o', default=None, help='Obstacles config')
+  @magic_arguments.argument('--xpos', '-x', default=None, help='x co-ord config')
+  @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
+  @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
+  @magic_arguments.argument('--ultrasound', '-u',  action='store_true', help='Show ultrasound rays')
+  @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
+  @magic_arguments.argument('--quiet', '-q', action='store_true', help='No audio confirmation')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
@@ -138,7 +197,8 @@ gyro = GyroSensor(INPUT_4)
       # However, if we copy and paste the cell that has been run
       # the javascript ping will also be replayed unless we clear it?
       display(Javascript('console.log("here")'))
-      self.download_ping()
+      if not args.quiet:
+        self.download_ping()
 
     except:
 

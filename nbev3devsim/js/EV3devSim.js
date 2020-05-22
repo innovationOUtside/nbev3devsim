@@ -143,6 +143,18 @@ function EV3devSim(id) {
     self.measurementLayer.style.transformOrigin = '0 0';
     self.measurementLayer.style.cursor = 'crosshair';
 
+    self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
+    self.sensorArrayLeft.style.position = 'absolute';
+    self.sensorArrayLeft.style.transform = scaler;
+    self.sensorArrayLeft.style.transformOrigin = '0 0';
+    self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
+
+    self.sensorArrayRight = document.getElementById('sensorArrayRight');
+    self.sensorArrayRight.style.position = 'absolute';
+    self.sensorArrayRight.style.transform = scaler;
+    self.sensorArrayRight.style.transformOrigin = '0 0';
+    self.sensorArrayRightCtx = self.sensorArrayRight.getContext('2d');
+
     self.backgroundCtx = self.background.getContext('2d');
 
     self.obstaclesLayerCtx = self.obstaclesLayer.getContext('2d');
@@ -829,12 +841,12 @@ function EV3devSim(id) {
 
     var x1 = cos * self.robotSpecs.sensor1.x - sin * self.robotSpecs.sensor1.y + self.robotStates.x;
     var y1 = -(sin * self.robotSpecs.sensor1.x + cos * self.robotSpecs.sensor1.y) + (HEIGHT - self.robotStates.y);
-    self.robotStates.sensor1 = self.getSensorValues(x1, y1, self.robotStates.sensor1.diameter);
+    self.robotStates.sensor1 = self.getSensorValues(x1, y1, self.robotStates.sensor1.diameter, 'sensor1');
 
     if (typeof self.robotSpecs.sensor2 != 'undefined') {
       var x2 = cos * self.robotSpecs.sensor2.x - sin * self.robotSpecs.sensor2.y + self.robotStates.x;
       var y2 = -(sin * self.robotSpecs.sensor2.x + cos * self.robotSpecs.sensor2.y) + (HEIGHT - self.robotStates.y);
-      self.robotStates.sensor2 = self.getSensorValues(x2, y2, self.robotStates.sensor2.diameter);
+      self.robotStates.sensor2 = self.getSensorValues(x2, y2, self.robotStates.sensor2.diameter, 'sensor2');
     }
   };
 
@@ -855,17 +867,33 @@ function EV3devSim(id) {
     return raw;
   }
 
-  this.getSensorValues = function (x, y, diameter=SENSOR_DIAMETER) {
+  this.getSensorValues = function (x, y, diameter=SENSOR_DIAMETER, sensor='') {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
 
     //The following assumes that both sensors have the same diameter
+    var radius = diameter / 2;
     var sensorBox = self.backgroundCtx.getImageData(
-      x - diameter / 2,
-      y - diameter / 2,
+      x - radius,
+      y - radius,
       diameter,
       diameter
     );
+
+    if (sensor=='sensor1')
+      self.sensorArrayLeftCtx.drawImage(self.background,
+                      Math.min(Math.max(0, x - radius ), WIDTH-diameter),
+                      Math.min(Math.max(0, y - radius), HEIGHT-diameter),
+                      diameter, diameter,
+                      0, 0,
+                      200, 200);
+    else if (sensor='sensor2')
+      self.sensorArrayRightCtx.drawImage(self.background,
+                      Math.min(Math.max(0, x - radius ), WIDTH-diameter),
+                      Math.min(Math.max(0, y - radius), HEIGHT-diameter),
+                      diameter, diameter,
+                      0, 0,
+                      200, 200);
 
     var redTotal = 0;
     var greenTotal = 0;

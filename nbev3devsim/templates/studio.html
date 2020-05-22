@@ -27,7 +27,8 @@
     <div>Y : <input type="number" id="yPos"></div>
     <div>Angle : <input type="number" id="angle"></div>
     <div><button id="move">Move</button>
-      <button id="reset">Reset</button></div>
+      <button id="reset">Reset</button>
+      <button id="resetReset" style="display: none;">ResetReset</button></div>
   </div>
 </div>
 <div class="row">
@@ -76,13 +77,19 @@
   <pre id="output"></pre>
 </div>
 
-<div id="readings">Sensor readings:
-  <div>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
+<div class="row">
+  <div id="readings">Sensor readings:
+    <div>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
+    </div>
+    <div>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>
+    </div>
+    <div>Ultrasonic: <span id="ultrasonic_value"></span></div>
+    <div>Gyro: <span id="gyro_value"></span></div>
   </div>
-  <div>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>
+  <div id='sensorArray' class='right'>Sensor arrays:
+    <canvas id='sensorArrayLeft'></canvas>
+    <canvas id='sensorArrayRight'></canvas>
   </div>
-  <div>Ultrasonic: <span id="ultrasonic_value"></span></div>
-  <div>Gyro: <span id="gyro_value"></span></div>
 </div>
 
 <div id="field"></div>

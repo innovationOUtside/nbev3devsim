@@ -146,6 +146,14 @@ document.getElementById('obstacles').addEventListener('click', function () {
     sim.clearObstaclesLayer();
   }
 });
+
+
+document.getElementById('resetReset').addEventListener('click', function () {
+  sim.robotStates._x = document.getElementById('xPos').value;
+  sim.robotStates._y = document.getElementById('yPos').value;
+  sim.robotStates._angle = document.getElementById('angle').value;
+})
+
 document.getElementById('move').addEventListener('click', function () {
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;

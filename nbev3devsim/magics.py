@@ -80,6 +80,15 @@ bright_sound('square', 1.5);'''))
         raySelector.click();
       '''
       self.shell.user_ns[args.sim].js_init(_js)
+
+    if args.pendown:
+      _js = f'''
+        var penSelector = document.getElementById('penDown');
+        penSelector.checked = true;
+        var event = new Event('change');
+        penSelector.dispatchEvent(event);
+      '''
+      self.shell.user_ns[args.sim].js_init(_js)
       
 
   @line_cell_magic
@@ -94,6 +103,7 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
   @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   @magic_arguments.argument('--ultrasound', '-u', action='store_true', help='Show ultrasound rays')
+  @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
   def sim_magic(self, line, cell):
     "Send code to simulator."
     args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -119,6 +129,7 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
   @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   @magic_arguments.argument('--ultrasound', '-u', action='store_true', help='Show ultrasound rays')
+  @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -149,6 +160,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
   @magic_arguments.argument('--ypos', '-y', default=None, help='y co-ord config')
   @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   @magic_arguments.argument('--ultrasound', '-u',  action='store_true', help='Show ultrasound rays')
+  @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)

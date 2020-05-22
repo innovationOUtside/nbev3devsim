@@ -82,14 +82,18 @@ bright_sound('square', 1.5);'''))
       self.shell.user_ns[args.sim].js_init(_js)
 
     if args.pendown:
-      _js = f'''
+      _penDown = 'true'
+    else:
+      # Use pen up as a forced default...
+      _penDown = 'false'
+
+    _js = f'''
         var penSelector = document.getElementById('penDown');
-        penSelector.checked = true;
+        penSelector.checked = {_penDown};
         var event = new Event('change');
         penSelector.dispatchEvent(event);
       '''
-      self.shell.user_ns[args.sim].js_init(_js)
-      
+    self.shell.user_ns[args.sim].js_init(_js)
 
   @line_cell_magic
   @magic_arguments.magic_arguments()

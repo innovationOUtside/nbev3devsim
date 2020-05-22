@@ -104,6 +104,7 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   @magic_arguments.argument('--ultrasound', '-u', action='store_true', help='Show ultrasound rays')
   @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
+  @magic_arguments.argument('--quiet', '-q', action='store_true', help='No audio confirmation')
   def sim_magic(self, line, cell):
     "Send code to simulator."
     args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -114,7 +115,8 @@ bright_sound('square', 1.5);'''))
     except:
       print(f'Is {args.sim} defined?')
       return
-    self.download_ping()
+    if not args.quiet:
+      self.download_ping()
 
 
   @line_cell_magic
@@ -130,6 +132,7 @@ bright_sound('square', 1.5);'''))
   @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   @magic_arguments.argument('--ultrasound', '-u', action='store_true', help='Show ultrasound rays')
   @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
+  @magic_arguments.argument('--quiet', '-q', action='store_true', help='No audio confirmation')
   def sim_magic_imports(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -145,7 +148,8 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     except:
       print(f'Is {args.sim} defined?')
       return
-    self.download_ping()
+    if not args.quiet:
+      self.download_ping()
 
 
   @line_cell_magic
@@ -161,6 +165,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
   @magic_arguments.argument('--angle', '-a', default=None, help='Angle config')
   @magic_arguments.argument('--ultrasound', '-u',  action='store_true', help='Show ultrasound rays')
   @magic_arguments.argument('--pendown', '-p', action='store_true', help='Set pen down')
+  @magic_arguments.argument('--quiet', '-q', action='store_true', help='No audio confirmation')
   def sim_magic_preloaded(self, line, cell):
     "Send code to simulator with imports and common definitions."
     args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
@@ -192,7 +197,8 @@ gyro = GyroSensor(INPUT_4)
       # However, if we copy and paste the cell that has been run
       # the javascript ping will also be replayed unless we clear it?
       display(Javascript('console.log("here")'))
-      self.download_ping()
+      if not args.quiet:
+        self.download_ping()
 
     except:
 

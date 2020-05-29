@@ -65,8 +65,7 @@ document.getElementById('codeDisplayClose').addEventListener('click', function (
   document.getElementById('codeDisplay').classList.add('closed');
 });
 
-
-document.getElementById('map').value = 'Empty Map';
+document.getElementById('map').selectedIndex = "0";;
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;
 
@@ -290,7 +289,9 @@ document.getElementById('obstaclesPreset').addEventListener('change', function (
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 });
 
-var imagepath = 'backgrounds/'
+//var imagepath = '/notebooks/backgrounds/'
+var imagepath = '/'+window.location.pathname.split('/')[1]+'/backgrounds/'
+
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('change', function () {
   var map = document.getElementById('map').value;

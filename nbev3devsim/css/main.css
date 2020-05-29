@@ -1,3 +1,7 @@
+.roboSim button{
+  background:AliceBlue;
+}
+
 .row {
   display: flex;
   justify-content: space-between;
@@ -84,6 +88,29 @@
   justify-content: space-between;
   margin-top: 0.2em;
   width: 100%;
+}
+
+.sensorReading {
+  border: 1px solid blue;
+}
+
+#sensorArray {
+  border: 1px solid black;
+}
+
+.checkboxLabel {
+  border: 1px solid grey;
+}
+
+.sensorGrid {
+  width: 150px; height: 150px;
+}
+
+#sensorArrayLeft {
+  border: 2px solid red;
+}
+#sensorArrayRight {
+  border: 2px solid green;
 }
 
 #robotConfigurator, #obstaclesConfigurator, #codeDisplay {

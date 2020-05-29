@@ -4,10 +4,30 @@ from IPython.display import Javascript, clear_output, display
 
 import time
 
+import io
+import sys
+import subprocess
+import tempfile
+from contextlib import redirect_stdout
+
+
 @magics_class
 class NbEv3DevSimMagic(Magics):
   def __init__(self, shell, cache_display_data=False):
     super(NbEv3DevSimMagic, self).__init__(shell)
+
+  def linter(self, cell):
+    """Lint contents of code to be downloaded."""
+    with tempfile.NamedTemporaryFile(mode='r+', delete=False) as f:
+      f.write(cell)
+      # Make sure the file is written
+      f.flush()
+      f.close()
+    
+    report = subprocess.getoutput(f"pyflakes {f.name}")
+    if report:
+      report = report.splitlines()
+      display(report)
 
   def download_ping(self):
     display(Javascript('''var context = new AudioContext();
@@ -82,14 +102,18 @@ bright_sound('square', 1.5);'''))
       self.shell.user_ns[args.sim].js_init(_js)
 
     if args.pendown:
-      _js = f'''
+      _penDown = 'true'
+    else:
+      # Use pen up as a forced default...
+      _penDown = 'false'
+
+    _js = f'''
         var penSelector = document.getElementById('penDown');
-        penSelector.checked = true;
+        penSelector.checked = {_penDown};
         var event = new Event('change');
         penSelector.dispatchEvent(event);
       '''
-      self.shell.user_ns[args.sim].js_init(_js)
-      
+    self.shell.user_ns[args.sim].js_init(_js)
 
   @line_cell_magic
   @magic_arguments.magic_arguments()
@@ -184,6 +208,7 @@ gyro = GyroSensor(INPUT_4)
 '''
     try:
       cell = preload + cell
+      #self.linter(cell)
 
       self.handle_args(args)
 

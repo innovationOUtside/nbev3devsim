@@ -49,14 +49,14 @@ import shutil
 
 # Copy over background files
 _dir = "backgrounds"
-
+_localdir = os.path.join(os.environ['HOME'], _dir)
 #Py 3.8?
 #shutil.copytree(get_file_path(_dir), _dir, dirs_exist_ok=True)
-if not os.path.isdir(_dir):
-    os.makedirs(_dir)
+if not os.path.isdir(_localdir):
+    os.makedirs(_localdir)
 _path = get_file_path(_dir)
 for f in os.listdir(_path):
-    shutil.copy(os.path.join(get_file_path(_dir), f), _dir)
+    shutil.copy(os.path.join(get_file_path(_dir), f), _localdir)
 
 with open(get_file_path('templates/studio.html'), 'r') as f:
     html = f.read()

@@ -65,8 +65,7 @@ document.getElementById('codeDisplayClose').addEventListener('click', function (
   document.getElementById('codeDisplay').classList.add('closed');
 });
 
-
-document.getElementById('map').value = 'Empty Map';
+document.getElementById('map').selectedIndex = "0";;
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;
 
@@ -290,7 +289,9 @@ document.getElementById('obstaclesPreset').addEventListener('change', function (
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 });
 
-var imagepath = 'backgrounds/'
+//var imagepath = '/notebooks/backgrounds/'
+var imagepath = '/'+window.location.pathname.split('/')[1]+'/backgrounds/'
+
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('change', function () {
   var map = document.getElementById('map').value;
@@ -312,6 +313,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(400, 500, 0, true);
+  } else if (map == 'Linear_grey') {
+    sim.loadBackground(imagepath + '_linear_grey.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(1000, 50, 90, true);
   } else if (map == 'Radial_grey') {
     //Load background
     sim.loadBackground(imagepath + '_radial_grey.png');
@@ -377,7 +383,12 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(698, 130, 90, true);
-
+  }
+    else if (map == 'Thruxton_Circuit') {
+      sim.loadBackground(imagepath + 'thruxton_track.png');
+      sim.clearObstacles();
+      sim.clearObstaclesLayer();
+      setPos(698, 130, 90, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);

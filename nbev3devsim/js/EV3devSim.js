@@ -144,15 +144,9 @@ function EV3devSim(id) {
     self.measurementLayer.style.cursor = 'crosshair';
 
     self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
-    self.sensorArrayLeft.style.position = 'absolute';
-    self.sensorArrayLeft.style.transform = scaler;
-    self.sensorArrayLeft.style.transformOrigin = '0 0';
     self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
 
     self.sensorArrayRight = document.getElementById('sensorArrayRight');
-    self.sensorArrayRight.style.position = 'absolute';
-    self.sensorArrayRight.style.transform = scaler;
-    self.sensorArrayRight.style.transformOrigin = '0 0';
     self.sensorArrayRightCtx = self.sensorArrayRight.getContext('2d');
 
     self.backgroundCtx = self.background.getContext('2d');

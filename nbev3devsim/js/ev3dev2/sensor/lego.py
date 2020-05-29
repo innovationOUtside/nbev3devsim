@@ -39,9 +39,11 @@ class ColorSensor:
     self.sensor = ev3dev2_glue.ColorSensor(address)
 
   @property
-  def reflected_light_intensity(self):
+  def reflected_light_intensity(self, full_spectrum=False):
     time.sleep(SENSOR_DELAY)
-    #return int(list(self.sensor.value())[0])
+    if not full_spectrum:
+      return int(list(self.sensor.value())[0])
+
     rgb = list(self.sensor.value())
     for i in range(3):
       rgb[i] = int(rgb[i])

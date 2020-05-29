@@ -312,6 +312,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(400, 500, 0, true);
+  } else if (map == 'Linear_grey') {
+    sim.loadBackground(imagepath + '_linear_grey.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(1000, 50, 90, true);
   } else if (map == 'Radial_grey') {
     //Load background
     sim.loadBackground(imagepath + '_radial_grey.png');

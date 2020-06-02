@@ -1,0 +1,4 @@
+include jupyter-config nb_cell_tools.json
+recursive-include nb_cell_tools/static *.js
+include nb_cell_tools/static nb_cell_tools.png
+include nb_cell_tools/static/nb_cell_tools.yaml

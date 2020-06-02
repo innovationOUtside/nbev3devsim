@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="nbev3devsim",
-    packages=['nbev3devsim'],
+    packages=['nbev3devsim', 'nb_cell_tools'],
     version='0.0.1',
     include_package_data=True,
     package_data = {
@@ -12,6 +12,19 @@ setup(
         'nest_asyncio',
         'pandas',
         'seaborn'
+    ],
+    data_files=[
+        # like `jupyter nbextension install --sys-prefix`
+        ("share/jupyter/nbextensions/nb_cell_tools", [
+            "nb_cell_tools/static/index.js",
+            "nb_cell_tools/static/jquery.dialogextend.js",
+            "nb_cell_tools/static/nb_cell_tools.png",
+            "nb_cell_tools/static/nb_cell_tools.yaml"
+        ]),
+        # like `jupyter nbextension enable --sys-prefix`
+        ("etc/jupyter/nbconfig/notebook.d", [
+            "jupyter-config/nbconfig/notebook.d/nb_cell_tools.json"
+        ])
     ],
 
 )

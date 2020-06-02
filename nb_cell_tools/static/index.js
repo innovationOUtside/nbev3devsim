@@ -74,7 +74,12 @@ define(["require", "./jquery.dialogextend"], function (require, dialogextend) {
 			playground.setAttribute("id", "playground");
 			playground.innerHTML = '<iframe src="/proxy/8999/index_min.html#activation=tanh&batchSize=10&dataset=circle&regDataset=reg-plane&learningRate=0.03&regularizationRate=0&noise=0&networkShape=4,2&seed=0.24774&showTestData=false&discretize=false&percTrainData=50&x=true&y=true&xTimesY=false&xSquared=false&ySquared=false&cosX=false&sinX=false&cosY=false&sinY=false&collectStats=false&problem=classification&initZero=false&hideText=false"></iframe>';
 			document.getElementsByTagName("body")[0].appendChild(playground);
-			$("#playground").dialog();
+			//http://jquery.10927.n7.nabble.com/resizing-iframe-inside-a-dialog-td124892.html#a124895
+			//resize: function() { $('iframe').hide(); }, resizeStop: function() { $('iframe').show();
+			//$('#example iframe').height($(this).height()-70)
+			$("#playground").dialog({resizeStop: function() { $('#playground iframe').height("100%");  $('#playground iframe').width("100%");}});
+
+			
 		}
 	}
 
@@ -97,7 +102,8 @@ define(["require", "./jquery.dialogextend"], function (require, dialogextend) {
 	var layout_left = function() {
 		var style = document.createElement("style");
 		style.setAttribute("id", "hangLeft");
-		style.innerHTML = "#notebook-container { width:50%; float:left !important;}; #playground { overflow: hidden;  position: relative; }; #playground iframe { border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%; resize: both;overflow: auto; };";
+		//style.innerHTML = "#notebook-container { width:50%; float:left !important;}; #playground { overflow: hidden;  position: relative; }; #playground iframe { border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%; resize: both;overflow: auto; };";
+		style.innerHTML = "#notebook-container { width:50%; float:left !important;}; #playground { overflow: hidden;  position: relative; }; #playground iframe { border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;  };";
 		document.getElementsByTagName("head")[0].appendChild(style);
 	}
 
@@ -106,22 +112,22 @@ define(["require", "./jquery.dialogextend"], function (require, dialogextend) {
 			'help': 'Enable left view.',
 			'icon': 'fa-folder',
 			'handler': toggle_tabs
-		}, 'toggle_tabs', 'cell_tools');
+		}, 'toggle_tabs', 'nb_cell_tools');
 
 		Jupyter.actions.register({
 			'help': 'Toggle two-column view on a code cell',
 			'icon': 'fa-columns',
 			'handler': toggle_columns
-		}, 'toggle_columns', 'cell_tools');
+		}, 'toggle_columns', 'nb_cell_tools');
 
 		IPython.toolbar.add_buttons_group([
 			{
-				'action': 'cell_tools:toggle_tabs'
+				'action': 'nb_cell_tools:toggle_tabs'
 			},
 			{
-				'action': 'cell_tools:toggle_columns'
+				'action': 'nb_cell_tools:toggle_columns'
 			}
-		], 'cell_tools-buttons');
+		], 'nb_cell_tools-buttons');
 	};
 
 	var load_ipython_extension = function () {

@@ -1,0 +1,6 @@
+Type: Jupyter Notebook Extension
+Compatibility: Jupyter 4.x, 5.x
+Name: nb_cell_tools
+Main: index.js
+Description: Adds buttons for cell tools (tab, columns, etc)
+Icon: nb_cell_tools.png

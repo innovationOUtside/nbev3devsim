@@ -336,7 +336,7 @@ document.getElementById('map').addEventListener('change', function () {
     sim.loadBackground(imagepath + '_coloured_bands.png');
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(500, 250, 90, true);
+    setPos(500, 500, 0, true);
   } else if (map == 'Grey_and_black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();

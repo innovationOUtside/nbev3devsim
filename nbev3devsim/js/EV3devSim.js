@@ -198,11 +198,11 @@ function EV3devSim(id) {
       self.measurePts[0] = [x, y];
     } else if (self.measurePts[1] == null) {
       self.measurePts[1] = [x, y];
-      self.clearMeasurementLayer();
-      self.drawMeasurementLayer(self.measurePts[0], [x, y]);
+      //self.clearMeasurementLayer();
+      //self.drawMeasurementLayer(self.measurePts[0], [x, y]);
     } else {
       self.measurePts = [null, null];
-      self.clearMeasurementLayer();
+      //self.clearMeasurementLayer();
     }
   };
 
@@ -940,8 +940,10 @@ function EV3devSim(id) {
     document.getElementById('ultrasonic_value').innerHTML = self.robotStates.ultrasonic.toFixed(2);
     document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) +", "+self.robotStates.gyro[1].toFixed(2) ;
   
-    document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(self.robotStates.sensor1);
-    document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(self.robotStates.sensor2);
+    if (!self.dragok) {
+      document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(self.robotStates.sensor1);
+      document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(self.robotStates.sensor2);
+    }
   }
 
   // handle mousedown events

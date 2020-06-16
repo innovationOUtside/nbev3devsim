@@ -92,6 +92,7 @@ function EV3devSim(id) {
 
   self.measurePts = [null, null];
 
+  // TO DO: refactor this as a function that lets us create a layer more straightforwardly
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
     self.background = document.createElement('canvas');
@@ -99,13 +100,14 @@ function EV3devSim(id) {
     self.foreground = document.createElement('canvas');
     self.penLayer = document.createElement('canvas');
     self.measurementLayer = document.createElement('canvas');
+    self.lightLayer = document.createElement('canvas');
 
     self.background.setAttribute('id', 'background');
     self.penLayer.setAttribute('id', 'penLayer');
     self.obstaclesLayer.setAttribute('id', 'obstaclesLayer');
     self.foreground.setAttribute('id', 'foreground');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
-
+    self.lightLayer.setAttribute('id', 'lightLayer');
 
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
@@ -115,6 +117,8 @@ function EV3devSim(id) {
     self.foreground.height = HEIGHT;
     self.measurementLayer.width = WIDTH;
     self.measurementLayer.height = HEIGHT;
+    self.lightLayer.width = WIDTH;
+    self.lightLayer.height = HEIGHT;
     // pen down
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;

@@ -1,3 +1,5 @@
+
+
 function setPos(x, y, angle, init=false, reset=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
@@ -146,6 +148,18 @@ document.getElementById('obstacles').addEventListener('click', function () {
   }
 });
 
+document.getElementById('randomLocation').addEventListener('click', function () {
+  var _x = Math.floor(Math.random() * sim.WIDTH);
+  var _y = Math.floor(Math.random() * sim.HEIGHT); 
+  var _angle = Math.floor(Math.random() * 360);
+
+  // TO DO - make a "noPenMove" function to take coords/angle and move w/ no pen
+  var tmp = sim.robotStates.penDown;
+  sim.robotStates.penDown = false;
+  setPos(_x, _y, _angle, reset=true);
+  sim.robotStates.penDown = tmp;
+})
+
 
 document.getElementById('resetReset').addEventListener('click', function () {
   sim.robotStates._x = document.getElementById('xPos').value;
@@ -226,7 +240,7 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
   //TO DO - need to capture current robot location then reset to that
   if (preconfig == 'Default_Robot'){
     robotSpecs = sim.default_robot_spec;
-  } else if (preconfig == 'Small_Robot') {
+  } else if ((preconfig == 'Small_Robot') || (preconfig == 'Small_Robot_Wide_Eyes') ) {
       robotSpecs = {
         "wheeldiameter": 28,
         "wheelSpacing": 90,
@@ -238,7 +252,7 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
           "color": "red",
           "width": 6
         },
-        "weight": "medium",
+        "weight": "weightless",
         "sensorNoise": 0,
         "sensor1": {
           "enabled": true,
@@ -264,6 +278,10 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
         }
       };
   };
+  if (preconfig == 'Small_Robot_Wide_Eyes') {
+    robotSpecs.sensor1.x = -30;
+    robotSpecs.sensor2.x = 30;
+  }
   sim.loadRobot(robotSpecs);
   sim.drawAll();
 });
@@ -402,7 +420,12 @@ document.getElementById('map').addEventListener('change', function () {
       [1758, 900, 150, 150],
       [2126, 388, 150, 150]
     ]);
-
+  }
+  else if (map == 'Topo_map') {
+    sim.loadBackground(imagepath + 'Topo_map.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(698, 130, 90, true);
   } else if (map == 'Upload Image (2362x1143px)...') {
     console.log('upload');
     var hiddenElement = document.createElement('input');

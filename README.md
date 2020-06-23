@@ -5,7 +5,7 @@ Click the Binder button to launch a demo:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://gke.mybinder.org/v2/gh/innovationOUtside/nbev3devsim/master?filepath=nbev3devsim%2Fev3devsim_demo.ipynb)
 
-
+![](.images/ev3devsim_demo_screenshot.png)
 
 ### About `ev3devsim`
 

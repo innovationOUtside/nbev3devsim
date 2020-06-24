@@ -97,28 +97,31 @@ function EV3devSim(id) {
   this.loadCanvas = function (id) {
     self.background = document.createElement('canvas');
     self.obstaclesLayer = document.createElement('canvas');
+    self.lightLayer = document.createElement('canvas');
     self.foreground = document.createElement('canvas');
     self.penLayer = document.createElement('canvas');
     self.measurementLayer = document.createElement('canvas');
-    self.lightLayer = document.createElement('canvas');
+
 
     self.background.setAttribute('id', 'background');
     self.penLayer.setAttribute('id', 'penLayer');
     self.obstaclesLayer.setAttribute('id', 'obstaclesLayer');
+    self.lightLayer.setAttribute('id', 'lightLayer');
     self.foreground.setAttribute('id', 'foreground');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
-    self.lightLayer.setAttribute('id', 'lightLayer');
+ 
 
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
     self.obstaclesLayer.width = WIDTH;
     self.obstaclesLayer.height = HEIGHT;
+    self.lightLayer.width = WIDTH;
+    self.lightLayer.height = HEIGHT;
     self.foreground.width = WIDTH;
     self.foreground.height = HEIGHT;
     self.measurementLayer.width = WIDTH;
     self.measurementLayer.height = HEIGHT;
-    self.lightLayer.width = WIDTH;
-    self.lightLayer.height = HEIGHT;
+
     // pen down
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
@@ -137,6 +140,10 @@ function EV3devSim(id) {
     self.obstaclesLayer.style.position = 'absolute';
     self.obstaclesLayer.style.transform = scaler;
     self.obstaclesLayer.style.transformOrigin = '0 0';
+
+    self.lightLayer.style.position = 'absolute';
+    self.lightLayer.style.transform = scaler;
+    self.lightLayer.style.transformOrigin = '0 0';
 
     self.foreground.style.position = 'absolute';
     self.foreground.style.transform = scaler;
@@ -159,6 +166,10 @@ function EV3devSim(id) {
     self.obstaclesLayerCtx.translate(0, HEIGHT);
     self.obstaclesLayerCtx.scale(1, -1);
 
+    self.lightLayerCtx = self.lightLayer.getContext('2d');
+    self.lightLayerCtx.translate(0, HEIGHT);
+    self.lightLayerCtx.scale(1, -1);
+
     self.foregroundCtx = self.foreground.getContext('2d');
     self.foregroundCtx.translate(0, HEIGHT);
     self.foregroundCtx.scale(1, -1);
@@ -172,6 +183,7 @@ function EV3devSim(id) {
     self.parent = document.getElementById(id);
     self.parent.appendChild(self.background);
     self.parent.appendChild(self.obstaclesLayer);
+    //self.parent.appendChild(self.lightLayer);
     self.parent.appendChild(self.foreground);
     self.parent.appendChild(self.penLayer);
 
@@ -179,7 +191,7 @@ function EV3devSim(id) {
     self.parent.style.width = WIDTH / 2;
     self.parent.style.height = HEIGHT / 2;
 
-    self.measurementLayer.addEventListener('click', self.measurementClick);
+    //self.measurementLayer.addEventListener('click', self.measurementClick);
     //self.measurementLayer.addEventListener('mousemove', self.measurementMove);
 
     /// TH TEST START 

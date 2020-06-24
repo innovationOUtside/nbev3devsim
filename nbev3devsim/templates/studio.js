@@ -177,7 +177,11 @@ document.getElementById('move').addEventListener('click', function () {
 
   setPos(x, y, angle, reset=true);
   sim.robotStates.penDown = tmp;
+
+  sim.getColorSensorsValues();
+  sim.displaySensorValues();
 });
+
 document.getElementById('reset').addEventListener('click', function () {
   // Don't draw the trace when we reset the robot position
   var tmp = sim.robotStates.penDown;

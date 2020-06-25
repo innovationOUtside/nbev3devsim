@@ -194,13 +194,10 @@ function EV3devSim(id) {
     //self.measurementLayer.addEventListener('click', self.measurementClick);
     //self.measurementLayer.addEventListener('mousemove', self.measurementMove);
 
-    /// TH TEST START 
     // listen for mouse events
     self.measurementLayer.addEventListener('mousedown', self.myDown);
     self.measurementLayer.addEventListener('mouseup', self.myUp);
     self.measurementLayer.addEventListener('mousemove', self.myMove);
-
-    /// TH TEST END
 
   };
 
@@ -984,8 +981,8 @@ function EV3devSim(id) {
     }
 
     // save the current mouse position
-    self.drag_startX = mx;
-    self.drag_startY = my;
+    //self.drag_startX = mx;
+    //self.drag_startY = my;
   }
 
 
@@ -1011,12 +1008,10 @@ function EV3devSim(id) {
 
   //TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
   this.cursorCanvasCoords = function (e) {
-    bound_rect = self.measurementLayer.getBoundingClientRect();
-    br_x = parseInt(bound_rect.left);
-    br_y = parseInt(bound_rect.bottom);
+    var bb = $('#measurementLayer').offset()
     var cursorCoords = {
-      "mx": parseInt((e.pageX - br_x) * (WIDTH / self.measurementLayer.width) / self.scale),
-      "my": -parseInt((e.pageY - br_y) * (HEIGHT / self.measurementLayer.height) / self.scale),
+      mx: parseInt((e.pageX - bb.left) * (WIDTH / self.measurementLayer.width) / self.scale),
+      my: HEIGHT - parseInt((e.pageY - bb.top) * (HEIGHT / self.measurementLayer.height) / self.scale),
       "pageX": e.pageX,
       "pageY": e.pageY
     }
@@ -1025,11 +1020,12 @@ function EV3devSim(id) {
 
   // handle mouse moves
   this.myMove = function (e) {
+    
     var cursorCoords = self.cursorCanvasCoords(e)
     var mx = cursorCoords.mx
     var my = cursorCoords.my
     // TO DO find the size in the sim coord schem of the robot?
-    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
+    console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
 
     var rW = DRAG_DIAMETER / 2;
     var rH = DRAG_DIAMETER / 2;
@@ -1049,15 +1045,17 @@ function EV3devSim(id) {
 
       // calculate the distance the mouse has moved
       // since the last mousemove
-      var dx = mx - self.drag_startX;
-      var dy = my - self.drag_startY;
+      //var dx = mx - self.drag_startX;
+      //var dy = my - self.drag_startY;
 
       // move the robot that isDragging 
       // by the distance the mouse has moved
       // since the last mousemove
 
-      self.robotStates.x += dx;
-      self.robotStates.y += dy;
+      //self.robotStates.x += dx;
+      //self.robotStates.y -= dy;
+      self.robotStates.x = mx;
+      self.robotStates.y = my;
 
       document.getElementById('xPos').value = self.robotStates.x;
       document.getElementById('yPos').value = self.robotStates.y;
@@ -1066,8 +1064,8 @@ function EV3devSim(id) {
       self.drawAll();
 
       // reset the starting mouse position for the next mousemove
-      self.drag_startX = mx;
-      self.drag_startY = my;
+      //self.drag_startX = mx;
+      //self.drag_startY = my;
 
       //Update sensor reading display
       //self.displaySensorValues();

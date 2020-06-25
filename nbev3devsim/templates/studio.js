@@ -1,5 +1,4 @@
 
-
 function setPos(x, y, angle, init=false, reset=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
@@ -63,6 +62,7 @@ document.getElementById('showCode').addEventListener('click', function () {
   document.getElementById('codeDisplayCode').value = _code;
   document.getElementById('codeDisplay').classList.remove('closed');
 });
+
 document.getElementById('codeDisplayClose').addEventListener('click', function () {
   document.getElementById('codeDisplay').classList.add('closed');
 });
@@ -70,6 +70,7 @@ document.getElementById('codeDisplayClose').addEventListener('click', function (
 document.getElementById('map').selectedIndex = "0";;
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;
+
 
 document.getElementById('configureObstacles').addEventListener('click', function () {
   document.getElementById('obstaclesConfigurator').classList.remove('closed');
@@ -86,9 +87,11 @@ document.getElementById('obstaclesConfiguratorApply').addEventListener('click', 
   sim.loadObstacles(obstacles);
   document.getElementById('obstaclesConfigurator').classList.add('closed');
 });
+
 document.getElementById('obstaclesConfiguratorClose').addEventListener('click', function () {
   document.getElementById('obstaclesConfigurator').classList.add('closed');
 });
+
 document.getElementById('obstaclesConfiguratordownload').addEventListener('click', function () {
   var obstaclesSpecs = document.getElementById('obstaclesConfiguratorEditor').value
 
@@ -464,12 +467,14 @@ document.getElementById('robotConfiguratorOpen').addEventListener('click', funct
 document.getElementById('robotConfiguratorCancel').addEventListener('click', function () {
   document.getElementById('robotConfigurator').classList.add('closed');
 });
+
 document.getElementById('robotConfiguratorApply').addEventListener('click', function () {
   var robotSpecs = JSON.parse(document.getElementById('robotConfiguratorEditor').value);
   sim.loadRobot(robotSpecs);
   sim.drawAll();
   document.getElementById('robotConfigurator').classList.add('closed');
 });
+
 document.getElementById('robotConfiguratordownload').addEventListener('click', function () {
   var robotSpecs = document.getElementById('robotConfiguratorEditor').value
   var hiddenElement = document.createElement('a');
@@ -478,6 +483,7 @@ document.getElementById('robotConfiguratordownload').addEventListener('click', f
   hiddenElement.download = 'robot_config.json';
   hiddenElement.dispatchEvent(new MouseEvent('click'));
 });
+
 document.getElementById('robotConfiguratorupload').addEventListener('click', function () {
   var hiddenElement = document.createElement('input');
   hiddenElement.type = 'file';

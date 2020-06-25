@@ -97,28 +97,31 @@ function EV3devSim(id) {
   this.loadCanvas = function (id) {
     self.background = document.createElement('canvas');
     self.obstaclesLayer = document.createElement('canvas');
+    self.lightLayer = document.createElement('canvas');
     self.foreground = document.createElement('canvas');
     self.penLayer = document.createElement('canvas');
     self.measurementLayer = document.createElement('canvas');
-    self.lightLayer = document.createElement('canvas');
+
 
     self.background.setAttribute('id', 'background');
     self.penLayer.setAttribute('id', 'penLayer');
     self.obstaclesLayer.setAttribute('id', 'obstaclesLayer');
+    self.lightLayer.setAttribute('id', 'lightLayer');
     self.foreground.setAttribute('id', 'foreground');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
-    self.lightLayer.setAttribute('id', 'lightLayer');
+ 
 
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
     self.obstaclesLayer.width = WIDTH;
     self.obstaclesLayer.height = HEIGHT;
+    self.lightLayer.width = WIDTH;
+    self.lightLayer.height = HEIGHT;
     self.foreground.width = WIDTH;
     self.foreground.height = HEIGHT;
     self.measurementLayer.width = WIDTH;
     self.measurementLayer.height = HEIGHT;
-    self.lightLayer.width = WIDTH;
-    self.lightLayer.height = HEIGHT;
+
     // pen down
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
@@ -137,6 +140,10 @@ function EV3devSim(id) {
     self.obstaclesLayer.style.position = 'absolute';
     self.obstaclesLayer.style.transform = scaler;
     self.obstaclesLayer.style.transformOrigin = '0 0';
+
+    self.lightLayer.style.position = 'absolute';
+    self.lightLayer.style.transform = scaler;
+    self.lightLayer.style.transformOrigin = '0 0';
 
     self.foreground.style.position = 'absolute';
     self.foreground.style.transform = scaler;
@@ -159,6 +166,10 @@ function EV3devSim(id) {
     self.obstaclesLayerCtx.translate(0, HEIGHT);
     self.obstaclesLayerCtx.scale(1, -1);
 
+    self.lightLayerCtx = self.lightLayer.getContext('2d');
+    self.lightLayerCtx.translate(0, HEIGHT);
+    self.lightLayerCtx.scale(1, -1);
+
     self.foregroundCtx = self.foreground.getContext('2d');
     self.foregroundCtx.translate(0, HEIGHT);
     self.foregroundCtx.scale(1, -1);
@@ -172,6 +183,7 @@ function EV3devSim(id) {
     self.parent = document.getElementById(id);
     self.parent.appendChild(self.background);
     self.parent.appendChild(self.obstaclesLayer);
+    //self.parent.appendChild(self.lightLayer);
     self.parent.appendChild(self.foreground);
     self.parent.appendChild(self.penLayer);
 
@@ -179,16 +191,13 @@ function EV3devSim(id) {
     self.parent.style.width = WIDTH / 2;
     self.parent.style.height = HEIGHT / 2;
 
-    self.measurementLayer.addEventListener('click', self.measurementClick);
+    //self.measurementLayer.addEventListener('click', self.measurementClick);
     //self.measurementLayer.addEventListener('mousemove', self.measurementMove);
 
-    /// TH TEST START 
     // listen for mouse events
     self.measurementLayer.addEventListener('mousedown', self.myDown);
     self.measurementLayer.addEventListener('mouseup', self.myUp);
     self.measurementLayer.addEventListener('mousemove', self.myMove);
-
-    /// TH TEST END
 
   };
 
@@ -972,8 +981,8 @@ function EV3devSim(id) {
     }
 
     // save the current mouse position
-    self.drag_startX = mx;
-    self.drag_startY = my;
+    //self.drag_startX = mx;
+    //self.drag_startY = my;
   }
 
 
@@ -999,12 +1008,10 @@ function EV3devSim(id) {
 
   //TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
   this.cursorCanvasCoords = function (e) {
-    bound_rect = self.measurementLayer.getBoundingClientRect();
-    br_x = parseInt(bound_rect.left);
-    br_y = parseInt(bound_rect.bottom);
+    var bb = $('#measurementLayer').offset()
     var cursorCoords = {
-      "mx": parseInt((e.pageX - br_x) * (WIDTH / self.measurementLayer.width) / self.scale),
-      "my": -parseInt((e.pageY - br_y) * (HEIGHT / self.measurementLayer.height) / self.scale),
+      mx: parseInt((e.pageX - bb.left) * (WIDTH / self.measurementLayer.width) / self.scale),
+      my: HEIGHT - parseInt((e.pageY - bb.top) * (HEIGHT / self.measurementLayer.height) / self.scale),
       "pageX": e.pageX,
       "pageY": e.pageY
     }
@@ -1013,11 +1020,12 @@ function EV3devSim(id) {
 
   // handle mouse moves
   this.myMove = function (e) {
+    
     var cursorCoords = self.cursorCanvasCoords(e)
     var mx = cursorCoords.mx
     var my = cursorCoords.my
     // TO DO find the size in the sim coord schem of the robot?
-    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
+    console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
 
     var rW = DRAG_DIAMETER / 2;
     var rH = DRAG_DIAMETER / 2;
@@ -1037,15 +1045,17 @@ function EV3devSim(id) {
 
       // calculate the distance the mouse has moved
       // since the last mousemove
-      var dx = mx - self.drag_startX;
-      var dy = my - self.drag_startY;
+      //var dx = mx - self.drag_startX;
+      //var dy = my - self.drag_startY;
 
       // move the robot that isDragging 
       // by the distance the mouse has moved
       // since the last mousemove
 
-      self.robotStates.x += dx;
-      self.robotStates.y += dy;
+      //self.robotStates.x += dx;
+      //self.robotStates.y -= dy;
+      self.robotStates.x = mx;
+      self.robotStates.y = my;
 
       document.getElementById('xPos').value = self.robotStates.x;
       document.getElementById('yPos').value = self.robotStates.y;
@@ -1054,8 +1064,8 @@ function EV3devSim(id) {
       self.drawAll();
 
       // reset the starting mouse position for the next mousemove
-      self.drag_startX = mx;
-      self.drag_startY = my;
+      //self.drag_startX = mx;
+      //self.drag_startY = my;
 
       //Update sensor reading display
       //self.displaySensorValues();

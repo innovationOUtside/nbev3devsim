@@ -904,10 +904,20 @@ function EV3devSim(id) {
     }
   };
 
+  //Central limit estimate of normal distribution
+  this.gaussianRand = function() {
+    var rand = 0;
+    for (var i = 0; i < 6; i += 1) {
+      rand += Math.random();
+    }
+    return rand / 6;
+  }
+  
   //Create a simple noise component in range +/-1
   this.simpleNoise = function (noise = 1) {
     if (noise > 0) {
-      noise = noise * (Math.random() - 0.5) * 2;
+      // TO DO - better noise model? eg this.gaussianRand() ?
+      noise = (Math.random() - 0.5) * 2.0 * noise;
     }
     return noise;
   }

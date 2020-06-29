@@ -953,14 +953,17 @@ function EV3devSim(id) {
 
   //Update the sensor display panel
   this.displaySensorValues = function () {
-    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLight(self.robotStates.sensor1)).toFixed(2) + ' ('+self.robotStates.sensor1[0].toFixed(2) +', ' + self.robotStates.sensor1[1].toFixed(2) + ', ' + self.robotStates.sensor1[2].toFixed(2)+')';
-    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLight(self.robotStates.sensor2)).toFixed(2) + ' ('+ self.robotStates.sensor2[0].toFixed(2) +', ' + self.robotStates.sensor2[1].toFixed(2) + ', ' + self.robotStates.sensor2[2].toFixed(2)+')';
+    var _sensor1 = self.robotStates.sensor1;
+    var _sensor2 = self.robotStates.sensor2;
+    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLightR(_sensor1)).toFixed(2) + '|' + (self.getReflectedLight(_sensor1)).toFixed(2) + ' ('+_sensor1[0].toFixed() +', ' + _sensor1[1].toFixed() + ', ' + _sensor1[2].toFixed()+')';
+    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLightR(_sensor2)).toFixed(2) + '|' + (self.getReflectedLight(_sensor2)).toFixed(2) + ' ('+ _sensor2[0].toFixed() +', ' + _sensor2[1].toFixed() + ', ' + _sensor2[2].toFixed()+')';
+  
     document.getElementById('ultrasonic_value').innerHTML = self.robotStates.ultrasonic.toFixed(2);
     document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) +", "+self.robotStates.gyro[1].toFixed(2) ;
   
     if (!self.dragok) {
-      document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(self.robotStates.sensor1);
-      document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(self.robotStates.sensor2);
+      document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(_sensor1);
+      document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(_sensor2);
     }
   }
 

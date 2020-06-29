@@ -154,12 +154,54 @@ function EV3devSim(id) {
     self.measurementLayer.style.cursor = 'crosshair';
 
     self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
+    //No smoothing - see pixels cleanly
+    //https://miguelmota.com/blog/pixelate-images-with-canvas/
+    self.sensorArrayLeft.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+                         'image-rendering: -moz-crisp-edges;' + // FireFox
+                         'image-rendering: -o-crisp-edges;' +  // Opera
+                         'image-rendering: -webkit-crisp-edges;' + // Chrome
+                         'image-rendering: crisp-edges;' + // Chrome
+                         'image-rendering: -webkit-optimize-contrast;' + // Safari
+                         'image-rendering: pixelated; ' + // Future browsers
+                         '-ms-interpolation-mode: nearest-neighbor;'; // IE
+    self.sensorArrayLeft.height = SENSOR_DIAMETER;
+    self.sensorArrayLeft.width = SENSOR_DIAMETER;
     self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
+    self.sensorArrayLeftCtx.webkitImageSmoothingEnabled = false;
+    self.sensorArrayLeftCtx.mozImageSmoothingEnabled = false;
+    self.sensorArrayLeftCtx.msImageSmoothingEnabled = false;
+    self.sensorArrayLeftCtx.imageSmoothingEnabled = false;
 
     self.sensorArrayRight = document.getElementById('sensorArrayRight');
+    self.sensorArrayRight.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+    'image-rendering: -moz-crisp-edges;' + // FireFox
+    'image-rendering: -o-crisp-edges;' +  // Opera
+    'image-rendering: -webkit-crisp-edges;' + // Chrome
+    'image-rendering: crisp-edges;' + // Chrome
+    'image-rendering: -webkit-optimize-contrast;' + // Safari
+    'image-rendering: pixelated; ' + // Future browsers
+    '-ms-interpolation-mode: nearest-neighbor;'; // IE
+    self.sensorArrayRight.height = SENSOR_DIAMETER;
+    self.sensorArrayRight.width = SENSOR_DIAMETER;
     self.sensorArrayRightCtx = self.sensorArrayRight.getContext('2d');
+    self.sensorArrayRightCtx.webkitImageSmoothingEnabled = false;
+    self.sensorArrayRightCtx.mozImageSmoothingEnabled = false;
+    self.sensorArrayRightCtx.msImageSmoothingEnabled = false;
+    self.sensorArrayRightCtx.imageSmoothingEnabled = false;
 
+    //self.background.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+    //'image-rendering: -moz-crisp-edges;' + // FireFox
+    //'image-rendering: -o-crisp-edges;' +  // Opera
+    //'image-rendering: -webkit-crisp-edges;' + // Chrome
+    //'image-rendering: crisp-edges;' + // Chrome
+    //'image-rendering: -webkit-optimize-contrast;' + // Safari
+    //'image-rendering: pixelated; ' + // Future browsers
+    //'-ms-interpolation-mode: nearest-neighbor;';
     self.backgroundCtx = self.background.getContext('2d');
+    //self.backgroundCtx.webkitImageSmoothingEnabled = false;
+    //self.backgroundCtx.mozImageSmoothingEnabled = false;
+    //self.backgroundCtx.msImageSmoothingEnabled = false;
+    //self.backgroundCtx.imageSmoothingEnabled = false;
 
     self.obstaclesLayerCtx = self.obstaclesLayer.getContext('2d');
     self.obstaclesLayerCtx.translate(0, HEIGHT);
@@ -853,12 +895,12 @@ function EV3devSim(id) {
 
     var x1 = cos * self.robotSpecs.sensor1.x - sin * self.robotSpecs.sensor1.y + self.robotStates.x;
     var y1 = -(sin * self.robotSpecs.sensor1.x + cos * self.robotSpecs.sensor1.y) + (HEIGHT - self.robotStates.y);
-    self.robotStates.sensor1 = self.getSensorValues(x1, y1, self.robotStates.sensor1.diameter, 'sensor1');
+    self.robotStates.sensor1 = self.getSensorValues(x1, y1, self.robotSpecs.sensor1.diameter, 'sensor1');
 
     if (typeof self.robotSpecs.sensor2 != 'undefined') {
       var x2 = cos * self.robotSpecs.sensor2.x - sin * self.robotSpecs.sensor2.y + self.robotStates.x;
       var y2 = -(sin * self.robotSpecs.sensor2.x + cos * self.robotSpecs.sensor2.y) + (HEIGHT - self.robotStates.y);
-      self.robotStates.sensor2 = self.getSensorValues(x2, y2, self.robotStates.sensor2.diameter, 'sensor2');
+      self.robotStates.sensor2 = self.getSensorValues(x2, y2, self.robotSpecs.sensor2.diameter, 'sensor2');
     }
   };
 
@@ -891,21 +933,28 @@ function EV3devSim(id) {
       diameter,
       diameter
     );
-
-    if (sensor=='sensor1')
+    var sensorViewCtx;
+    var sensorView;
+    if (sensor=='sensor1') {
       self.sensorArrayLeftCtx.drawImage(self.background,
-                      Math.min(Math.max(0, x - radius ), WIDTH-diameter),
-                      Math.min(Math.max(0, y - radius), HEIGHT-diameter),
-                      diameter, diameter,
-                      0, 0,
-                      200, 200);
-    else if (sensor='sensor2')
+                    Math.min(Math.max(0, x - radius ), WIDTH-diameter),
+                    Math.min(Math.max(0, y - radius), HEIGHT-diameter),
+                    diameter, diameter,
+                    0, 0,
+                    diameter, diameter);
+      sensorViewCtx = self.sensorArrayLeftCtx;
+      sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
+    }
+    else if (sensor='sensor2') {
       self.sensorArrayRightCtx.drawImage(self.background,
-                      Math.min(Math.max(0, x - radius ), WIDTH-diameter),
-                      Math.min(Math.max(0, y - radius), HEIGHT-diameter),
-                      diameter, diameter,
-                      0, 0,
-                      200, 200);
+                    Math.min(Math.max(0, x - radius ), WIDTH-diameter),
+                    Math.min(Math.max(0, y - radius), HEIGHT-diameter),
+                    diameter, diameter,
+                    0, 0,
+                    diameter, diameter);
+      sensorViewCtx = self.sensorArrayRightCtx;
+      sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
+    }
 
     var redTotal = 0;
     var greenTotal = 0;
@@ -913,17 +962,39 @@ function EV3devSim(id) {
     var count = 0;
     var radius = diameter / 2;
     var radiusSquare = radius ** 2;
-    for (let row = 0; row < diameter; row++) {
-      for (let col = 0; col < diameter; col++) {
+    var redNoise = 0;
+    var blueNoise = 0;
+    var greenNoise = 0;
+    var noiseLayer = [];
+
+    // TO DO: optimise this for where there is no noise
+    // TO DO how do we provide the sensor view with added noise?
+    for (let col = 0; col < diameter; col++) {
+      for (let row = 0; row < diameter; row++) {
+        let offset = (row * (diameter * 4) + col * 4);
         if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
-          let offset = row * (diameter * 4) + col * 4;
+          
+          redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
+          redTotal += redNoise;
+          greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
+          greenTotal += greenNoise;
+          blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotSpecs.sensorNoise);
+          blueTotal += blueNoise;
+          sensorView.data[offset] = redNoise;
+          sensorView.data[offset+1] = greenNoise;
+          sensorView.data[offset+2] = blueNoise;
           count++;
-          redTotal += self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
-          greenTotal += self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
-          blueTotal += self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotSpecs.sensorNoise);
+        } else {
+          sensorView.data[offset] = 245;
+          sensorView.data[offset+1] = 226;
+          sensorView.data[offset+2] = 225;
         }
       }
     }
+
+    sensorViewCtx.putImageData(sensorView, 0, 0);
+    
+    // TO DO - we could do a much simple noise estimate and just add noise here?
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 

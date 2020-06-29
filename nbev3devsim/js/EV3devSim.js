@@ -1041,6 +1041,10 @@ function EV3devSim(id) {
     return 100.0 * parseInt(val[0]) / 255
   }
 
+  //Update motor display panel
+  this.displayMotorValues = function () {
+    document.getElementById('leftWheel_value').innerHTML = self.robotStates.leftWheel.speed.toFixed(2);
+    document.getElementById('rightWheel_value').innerHTML = self.robotStates.rightWheel.speed.toFixed(2);
   }
 
   //Update the sensor display panel

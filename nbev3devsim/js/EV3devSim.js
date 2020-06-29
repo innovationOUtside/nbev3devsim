@@ -442,7 +442,11 @@ function EV3devSim(id) {
     var width = RIGHT_LIMIT - LEFT_LIMIT;
     var height = TOP_LIMIT - BOTTOM_LIMIT;
 
+    self.robotSpecs.width = width;
+    self.robotSpecs.height = height;
+
     self.robotCanvas = document.createElement('canvas');
+    self.robotCanvas.id = 'simone'
     self.robotCanvas.width = width;
     self.robotCanvas.height = height;
 

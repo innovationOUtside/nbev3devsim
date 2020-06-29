@@ -362,6 +362,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(500, 500, 0, true);
+  } else if (map == 'Rainbow_bands') {
+      sim.loadBackground(imagepath + '_rainbow_bands.png');
+      sim.clearObstacles();
+      sim.clearObstaclesLayer();
+      setPos(150, 500, 0, true);
   } else if (map == 'Grey_and_black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();
@@ -373,6 +378,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstaclesLayer();
     setPos(750, 375, -180, true);
 
+  } else if (map == 'Noisy_Lollipop') {
+    sim.loadBackground(imagepath + '_noisy_line_follower_track.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(750, 375, -180, true);
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');
     sim.clearObstacles();
@@ -408,12 +418,16 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(698, 130, 90, true);
-  }
-    else if (map == 'Thruxton_Circuit') {
+  } else if (map == 'Sensor_Diameter_Test') {
+    sim.loadBackground(imagepath + '_sensor_diameter_test.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(550, 450, 90, true);
+  }  else if (map == 'Thruxton_Circuit') {
       sim.loadBackground(imagepath + 'thruxton_track.png');
       sim.clearObstacles();
       sim.clearObstaclesLayer();
-      setPos(698, 130, 90, true);
+      setPos(457, 242, 120, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);

@@ -10,7 +10,9 @@
       <option>Linear_grey</option>
       <option>Radial_grey</option>
       <option>Lollipop</option>
+      <option>Noisy_Lollipop</option>
       <option>Coloured_bands</option>
+      <option>Rainbow_bands</option>
       <option>WRO_2019_Regular_Junior</option>
       <option>WRO_2018_Regular_Junior</option>
       <option>FLL_2019_City_Shaper</option>
@@ -19,6 +21,7 @@
       <option>Junction_Handling_Test</option>
       <option>Topo_map</option>
       <option>Obstacles_Test</option>
+      <option>Sensor_Diameter_Test</option>
       <option>Thruxton_Circuit</option>
       <option>Upload Image (2362x1143px)...</option>
       <option hidden>Custom Image</option>
@@ -84,7 +87,11 @@
   </div>
 
   <div class="row">
-    <div id="readings">Sensor readings:
+    <div id="readings">Port Values:
+      <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
+      </div>
+      <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
+    </div>
       <div class='sensorReading'>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
       </div>
       <div class='sensorReading'>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>

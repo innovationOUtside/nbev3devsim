@@ -567,6 +567,13 @@ function EV3devSim(id) {
     else if (_tmp>0) wheel.speed = Math.max(Math.round(_tmp), -1050);
   };
 
+  this.bigDraw = function() {
+    self.drawAll();
+    self.displayMotorValues();
+    self.getColorSensorsValues();
+    self.displaySensorValues();
+  }
+
   this.animate = function () {
     self.clock++;
 
@@ -590,9 +597,7 @@ function EV3devSim(id) {
       self.robotStates.angle -= Math.PI * 2;
     }
 
-    self.drawAll();
-    self.getColorSensorsValues();
-    self.displaySensorValues();
+    self.bigDraw();
   };
 
   this.drawAll = function () {

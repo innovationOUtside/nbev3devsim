@@ -8,7 +8,6 @@ function EV3devSim(id) {
   const HEIGHT = 1143;
 
   const BACK = -120;
-  const DRAG_DIAMETER = 150;
 
   const WHEEL_WIDTH = 20;
   const SENSOR_WIDTH = 30;
@@ -46,7 +45,7 @@ function EV3devSim(id) {
       width: 6
     },
     weight: 'medium',
-    // This is a covenience generic to sensor1 and sensor2
+    // This is a convenience value generic to sensor1 and sensor2
     sensorNoise: 0,
     sensor1: {
       enabled: true,
@@ -977,10 +976,10 @@ function EV3devSim(id) {
     var my = cursorCoords.my
     // TO DO find the size in the sim coord schem of the robot?
     //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
-    var rW = 100 / 2
-    var rH = 100 / 2
+    var rW = self.robotSpecs.width / 2
+    var rH = self.robotSpecs.height / 2
     if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
-      //console.log('Drag enable...');
+    //console.log('Drag enable...');
       self.dragok = true;
       self.isDragging = true;
     }
@@ -1029,14 +1028,13 @@ function EV3devSim(id) {
     var cursorCoords = self.cursorCanvasCoords(e)
     var mx = cursorCoords.mx
     var my = cursorCoords.my
-    // TO DO find the size in the sim coord schem of the robot?
-    console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
+    //console.log('c'+mx+'c'+my+'x'+self.robotStates.x+'y'+self.robotStates.y)
 
-    var rW = DRAG_DIAMETER / 2;
-    var rH = DRAG_DIAMETER / 2;
-    if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
-      console.log('Over the robot, ish...');
-    }
+    var rW = self.robotSpecs.width / 2;
+    var rH = self.robotSpecs.height / 2;
+    //if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
+    //  console.log('Over the robot, ish...');
+    //}
     // if we're dragging anything...
     if (self.dragok) {
 

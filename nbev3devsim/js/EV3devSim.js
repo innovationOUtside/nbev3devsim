@@ -941,13 +941,20 @@ function EV3devSim(id) {
   }
 
 
-  // This follows the rerlfected light definition in ev3dev2/sensor/lego.py
+  // Return triband reflected light
   this.getReflectedLight = function(val) {
     var sum = 0;
     for( var i = 0; i < val.length; i++ ){
       sum += parseInt(val[i]); 
     }
     return 100.0 * sum / 765
+  }
+
+  // Return pure (R) reflected light
+  this.getReflectedLightR = function(val) {
+    //Value of reflected light (i.e. reflected R component) as percentage
+    return 100.0 * parseInt(val[0]) / 255
+  }
 
   }
 

@@ -25,10 +25,12 @@ function setPos(x, y, angle, init=false, reset=false) {
   }
 
   // Render scene
-  sim.drawAll();
+  //sim.drawAll();
+  sim.getColorSensorsValues();
+  sim.bigDraw();
 
   //Update sensor reading display
-  sim.displaySensorValues();
+  //sim.displaySensorValues();
 }
 
 var sim = new EV3devSim('field');
@@ -45,6 +47,8 @@ document.getElementById('codeFromClipboard').addEventListener('click', function 
 var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {
   sim.robotSpecs.sensorNoise = parseFloat(this.value);
+  sim.getColorSensorsValues();
+  sim.displaySensorValues();
 }
 
 var wheelNoiseSlider = document.getElementById("wheelNoiseSlider");
@@ -284,11 +288,18 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
           "enabled": true
         }
       };
-  };
+  } else robotSpecs = sim.default_robot_spec;
+
   if (preconfig == 'Small_Robot_Wide_Eyes') {
     robotSpecs.sensor1.x = -30;
     robotSpecs.sensor2.x = 30;
   }
+
+  if (preconfig == 'Sensor_Diameter_Config') {
+    robotSpecs.sensor1.diameter = 30;
+    robotSpecs.sensor2.diameter = 10;
+  }
+
   sim.loadRobot(robotSpecs);
   sim.drawAll();
 });
@@ -362,6 +373,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(500, 500, 0, true);
+  } else if (map == 'Rainbow_bands') {
+      sim.loadBackground(imagepath + '_rainbow_bands.png');
+      sim.clearObstacles();
+      sim.clearObstaclesLayer();
+      setPos(150, 500, 0, true);
   } else if (map == 'Grey_and_black') {
     sim.loadBackground(imagepath + '_grey_and_black.png');
     sim.clearObstacles();
@@ -373,6 +389,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstaclesLayer();
     setPos(750, 375, -180, true);
 
+  } else if (map == 'Noisy_Lollipop') {
+    sim.loadBackground(imagepath + '_noisy_line_follower_track.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(750, 375, -180, true);
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');
     sim.clearObstacles();
@@ -408,12 +429,16 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(698, 130, 90, true);
-  }
-    else if (map == 'Thruxton_Circuit') {
+  } else if (map == 'Sensor_Diameter_Test') {
+    sim.loadBackground(imagepath + '_sensor_diameter_test.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(550, 450, 90, true);
+  }  else if (map == 'Thruxton_Circuit') {
       sim.loadBackground(imagepath + 'thruxton_track.png');
       sim.clearObstacles();
       sim.clearObstaclesLayer();
-      setPos(698, 130, 90, true);
+      setPos(457, 242, 120, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);
@@ -471,7 +496,12 @@ document.getElementById('robotConfiguratorCancel').addEventListener('click', fun
 document.getElementById('robotConfiguratorApply').addEventListener('click', function () {
   var robotSpecs = JSON.parse(document.getElementById('robotConfiguratorEditor').value);
   sim.loadRobot(robotSpecs);
-  sim.drawAll();
+  // TO DO - need a standalone configuration update function we can call
+  sim.sensorArrayLeft.height = sim.robotSpecs.sensor1.diameter;
+  sim.sensorArrayLeft.width = sim.robotSpecs.sensor1.diameter;
+  sim.sensorArrayRight.height = sim.robotSpecs.sensor2.diameter;
+  sim.sensorArrayRight.width = sim.robotSpecs.sensor2.diameter;
+  sim.bigDraw();
   document.getElementById('robotConfigurator').classList.add('closed');
 });
 

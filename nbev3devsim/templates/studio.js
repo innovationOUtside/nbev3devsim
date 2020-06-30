@@ -294,6 +294,12 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
     robotSpecs.sensor1.x = -30;
     robotSpecs.sensor2.x = 30;
   }
+
+  if (preconfig == 'Sensor_Diameter_Config') {
+    robotSpecs.sensor1.diameter = 30;
+    robotSpecs.sensor2.diameter = 10;
+  }
+
   sim.loadRobot(robotSpecs);
   sim.drawAll();
 });

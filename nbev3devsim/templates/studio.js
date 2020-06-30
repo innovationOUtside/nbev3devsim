@@ -25,10 +25,12 @@ function setPos(x, y, angle, init=false, reset=false) {
   }
 
   // Render scene
-  sim.drawAll();
+  //sim.drawAll();
+  sim.getColorSensorsValues();
+  sim.bigDraw();
 
   //Update sensor reading display
-  sim.displaySensorValues();
+  //sim.displaySensorValues();
 }
 
 var sim = new EV3devSim('field');
@@ -45,6 +47,8 @@ document.getElementById('codeFromClipboard').addEventListener('click', function 
 var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {
   sim.robotSpecs.sensorNoise = parseFloat(this.value);
+  sim.getColorSensorsValues();
+  sim.displaySensorValues();
 }
 
 var wheelNoiseSlider = document.getElementById("wheelNoiseSlider");
@@ -284,7 +288,8 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
           "enabled": true
         }
       };
-  };
+  } else robotSpecs = sim.default_robot_spec;
+
   if (preconfig == 'Small_Robot_Wide_Eyes') {
     robotSpecs.sensor1.x = -30;
     robotSpecs.sensor2.x = 30;

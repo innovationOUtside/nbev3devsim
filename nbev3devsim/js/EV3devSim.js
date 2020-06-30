@@ -338,6 +338,8 @@ function EV3devSim(id) {
     var img = new Image();   // Create new img element
     img.addEventListener('load', function () {
       self.backgroundCtx.drawImage(img, 0, 0);
+      self.getColorSensorsValues();
+      self.bigDraw();
     }, false);
     img.src = imgURL;
   };

@@ -508,10 +508,10 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   var robotSpecs = JSON.parse(document.getElementById('robotConfiguratorEditor').value);
   sim.loadRobot(robotSpecs);
   // TO DO - need a standalone configuration update function we can call
-  sim.sensorArrayLeft.height = sim.robotSpecs.sensor1.diameter;
-  sim.sensorArrayLeft.width = sim.robotSpecs.sensor1.diameter;
-  sim.sensorArrayRight.height = sim.robotSpecs.sensor2.diameter;
-  sim.sensorArrayRight.width = sim.robotSpecs.sensor2.diameter;
+  //sim.sensorArrayLeft.height = sim.robotSpecs.sensor1.diameter;
+  //sim.sensorArrayLeft.width = sim.robotSpecs.sensor1.diameter;
+  //sim.sensorArrayRight.height = sim.robotSpecs.sensor2.diameter;
+  //sim.sensorArrayRight.width = sim.robotSpecs.sensor2.diameter;
   sim.resetSensorDiameter();
   sim.bigDraw();
   document.getElementById('robotConfigurator').classList.add('closed');

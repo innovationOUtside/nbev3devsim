@@ -241,7 +241,13 @@ function EV3devSim(id) {
     self.measurementLayer.addEventListener('mousemove', self.myMove);
 
   };
-
+  
+  this.resetSensorDiameter = function() {
+    self.sensorArrayLeft.height = self.robotSpecs.sensor1.diameter;
+    self.sensorArrayLeft.width = self.robotSpecs.sensor1.diameter;
+    self.sensorArrayRight.height = self.robotSpecs.sensor2.diameter;
+    self.sensorArrayRight.width = self.robotSpecs.sensor2.diameter;
+  }
 
 
   this.measurementClick = function (e) {
@@ -517,6 +523,7 @@ function EV3devSim(id) {
       ctx.fill();
       ctx.stroke();
     }
+    self.resetSensorDiameter();
   };
 
   this.setRobotPos = function (x, y, angle) {
@@ -582,7 +589,7 @@ function EV3devSim(id) {
         wheel.state = '';
         return 0;
       }
-
+      wheel.pos += degrees;
     } else {
       wheel.state = '';
       return 0;

@@ -167,7 +167,6 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   sim.robotStates.penDown = tmp;
 })
 
-
 document.getElementById('resetReset').addEventListener('click', function () {
   sim.robotStates._x = document.getElementById('xPos').value;
   sim.robotStates._y = document.getElementById('yPos').value;
@@ -368,6 +367,13 @@ document.getElementById('map').addEventListener('change', function () {
 
     //Set initial location
     setPos(100, 400, 0, true);
+  } else if (map == 'Radial_red') {
+    //Load background
+    sim.loadBackground(imagepath + '_radial_red.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    //Set initial location
+    setPos(100, 400, 0, true);
   } else if (map == 'Coloured_bands') {
     sim.loadBackground(imagepath + '_coloured_bands.png');
     sim.clearObstacles();
@@ -394,6 +400,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(750, 375, -180, true);
+  } else if (map == 'Testcard') {
+    sim.loadBackground(imagepath + 'FuBK_testcard_vectorized.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(500, 250, 90, true);
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');
     sim.clearObstacles();
@@ -497,10 +508,11 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   var robotSpecs = JSON.parse(document.getElementById('robotConfiguratorEditor').value);
   sim.loadRobot(robotSpecs);
   // TO DO - need a standalone configuration update function we can call
-  sim.sensorArrayLeft.height = sim.robotSpecs.sensor1.diameter;
-  sim.sensorArrayLeft.width = sim.robotSpecs.sensor1.diameter;
-  sim.sensorArrayRight.height = sim.robotSpecs.sensor2.diameter;
-  sim.sensorArrayRight.width = sim.robotSpecs.sensor2.diameter;
+  //sim.sensorArrayLeft.height = sim.robotSpecs.sensor1.diameter;
+  //sim.sensorArrayLeft.width = sim.robotSpecs.sensor1.diameter;
+  //sim.sensorArrayRight.height = sim.robotSpecs.sensor2.diameter;
+  //sim.sensorArrayRight.width = sim.robotSpecs.sensor2.diameter;
+  sim.resetSensorDiameter();
   sim.bigDraw();
   document.getElementById('robotConfigurator').classList.add('closed');
 });
@@ -552,7 +564,9 @@ var chart_sensor_traces = [
   { id: "chart_left_light", tag: "Light_left:", color: "#CA80F6" },
   { id: "chart_right_light", tag: "Light_right:", color: "#CAF680" },
   { id: "chart_colour", tag: "Colour:", color: "#00FF00" },
-  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" }
+  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" },
+  { id: "chart_left_wheel", tag: "Wheel_left:", color: "#99FF00" },
+  { id: "chart_right_wheel", tag: "Wheel_right:", color: "#0099FF" }
 ]
 
 
@@ -584,9 +598,9 @@ function outf(text) {
 
   // Can we somehow stream data back to py context?
   report_callback(text);
-
   // Can we also send something back to py context and then get something back from py in return?
-  if (sim.collaborative) report_callback_responder(text);
+  // NOte there are quite a lot of delays in round trip
+  if ((sim.collaborative) && (text.trim()!='')) report_callback_responder(text);
 
   if (sim.showChart) {
     // Try updating the chart
@@ -619,11 +633,16 @@ function outf(text) {
   if (sim.collaborative) {
     if (typeof element !== 'undefined') {
       if (typeof element.response !== 'undefined') {
+        // The response element contains state sent from the Python environment
         var response = element.response;
         if (response != '') { 
+          // For now, just show what we've got back from py
           mypre.innerHTML = mypre.innerHTML + response;
           mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
           sim.pyState = response;
+          //The sim.pyState can be then referenced in sim py code:
+          //import ev3dev2_glue as glue
+          //print('gs',glue.pyState())
         }
         element.response = '';
       }
@@ -716,7 +735,12 @@ document.getElementById('stop').addEventListener('click', stopit );
 
 document.getElementById('clearTrace').addEventListener('click', function() {sim.clearPenLayer()} )
 
-document.getElementById('clearChart').addEventListener('click', function() {
+function clearChart(){
+  sim.previousChartTraces = [];
   set_chartlines()
   Plotly.newPlot('plotlyDiv', chart_lines);
+}
+
+document.getElementById('clearChart').addEventListener('click', function() {
+  clearChart();
 } )

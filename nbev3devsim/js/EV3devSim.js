@@ -583,6 +583,7 @@ function EV3devSim(id) {
         return 0;
       }
 
+      wheel.pos += degrees;
     } else {
       wheel.state = '';
       return 0;

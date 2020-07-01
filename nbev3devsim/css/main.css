@@ -218,11 +218,16 @@
 }
 
 .closed {
-  top: -1000px !important;
+  top: -2000px !important;
 }
 
 #run {
   background-color: yellow;
 }
 
+#background {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */

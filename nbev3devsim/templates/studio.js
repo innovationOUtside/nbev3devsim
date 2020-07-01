@@ -552,7 +552,9 @@ var chart_sensor_traces = [
   { id: "chart_left_light", tag: "Light_left:", color: "#CA80F6" },
   { id: "chart_right_light", tag: "Light_right:", color: "#CAF680" },
   { id: "chart_colour", tag: "Colour:", color: "#00FF00" },
-  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" }
+  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" },
+  { id: "chart_left_wheel", tag: "Wheel_left:", color: "#99FF00" },
+  { id: "chart_right_wheel", tag: "Wheel_right:", color: "#0099FF" }
 ]
 
 
@@ -584,7 +586,6 @@ function outf(text) {
 
   // Can we somehow stream data back to py context?
   report_callback(text);
-
   // Can we also send something back to py context and then get something back from py in return?
   if (sim.collaborative) report_callback_responder(text);
 
@@ -716,7 +717,12 @@ document.getElementById('stop').addEventListener('click', stopit );
 
 document.getElementById('clearTrace').addEventListener('click', function() {sim.clearPenLayer()} )
 
-document.getElementById('clearChart').addEventListener('click', function() {
+function clearChart(){
+  sim.previousChartTraces = [];
   set_chartlines()
   Plotly.newPlot('plotlyDiv', chart_lines);
+}
+
+document.getElementById('clearChart').addEventListener('click', function() {
+  clearChart();
 } )

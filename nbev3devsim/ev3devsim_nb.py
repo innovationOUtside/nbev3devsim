@@ -144,10 +144,13 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         # TO DO
         # - log all sensor channels
         # - add timestamp
-        if obj.startswith(('Ultrasonic:', 'Colour:', 'Light_left:', 'Light_right:', 'Gyro:')):
+        # TO DO  - this would be cleaner if we say: log colour, log ultrasonic etc
+        if obj.startswith(('^log','Ultrasonic:', 'Colour:', 'Light_left:', 'Light_right:', 'Gyro:', 'Wheel_left:', 'Wheel_right:')):
             typ = obj.split(': ')[0]
-            val = float(obj.split(': ')[1])
-            self.results_log.append({'index': datetime.utcnow(), typ: val})
+            vals = obj.split(': ')[1].strip().split()
+            val = float(vals[0])
+            clock = float(vals[1]) if len(vals)>1 else None
+            self.results_log.append({'index': datetime.utcnow(), 'simtime': clock, typ: val})
             self.count += 1
 
     def responder(self, obj):
@@ -187,9 +190,15 @@ def get_dataframe_from_datalog(datalog):
     """Generate a dataframe from datalog."""
     df = pd.DataFrame(datalog)
     if not df.empty:
-        df = df.melt(id_vars='index').dropna()
-        df['index'] = pd.to_timedelta(df['index']-df['index'].min())
-        df['time'] = df['index'].dt.total_seconds()
+        if 'simtime' in df.columns:
+            df = pd.DataFrame(datalog)
+            df.drop(['index'], axis=1, inplace=True)
+            df = df.melt(id_vars='simtime').dropna()
+            df.rename(columns={"simtime": "time"}, inplace=True)  
+        else:
+            df = df.melt(id_vars='index').dropna()
+            df['index'] = pd.to_timedelta(df['index']-df['index'].min())
+            df['time'] = df['index'].dt.total_seconds()
     return df
 
 def get_dataframe_from_widget(widget):

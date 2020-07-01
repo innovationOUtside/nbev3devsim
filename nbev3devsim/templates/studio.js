@@ -167,7 +167,6 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   sim.robotStates.penDown = tmp;
 })
 
-
 document.getElementById('resetReset').addEventListener('click', function () {
   sim.robotStates._x = document.getElementById('xPos').value;
   sim.robotStates._y = document.getElementById('yPos').value;
@@ -600,7 +599,8 @@ function outf(text) {
   // Can we somehow stream data back to py context?
   report_callback(text);
   // Can we also send something back to py context and then get something back from py in return?
-  if (sim.collaborative) report_callback_responder(text);
+  // NOte there are quite a lot of delays in round trip
+  if ((sim.collaborative) && (text.trim()!='')) report_callback_responder(text);
 
   if (sim.showChart) {
     // Try updating the chart
@@ -633,11 +633,16 @@ function outf(text) {
   if (sim.collaborative) {
     if (typeof element !== 'undefined') {
       if (typeof element.response !== 'undefined') {
+        // The response element contains state sent from the Python environment
         var response = element.response;
         if (response != '') { 
+          // For now, just show what we've got back from py
           mypre.innerHTML = mypre.innerHTML + response;
           mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
           sim.pyState = response;
+          //The sim.pyState can be then referenced in sim py code:
+          //import ev3dev2_glue as glue
+          //print('gs',glue.pyState())
         }
         element.response = '';
       }

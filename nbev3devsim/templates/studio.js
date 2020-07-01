@@ -368,6 +368,13 @@ document.getElementById('map').addEventListener('change', function () {
 
     //Set initial location
     setPos(100, 400, 0, true);
+  } else if (map == 'Radial_red') {
+    //Load background
+    sim.loadBackground(imagepath + '_radial_red.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    //Set initial location
+    setPos(100, 400, 0, true);
   } else if (map == 'Coloured_bands') {
     sim.loadBackground(imagepath + '_coloured_bands.png');
     sim.clearObstacles();
@@ -394,6 +401,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(750, 375, -180, true);
+  } else if (map == 'Testcard') {
+    sim.loadBackground(imagepath + 'FuBK_testcard_vectorized.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(500, 250, 90, true);
   } else if (map == 'Square') {
     sim.loadBackground(imagepath + '_square.png');
     sim.clearObstacles();

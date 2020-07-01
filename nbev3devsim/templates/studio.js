@@ -513,6 +513,7 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   sim.sensorArrayLeft.width = sim.robotSpecs.sensor1.diameter;
   sim.sensorArrayRight.height = sim.robotSpecs.sensor2.diameter;
   sim.sensorArrayRight.width = sim.robotSpecs.sensor2.diameter;
+  sim.resetSensorDiameter();
   sim.bigDraw();
   document.getElementById('robotConfigurator').classList.add('closed');
 });

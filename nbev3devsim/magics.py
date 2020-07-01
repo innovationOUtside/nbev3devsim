@@ -88,6 +88,7 @@ bright_sound('square', 1.5);"""
         document.getElementById('xPos').value = {args.xpos};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
+        document.getElementById('move').click();
       """
             )
         if args.ypos is not None:
@@ -96,6 +97,7 @@ bright_sound('square', 1.5);"""
         document.getElementById('yPos').value = {args.ypos};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
+        document.getElementById('move').click();
       """
             )
         if args.angle is not None:
@@ -103,6 +105,7 @@ bright_sound('square', 1.5);"""
         document.getElementById('angle').value = {args.angle};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
+        document.getElementById('move').click();
       """
             self.shell.user_ns[args.sim].js_init(_js)
 

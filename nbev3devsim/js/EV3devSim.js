@@ -198,10 +198,10 @@ function EV3devSim(id) {
     //'image-rendering: pixelated; ' + // Future browsers
     //'-ms-interpolation-mode: nearest-neighbor;';
     self.backgroundCtx = self.background.getContext('2d');
-    //self.backgroundCtx.webkitImageSmoothingEnabled = false;
-    //self.backgroundCtx.mozImageSmoothingEnabled = false;
-    //self.backgroundCtx.msImageSmoothingEnabled = false;
-    //self.backgroundCtx.imageSmoothingEnabled = false;
+    self.backgroundCtx.webkitImageSmoothingEnabled = false;
+    self.backgroundCtx.mozImageSmoothingEnabled = false;
+    self.backgroundCtx.msImageSmoothingEnabled = false;
+    self.backgroundCtx.imageSmoothingEnabled = false;
 
     self.obstaclesLayerCtx = self.obstaclesLayer.getContext('2d');
     self.obstaclesLayerCtx.translate(0, HEIGHT);

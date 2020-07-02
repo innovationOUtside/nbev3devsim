@@ -139,10 +139,12 @@ bright_sound('square', 1.5);"""
             _chart = "false"
 
         _js = f"""
+        document.getElementById('clearChart').click();
         var chartSelector = document.getElementById('showChart');
         chartSelector.checked = {_chart};
         var event = new Event('change');
         chartSelector.dispatchEvent(event);
+
       """
         self.shell.user_ns[args.sim].js_init(_js)
 

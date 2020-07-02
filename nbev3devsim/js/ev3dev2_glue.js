@@ -137,14 +137,14 @@ var $builtinmodule = function(name) {
         });
 
         $loc.valueLAB = new Sk.builtin.func(function(self) {
-            var rgb = [0, 0, 0];
+            var rgb;
             var xyz = [0, 0, 0];
             var lab = [0, 0, 0];
 
             if (self.side == "left") {
-                rgb = sim.robotStates.sensor1;
+                rgb = [...sim.robotStates.sensor1];
             } else if (self.side == "right") {
-                rgb = sim.robotStates.sensor2;
+                rgb = [...sim.robotStates.sensor2];
             }
 
             for (let i=0; i<3; i++) {
@@ -176,13 +176,13 @@ var $builtinmodule = function(name) {
         });
 
         $loc.valueHSV = new Sk.builtin.func(function(self) {
-            var rgb = [0, 0, 0];
+            var rgb;
             var hsv = [0, 0, 0];
 
             if (self.side == "left") {
-                rgb = sim.robotStates.sensor1;
+                rgb = [...sim.robotStates.sensor1];
             } else if (self.side == "right") {
-                rgb = sim.robotStates.sensor2;
+                rgb = [...sim.robotStates.sensor2];
             }
             for (let i=0; i<3; i++) {
                 rgb[i] = rgb[i] / 255;
@@ -217,13 +217,13 @@ var $builtinmodule = function(name) {
         });
 
         $loc.valueHLS = new Sk.builtin.func(function(self) {
-            var rgb = [0, 0, 0];
+            var rgb;
             var hls = [0, 0, 0];
 
             if (self.side == "left") {
-                rgb = sim.robotStates.sensor1;
+                rgb = [...sim.robotStates.sensor1];
             } else if (self.side == "right") {
-                rgb = sim.robotStates.sensor2;
+                rgb = [...sim.robotStates.sensor2];
             }
             for (let i=0; i<3; i++) {
                 rgb[i] = rgb[i] / 255;
@@ -294,6 +294,32 @@ var $builtinmodule = function(name) {
 
     }, "UltrasonicSensor", []);
 
-
+    mod.Sound = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        var self = this;
+    
+        $loc.__init__ = new Sk.builtin.func(function(self, address) {
+          self.volume = 1.0;
+        });
+    
+        $loc.speak = new Sk.builtin.func(function(self, command) {
+          var utter = new SpeechSynthesisUtterance(command.v);
+          utter.volume = self.volume;
+          speechSynthesis.speak(utter);
+        });
+    
+        $loc.set_volume = new Sk.builtin.func(function(self, volume) {
+          self.volume = parseFloat(volume.v) / 100;
+        });
+    
+        $loc.get_volume = new Sk.builtin.func(function(self) {
+          return self.volume;
+        });
+    
+        $loc.isSpeaking = new Sk.builtin.func(function(self, command) {
+          return speechSynthesis.speaking;
+        });
+      }, 'Sound', []);
+    
+    
     return mod;
 };

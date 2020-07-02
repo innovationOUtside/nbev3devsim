@@ -342,7 +342,13 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(1000, 500, 90, true);
-
+    
+  } else if (map == 'Two_shapes') {
+    sim.loadBackground(imagepath + '_two_shapes.png');
+    sim.clearObstacles();
+    sim.clearObstaclesLayer();
+    setPos(1000, 500, 90, true);
+    
   } else if (map == 'Grey_bands') {
     sim.loadBackground(imagepath + '_greys.png');
     sim.clearObstacles();

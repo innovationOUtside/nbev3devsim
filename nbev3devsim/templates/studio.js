@@ -210,6 +210,13 @@ document.getElementById('penDown').addEventListener('change', function (e) {
   }
 });
 
+// TO DO - need to set these based on form values when everything is loaded
+//sim.showChart = false; //showChart
+//sim.showSensorValues = true; //showSensorValues
+//sim.showSensorArray = false; //showSensorArray
+//sim.showWorld = true; //showWorld
+//sim.showOutput = true; //showOutput
+
 document.getElementById('showChart').addEventListener('change', function (e) {
   if (e.target.checked) {
     sim.showChart = true;
@@ -219,6 +226,47 @@ document.getElementById('showChart').addEventListener('change', function (e) {
     sim.showChart = false;
     document.getElementById("charter").style.display = 'none';
     //$("#charter").empty();
+  }
+});
+
+document.getElementById('showSensorValues').addEventListener('change', function (e) {
+  if (e.target.checked) {
+    sim.showSensorValues = true;
+    document.getElementById("sensorDisplays").style.display = 'block';
+  } else {
+    sim.showSensorValues = false;
+    document.getElementById("sensorDisplays").style.display = 'none';
+  }
+});
+
+document.getElementById('showSensorArray').addEventListener('change', function (e) {
+  if (e.target.checked) {
+    sim.showSensorArray = true;
+    document.getElementById("sensorArray").style.display = 'block';
+  } else {
+    sim.showSensorArray = false;
+    document.getElementById("sensorArray").style.display = 'none';
+  }
+});
+
+document.getElementById('showWorld').addEventListener('change', function (e) {
+  if (e.target.checked) {
+    sim.showWorld = true;
+    document.getElementById("field").style.display = 'block';
+  } else {
+    sim.showWorld = false;
+    document.getElementById("field").style.display = 'none';
+
+  }
+});
+
+document.getElementById('showOutput').addEventListener('change', function (e) {
+  if (e.target.checked) {
+    sim.showOutput = true;
+    document.getElementById("output").style.display = 'block';
+  } else {
+    sim.showOutput = false;
+    document.getElementById("output").style.display = 'none';
   }
 });
 
@@ -456,6 +504,11 @@ document.getElementById('map').addEventListener('change', function () {
       sim.clearObstacles();
       sim.clearObstaclesLayer();
       setPos(457, 242, 120, true);
+    }  else if (map == 'MNIST_Digits') {
+      sim.loadBackground(imagepath + '_number_sheet.png');
+      sim.clearObstacles();
+      sim.clearObstaclesLayer();
+      setPos(426, 56, 90, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);
@@ -605,8 +658,20 @@ function outf(text) {
   // Can we somehow stream data back to py context?
   report_callback(text);
   // Can we also send something back to py context and then get something back from py in return?
-  // NOte there are quite a lot of delays in round trip
+  // Note there are quite a lot of delays in round trip
   if ((sim.collaborative) && (text.trim()!='')) report_callback_responder(text);
+  if (text.startsWith('image_data')) {
+    // TO DO  - channel left or right
+    // pass the image array
+    var clock = sim.clock
+    _sd1 = sim.robotStates.sensor1dataArray;
+    _sd2 = sim.robotStates.sensor2dataArray;
+    report_image_data('left '+_sd1+' '+clock);
+    //report_image_data('right '+_sd2+' '+clock);
+    mypre.innerHTML = mypre.innerHTML + "Image data logged...";
+    mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+    return;
+  }
 
   if (sim.showChart) {
     // Try updating the chart

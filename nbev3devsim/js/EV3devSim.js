@@ -51,7 +51,7 @@ function EV3devSim(id) {
       enabled: true,
       x: -LIGHT_SENSOR_DEFAULT_ABS,
       y: 30,
-      diameter: SENSOR_DIAMETER
+      diameter: SENSOR_DIAMETER, 
     },
     sensor2: {
       enabled: true,
@@ -422,6 +422,8 @@ function EV3devSim(id) {
       },
       sensor1: [0, 0, 0],
       sensor2: [0, 0, 0],
+      sensor1dataArray: '',
+      sensor2dataArray: '',
       gyro: [0, 0], // angle, rate
       ultrasonic: 0
     };
@@ -943,7 +945,7 @@ function EV3devSim(id) {
 
     return raw;
   }
-
+  
   this.getSensorValues = function (x, y, diameter=SENSOR_DIAMETER, sensor='') {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
@@ -967,6 +969,7 @@ function EV3devSim(id) {
                     diameter, diameter);
       sensorViewCtx = self.sensorArrayLeftCtx;
       sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
+      //self.robotStates.sensor1dataArray = sensorBox.data.toString();
     }
     else if (sensor='sensor2') {
       self.sensorArrayRightCtx.drawImage(self.background,
@@ -977,6 +980,7 @@ function EV3devSim(id) {
                     diameter, diameter);
       sensorViewCtx = self.sensorArrayRightCtx;
       sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
+      //self.robotStates.sensor2dataArray = sensorBox.data.toString();
     }
 
     var redTotal = 0;
@@ -1014,6 +1018,11 @@ function EV3devSim(id) {
         }
       }
     }
+
+    if (sensor=='sensor1')
+      self.robotStates.sensor1dataArray = sensorView.data.toString();
+    else if (sensor=='sensor2')
+      self.robotStates.sensor2dataArray = sensorView.data.toString();
 
     sensorViewCtx.putImageData(sensorView, 0, 0);
     

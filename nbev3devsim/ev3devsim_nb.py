@@ -131,14 +131,22 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         self.js_init("ready();", ready=self.ready)
         
         self.results_log = []
+        self.image_data = []
+
         self.count = 0
     
     
     def clear_datalog(self):
         """Clear the datalog in the simulator ipywidget object."""
         self.results_log = []
+        self.image_data = []
         self.count = 0
-        
+    
+    def comms_image_data(self, obj):
+        """Grab image data into a log."""
+        self.image_data.append(obj.replace('image_data','').strip())
+        #self.image_data.append({'index': datetime.utcnow(), 'simtime': clock, typ: val})
+
     def print_repr(self, obj):
         """Callback function when anything is written to the simulator print window."""
         # TO DO
@@ -164,7 +172,7 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         # whenever something is written to the output window.
         # At the moment, we use this as a basis for data logging.
         #self.js_init(script_built, report_callback=print_repr)
-        self.js_init(script_built, report_callback=self.print_repr, report_callback_responder=self.responder)
+        self.js_init(script_built, report_callback=self.print_repr, report_callback_responder=self.responder, report_image_data=self.comms_image_data)
 
 
 # + persistent_id="1177dc49-9ea2-471b-86ce-17980b192d1f" last_executed_text="class SimInformation:\n    data = \"unknown: apparently the callback hasn't been called yet.\"\n    \ndef sim_callback(data):\n    \"\"\"Set SimInformation class data value.\"\"\"\n    SimInformation.data = data\n\ndef sim_get_data(sim_widget, sim_var=\"sim.robotStates\"):\n    \"\"\"Run async data request on simulator widget.\"\"\"\n    sim_widget.get_value_async(sim_callback, sim_var)\n\ndef sim_report(retval=False):\n    \"\"\"Get simulator data value.\"\"\"\n    print(\"Python thinks the sim data is: \" + repr(SimInformation.data))\n    if retval:\n        return SimInformation.data" execution_event_id="eb4ffdfb-af16-4c0c-8309-f159a7303734"

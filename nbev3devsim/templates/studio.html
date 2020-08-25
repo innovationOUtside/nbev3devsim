@@ -22,6 +22,7 @@
       <option>FLL_2018_Into_Orbit</option>
       <option>Line_Following_Test</option>
       <option>Junction_Handling_Test</option>
+      <option>MNIST_Digits</option>
       <!--<option>Topo_map</option>-->
       <option>Obstacles_Test</option>
       <option>Sensor_Diameter_Test</option>
@@ -62,6 +63,10 @@
             <option>Small_Robot_Wide_Eyes</option>
             </select>
           <input type="checkbox" id="showChart">Show chart
+          <input type="checkbox" id="showSensorValues" checked>Show sensor values
+          <input type="checkbox" id="showSensorArray">Show sensor array
+          <input type="checkbox" id="showWorld" checked>Show world
+          <input type="checkbox" id="showOutput" checked>Show output
           <input type="checkbox" id="penDown">Pen Down
         </div>
         <div class="rightFlex">
@@ -98,6 +103,7 @@
       </div>
       <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
     </div>
+    <div id='sensorDisplays'>
       <div class='sensorReading'>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
       </div>
       <div class='sensorReading'>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>
@@ -109,6 +115,7 @@
         <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
         <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
     </div>
+  </div>
   </div>
 
   <div id="field"></div>

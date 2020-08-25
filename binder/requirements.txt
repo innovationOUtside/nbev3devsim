@@ -1,0 +1,11 @@
+#This repo
+.
+
+#For demos
+pandas
+matplotlib
+seaborn
+
+#Workflow
+jupytext
+nbgitpuller

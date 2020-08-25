@@ -1,0 +1,19 @@
+#https://github.com/machine-learning-apps/repo2docker-action
+name: Build Notebook Container
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: checkout files in repo
+      uses: actions/checkout@master
+
+    - name: try-local-build
+      uses: ouseful-PR/repo2docker-action@master #forked and tweaked
+      with:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        IMAGE_NAME: "ousefuldemos/nbev3devsim"

@@ -34,7 +34,7 @@ class NbEv3DevSimMagic(Magics):
             Javascript(
                 """var context = new AudioContext();
       var o = null;
-var g = null;
+      var g = null;
       function bright_sound(type="square", x=1.5) {
     o = context.createOscillator()
     g = context.createGain()
@@ -125,6 +125,10 @@ bright_sound('square', 1.5);"""
             # Use pen up as a forced default...
             _penDown = "false"
 
+        if args.clear:
+            _js = "document.getElementById('clearTrace').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
         _js = f"""
         var penSelector = document.getElementById('penDown');
         penSelector.checked = {_penDown};
@@ -171,6 +175,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
@@ -212,6 +217,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
@@ -257,6 +263,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )

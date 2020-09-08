@@ -180,6 +180,8 @@ bright_sound('square', 1.5);"""
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
+    @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -193,6 +195,14 @@ bright_sound('square', 1.5);"""
             return
         if not args.quiet:
             self.download_ping()
+
+        if args.autorun:
+            _js = "document.getElementById('runCode').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
+        if args.stop:
+            _js = "document.getElementById('stop').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -222,6 +232,7 @@ bright_sound('square', 1.5);"""
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     def sim_magic_imports(self, line, cell):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -240,6 +251,11 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
         if not args.quiet:
             self.download_ping()
 
+        if args.autorun:
+            _js = "document.getElementById('runCode').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
+
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
@@ -268,6 +284,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     def sim_magic_preloaded(self, line, cell):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
@@ -302,6 +319,10 @@ gyro = GyroSensor(INPUT_4)
             display(Javascript('console.log("here")'))
             if not args.quiet:
                 self.download_ping()
+
+            if args.autorun:
+                _js = "document.getElementById('runCode').click();"
+                self.shell.user_ns[args.sim].js_init(_js)
 
         except:
 

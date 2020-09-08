@@ -197,6 +197,10 @@ def sim_report(retval=False):
 def get_dataframe_from_datalog(datalog):
     """Generate a dataframe from datalog."""
     df = pd.DataFrame(datalog)
+
+    #Remove the simtime column if it's all empty
+    df.dropna(axis=1, how='all', inplace=True)
+
     if not df.empty:
         if 'simtime' in df.columns:
             df = pd.DataFrame(datalog)

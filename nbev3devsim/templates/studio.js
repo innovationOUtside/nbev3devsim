@@ -820,3 +820,18 @@ function clearChart(){
 document.getElementById('clearChart').addEventListener('click', function() {
   clearChart();
 } )
+
+
+
+//Initialisation
+var event = new Event('change');
+document.getElementById('showChart').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showWorld').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showOutput').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showSensorValues').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showSensorArray').dispatchEvent(event);
+

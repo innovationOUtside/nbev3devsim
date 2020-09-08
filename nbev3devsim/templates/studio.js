@@ -63,7 +63,8 @@ document.getElementById('showCode').addEventListener('click', function () {
   // Strip out any prefix magic line
   _code = _code.split('\n').filter(function(line){ 
     return line.indexOf( "%" ) != 0; }).join('\n')
-  document.getElementById('codeDisplayCode').value = _code;
+  //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
+  document.getElementById('codeDisplayCode').textContent = _code;
   document.getElementById('codeDisplay').classList.remove('closed');
 });
 

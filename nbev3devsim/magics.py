@@ -193,7 +193,7 @@ bright_sound('square', 1.5);"""
         except:
             print(f"Is {args.sim} defined?")
             return
-        if not args.quiet:
+        if not args.quiet and cell is not None:
             self.download_ping()
 
         if args.autorun:

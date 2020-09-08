@@ -585,6 +585,10 @@ document.getElementById('robotConfiguratordownload').addEventListener('click', f
   hiddenElement.dispatchEvent(new MouseEvent('click'));
 });
 
+document.getElementById('penColor').addEventListener('change', function () {
+  sim.robotSpecs.pen.color = document.getElementById('penColor').value
+});
+
 document.getElementById('robotConfiguratorupload').addEventListener('click', function () {
   var hiddenElement = document.createElement('input');
   hiddenElement.type = 'file';

@@ -233,7 +233,8 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
-    def sim_magic_imports(self, line, cell):
+    @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
         preload = """
@@ -241,6 +242,9 @@ from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 """
+        if args.preview:
+            print(preload)
+            return
         try:
             cell = preload + cell
             self.shell.user_ns[args.sim].set_element("prog", cell)
@@ -285,7 +289,8 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
-    def sim_magic_preloaded(self, line, cell):
+    @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
         preload = """
@@ -301,6 +306,10 @@ colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
 """
+        if args.preview:
+            print(preload)
+            return
+
         try:
             cell = preload + cell
             # self.linter(cell)

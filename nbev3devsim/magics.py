@@ -209,6 +209,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
+    @magic_arguments.argument("--move", "-m", action="store_true", help="Move robot back to start")
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -222,6 +223,11 @@ bright_sound('square', 1.5);"""
             return
         if not args.quiet and cell is not None:
             self.download_ping()
+
+
+        if args.move:
+            _js = "document.getElementById('move').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
 
         if args.autorun:
             _js = "document.getElementById('runCode').click();"

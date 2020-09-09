@@ -187,12 +187,16 @@ def sim_get_data(sim_widget, sim_var="sim.robotStates"):
     """Run async data request on simulator widget."""
     sim_widget.get_value_async(sim_callback, sim_var)
 
-def sim_report(retval=False):
-    """Get simulator data value."""
-    print("Python thinks the sim data is: " + repr(SimInformation.data))
-    if retval:
-        return SimInformation.data
+def sim_data(retval=True):
+    """Return simulator data."""
+    # Remember to call sim_get_data(roboSim) in a previous cell
+    return SimInformation.data
 
+def sim_report(retval=True):
+    """Get simulator data value."""
+    if  not retval:
+        print("Python thinks the sim data is: " + repr(SimInformation.data))
+    return SimInformation.data
 
 def get_dataframe_from_datalog(datalog):
     """Generate a dataframe from datalog."""
@@ -216,6 +220,36 @@ def get_dataframe_from_datalog(datalog):
 def get_dataframe_from_widget(widget):
     """Generate a dataframe from retrieved simulator datalog."""
     return get_dataframe_from_datalog(widget.results_log)
+
+
+class RobotState():
+    def __init__(self, sim=None):
+        self.sim = sim
+        self.state = "unknown: apparently the callback hasn't been called yet."
+        self.update()
+  
+    def robot_state_callback(self, state):
+        if state:
+            state['left_light_raw'] = state['sensor1']
+            state['right_light_raw'] = state['sensor2']
+            state['left_light'] = state['sensor1'][0]
+            state['right_light'] = state['sensor2'][0]
+            state['left_light_pc'] = 100 * state['sensor1'][0] / 255
+            state['right_light_pc'] = 100 * state['sensor2'][0] / 255
+            state['left_light_full'] = 100 * sum(state['sensor1']) / 765
+            state['right_light_full'] = 100 * sum(state['sensor2']) / 765
+
+        self.state = state
+
+    def update(self):
+        if self.sim:
+            self.sim.get_value_async(self.robot_state_callback, "sim.robotStates")
+
+# + tags=["active-ipynb"]
+# r = RobotState(roboSim)
+# r.update()
+# # In a separate cell after update
+# r.state
 
 
 # + tags=["active-ipynb"]

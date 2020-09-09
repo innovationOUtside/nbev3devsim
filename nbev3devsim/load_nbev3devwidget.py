@@ -20,6 +20,8 @@ roboSim.set_element("response", '')
 display(roboSim)
 roboSim.element.dialog()
 
+#robotState = eds.RobotState(roboSim)
+#robotState.update()
 
 roboSim.js_init("""
 element.dialog({ "title" : "Robot Simulator" }).dialogExtend({

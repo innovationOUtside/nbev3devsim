@@ -1,4 +1,3 @@
-
 function setPos(x, y, angle, init=false, reset=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
@@ -745,6 +744,9 @@ var interruptHandler = function (susp) {
 };
 
 function runit() {
+
+  document.getElementById('sim_runStatus').classList.remove('led-red')
+  document.getElementById('sim_runStatus').classList.add('led-green')
   // This function runs when the simulator Run button is clicked 
   if (typeof Sk.hardInterrupt != 'undefined') {
     delete Sk.hardInterrupt;
@@ -783,6 +785,8 @@ function runit() {
   myPromise.then(
     function (mod) {
       sim.stopAnimation();
+      document.getElementById('sim_runStatus').classList.remove('led-green')
+      document.getElementById('sim_runStatus').classList.add('led-red')
       Sk.running = false;
     },
     // The following handles errors that arise when executing
@@ -792,6 +796,8 @@ function runit() {
     // Related issue: https://github.com/innovationOUtside/nbev3devsim/issues/49
     function (err) {
       Sk.running = false;
+      document.getElementById('sim_runStatus').classList.remove('led-green')
+      document.getElementById('sim_runStatus').classList.add('led-red')
       sim.stopAnimation();
       var mypre = document.getElementById("output");
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
@@ -803,6 +809,8 @@ function runit() {
 document.getElementById('runCode').addEventListener('click', runit);
 
 function stopit() {
+  document.getElementById('sim_runStatus').classList.remove('led-green')
+  document.getElementById('sim_runStatus').classList.add('led-red')
   sim.stopAnimation();
   Sk.hardInterrupt = true;
 }

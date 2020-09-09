@@ -163,6 +163,20 @@ bright_sound('square', 1.5);"""
       """
         self.shell.user_ns[args.sim].js_init(_js)
 
+        if args.output:
+            _output = "true"
+        else:
+            _output = "false"
+
+        _js = f"""
+        var chartSelector = document.getElementById('showOutput');
+        chartSelector.checked = {_output};
+        var event = new Event('change');
+        chartSelector.dispatchEvent(event);
+
+      """
+        self.shell.user_ns[args.sim].js_init(_js)
+
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
@@ -192,6 +206,7 @@ bright_sound('square', 1.5);"""
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
     def sim_magic(self, line, cell=None):
@@ -245,6 +260,7 @@ bright_sound('square', 1.5);"""
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
     def sim_magic_imports(self, line, cell=None):
@@ -302,6 +318,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
     def sim_magic_preloaded(self, line, cell=None):

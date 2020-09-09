@@ -239,6 +239,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--pencolor", "-P", default=None, help="Set pen color")
     @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"

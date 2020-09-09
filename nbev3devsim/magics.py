@@ -118,6 +118,17 @@ bright_sound('square', 1.5);"""
       """
             self.shell.user_ns[args.sim].js_init(_js)
 
+
+        if args.pencolor is not None:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_penSelector = document.getElementById("penColor");
+        magic_penSelector.value = "{args.pencolor}";
+        var magic_event = new Event('change');
+        magic_penSelector.dispatchEvent(magic_event);
+      """
+            )
+            
         # TO DO: pull this out into a reusable function, eg to apply to chart too?
         if args.pendown:
             _penDown = "true"
@@ -175,6 +186,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--pencolor", "-P", default=None, help="Set pen color")
     @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
@@ -283,6 +295,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--pencolor", "-P", default=None, help="Set pen color")
     @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"

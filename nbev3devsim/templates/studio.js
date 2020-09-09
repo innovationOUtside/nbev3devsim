@@ -843,3 +843,9 @@ document.getElementById('showSensorValues').dispatchEvent(event);
 event = new Event('change');
 document.getElementById('showSensorArray').dispatchEvent(event);
 
+// For some reason, we need this to let py retrieve vals from js sim
+// What it seems to do in bring a sim var into scope?
+var _prog = element.prog;
+element.prog = 'import ev3dev2_glue as glue';
+runit();
+element.prog = _prog;

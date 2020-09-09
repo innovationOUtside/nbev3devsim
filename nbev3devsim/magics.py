@@ -129,23 +129,23 @@ bright_sound('square', 1.5);"""
       """
             )
             
+
+        if args.clear:
+            _js = "document.getElementById('clearTrace').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
         # TO DO: pull this out into a reusable function, eg to apply to chart too?
         if args.pendown:
             _penDown = "true"
         else:
             # Use pen up as a forced default...
             _penDown = "false"
-
-        if args.clear:
-            _js = "document.getElementById('clearTrace').click();"
-            self.shell.user_ns[args.sim].js_init(_js)
-
         _js = f"""
         var penSelector = document.getElementById('penDown');
         penSelector.checked = {_penDown};
         var event = new Event('change');
         penSelector.dispatchEvent(event);
-      """
+        """
         self.shell.user_ns[args.sim].js_init(_js)
 
         if args.chart:

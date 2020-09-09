@@ -231,3 +231,36 @@
   image-rendering: crisp-edges;
 }
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */
+/* More LEDs: https://codepen.io/fskirschbaum/pen/MYJNaj */
+
+
+/* https://cssdeck.com/labs/css-leds */
+.led-red {
+  float: left;
+  margin: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: rgb(173, 51, 13);
+  border-radius: 50%;
+  box-shadow: #000 0 -1px 7px 1px, inset #600 0 -1px 9px, #F00 0 2px 12px;
+}
+
+.led-yellow {
+  float: left;
+  margin: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: rgb(228, 207, 20);
+  border-radius: 50%;
+  box-shadow: #000 0 -1px 7px 1px, inset #660 0 -1px 9px, #DD0 0 2px 12px;
+}
+
+.led-green {
+  float: left;
+  margin: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: rgb(18, 250, 18);
+  border-radius: 50%;
+  box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7D0 0 2px 12px;
+}

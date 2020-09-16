@@ -1,4 +1,3 @@
-
 function setPos(x, y, angle, init=false, reset=false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
@@ -63,7 +62,8 @@ document.getElementById('showCode').addEventListener('click', function () {
   // Strip out any prefix magic line
   _code = _code.split('\n').filter(function(line){ 
     return line.indexOf( "%" ) != 0; }).join('\n')
-  document.getElementById('codeDisplayCode').value = _code;
+  //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
+  document.getElementById('codeDisplayCode').textContent = _code;
   document.getElementById('codeDisplay').classList.remove('closed');
 });
 
@@ -499,6 +499,11 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearObstacles();
     sim.clearObstaclesLayer();
     setPos(550, 450, 90, true);
+  } else if (map == 'Simple_Shapes') {
+      sim.loadBackground(imagepath + '_simple_shapes.png');
+      sim.clearObstacles();
+      sim.clearObstaclesLayer();
+      setPos(800, 400, 0, true);
   }  else if (map == 'Thruxton_Circuit') {
       sim.loadBackground(imagepath + 'thruxton_track.png');
       sim.clearObstacles();
@@ -583,6 +588,10 @@ document.getElementById('robotConfiguratordownload').addEventListener('click', f
   hiddenElement.target = '_blank';
   hiddenElement.download = 'robot_config.json';
   hiddenElement.dispatchEvent(new MouseEvent('click'));
+});
+
+document.getElementById('penColor').addEventListener('change', function () {
+  sim.robotSpecs.pen.color = document.getElementById('penColor').value
 });
 
 document.getElementById('robotConfiguratorupload').addEventListener('click', function () {
@@ -740,6 +749,9 @@ var interruptHandler = function (susp) {
 };
 
 function runit() {
+
+  document.getElementById('sim_runStatus').classList.remove('led-red')
+  document.getElementById('sim_runStatus').classList.add('led-green')
   // This function runs when the simulator Run button is clicked 
   if (typeof Sk.hardInterrupt != 'undefined') {
     delete Sk.hardInterrupt;
@@ -778,6 +790,8 @@ function runit() {
   myPromise.then(
     function (mod) {
       sim.stopAnimation();
+      document.getElementById('sim_runStatus').classList.remove('led-green')
+      document.getElementById('sim_runStatus').classList.add('led-red')
       Sk.running = false;
     },
     // The following handles errors that arise when executing
@@ -787,6 +801,8 @@ function runit() {
     // Related issue: https://github.com/innovationOUtside/nbev3devsim/issues/49
     function (err) {
       Sk.running = false;
+      document.getElementById('sim_runStatus').classList.remove('led-green')
+      document.getElementById('sim_runStatus').classList.add('led-red')
       sim.stopAnimation();
       var mypre = document.getElementById("output");
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
@@ -798,6 +814,8 @@ function runit() {
 document.getElementById('runCode').addEventListener('click', runit);
 
 function stopit() {
+  document.getElementById('sim_runStatus').classList.remove('led-green')
+  document.getElementById('sim_runStatus').classList.add('led-red')
   sim.stopAnimation();
   Sk.hardInterrupt = true;
 }
@@ -815,3 +833,24 @@ function clearChart(){
 document.getElementById('clearChart').addEventListener('click', function() {
   clearChart();
 } )
+
+
+
+//Initialisation
+var event = new Event('change');
+document.getElementById('showChart').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showWorld').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showOutput').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showSensorValues').dispatchEvent(event);
+event = new Event('change');
+document.getElementById('showSensorArray').dispatchEvent(event);
+
+// For some reason, we need this to let py retrieve vals from js sim
+// What it seems to do in bring a sim var into scope?
+var _prog = element.prog;
+element.prog = 'import ev3dev2_glue as glue';
+runit();
+element.prog = _prog;

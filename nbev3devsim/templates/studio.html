@@ -1,6 +1,59 @@
 <div id="roboSim_root" class="roboSim" onmouseover="Jupyter.keyboard_manager.disable()" onmouseout="Jupyter.keyboard_manager.enable()">
 
   <div class="row">
+    <label class="checkboxLabel" for="showOutput">Show output</label><input type="checkbox" id="showOutput">
+    <label class="checkboxLabel" for="showSensorValues">Show sensor values</label><input type="checkbox" id="showSensorValues">
+    <label class="checkboxLabel" for="showChart">Show chart</label><input type="checkbox" id="showChart">
+    <label class="checkboxLabel" for="showSensorArray">Show sensor array</label><input type="checkbox" id="showSensorArray">
+    <label class="checkboxLabel" for="collaborative">Collaborative</label><input type="checkbox" id="collaborative">
+  </div>
+
+  <div class="row">
+    <div id="editor">
+      <pre id="output"></pre>
+    </div>
+  </div>
+
+  <div class="row">
+    <div id="charter">
+      <button id="clearChart">Clear Chart</button>
+      <div id="chartTraces">
+        <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour" checked>Colour</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light" checked>Left light</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_right_light" name="chart_right_light" checked>Right light</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_ultrasound" name="chart_ultrasound">Ultrasonic</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_gyro" name="chart_gyro">Gyro</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_left_wheel" name="chart_left_wheel">Left wheel</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_right_wheel" name="chart_right_wheel">Right wheel</label>
+      </div>
+      <div id="plotlyDiv"></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div id='sensorDisplays'>
+      <div id="readings">Port Values:
+        <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
+        </div>
+        <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
+        </div>
+        <div class='sensorReading'>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
+        </div>
+        <div class='sensorReading'>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>
+        </div>
+        <div class='sensorReading'>Ultrasonic: <span id="ultrasonic_value"></span></div>
+        <div class='sensorReading'>Gyro: <span id="gyro_value"></span></div>
+      </div>
+      <div id='sensorArray' class='rightFlex'>Sensor arrays:
+        <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
+        <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <label class="checkboxLabel" for="showWorld">Show world</label><input type="checkbox" id="showWorld" checked>
     <select id="map">
       <option selected="selected">Empty_Map</option>
       <option>Loop</option>
@@ -23,6 +76,7 @@
       <option>Line_Following_Test</option>
       <option>Junction_Handling_Test</option>
       <option>MNIST_Digits</option>
+      <option>Simple_Shapes</option>
       <!--<option>Topo_map</option>-->
       <option>Obstacles_Test</option>
       <option>Sensor_Diameter_Test</option>
@@ -30,95 +84,53 @@
       <option>Upload Image (2362x1143px)...</option>
       <option hidden>Custom Image</option>
     </select>
-    <div>
-      <button id="robotConfiguratorOpen">Configure Robot</button>
-      <button id="configureObstacles">Obstacles...</button>
+    <button id="upload">Load</button>
+    <button id="configureObstacles">Obstacles...</button>
+    
+  </div>
+
+  <div class="row">
+    <div id="noise_controls" class="row">
+      <label class="checkboxLabel" for="lightSensorNoiseSlider">Light sensor noise</label><input type="range" id="lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="128">
+      <label class="checkboxLabel" for="wheelNoiseSlider">Wheel noise</label><input type="range" id="wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500">
+    </div>
+    <select id="robotPreconfig">
+      <option>Default_Robot</option>
+      <option>Small_Robot</option>
+      <option>Small_Robot_Wide_Eyes</option>
+    </select>
+    <button id="robotConfiguratorOpen">Configure Robot</button>
+  </div>
+
+  <div class="row">
+    <div class="leftFlex">
+      <span id='sim_runStatus' class="led-red"></span>
+      <button id="runCode">Run</button>
+      <button id="stop">Stop</button>
+      <button id="showCode">Show Code</button>
+      <button id='codeFromClipboard'>Paste</button>
+      <label class="checkboxLabel" for="penDown">Pen Down</label><input type="checkbox" id="penDown">
+      <select id="penColor">
+        <option>red</option>
+        <option>orange</option>
+        <option>green</option>
+      </select>
+      <button id="clearTrace">Clear Trace</button>
     </div>
   </div>
   <div class="row">
-    <div>X : <input type="number" id="xPos"></div>
-    <div>Y : <input type="number" id="yPos"></div>
-    <div>Angle : <input type="number" id="angle"></div>
-    <div><button id="move">Move</button>
+      <button id="move">Move</button>
       <button id="reset">Reset</button>
       <button id="resetReset" style="display: none;">ResetReset</button>
       <button id="randomLocation" style="display: none;">Random Location</button>
-    </div>
-  </div>
-
-  <div class="row">
-    <div id="editor">
-      <div class="row buttons">
-        <div class="leftFlex">
-          <button id='codeFromClipboard'>Paste</button>
-          <button id="runCode">Run</button>
-          <button id="stop">Stop</button>
-          <button id="showCode">Show Code</button>
-          <input type="checkbox" id="collaborative">Collaborative
-        </div>
-        <div class="center">
-          <select id="robotPreconfig">
-            <option>Default_Robot</option>
-            <option>Small_Robot</option>
-            <option>Small_Robot_Wide_Eyes</option>
-            </select>
-          <input type="checkbox" id="showChart">Show chart
-          <input type="checkbox" id="showSensorValues" checked>Show sensor values
-          <input type="checkbox" id="showSensorArray">Show sensor array
-          <input type="checkbox" id="showWorld" checked>Show world
-          <input type="checkbox" id="showOutput" checked>Show output
-          <input type="checkbox" id="penDown">Pen Down
-        </div>
-        <div class="rightFlex">
-          <button id="clearTrace">Clear Trace</button>
-          <button id="clearChart">Clear Chart</button>
-          <button id="upload">Load</button>
-          <button id="download">Save</button>
-        </div>
-      </div>
-      <div id="noise_controls">
-        <label class="checkboxLabel"><input type="range" id="lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="128">Light sensor noise</label>
-        <label class="checkboxLabel"><input type="range" id="wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500">Wheel noise</label>
-      </div>
-      <div id="charter">
-        <div id="chartTraces">
-          <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour">Colour</label>
-          <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light">Left light</label>
-          <label class="checkboxLabel"><input type="checkbox" id="chart_right_light" name="chart_right_light">Right light</label>
-          <label class="checkboxLabel"><input type="checkbox" id="chart_ultrasound" name="chart_ultrasound">Ultrasonic</label>
-          <label class="checkboxLabel"><input type="checkbox" id="chart_gyro" name="chart_gyro">Gyro</label>
-
-          <label class="checkboxLabel"><input type="checkbox" id="chart_left_wheel" name="chart_left_wheel">Left wheel</label>
-          <label class="checkboxLabel"><input type="checkbox" id="chart_right_wheel" name="chart_right_wheel">Right wheel</label>
-        </div>
-        <div id="plotlyDiv"></div>
-      </div>
-    </div>
-    <pre id="output"></pre>
-  </div>
-
-  <div class="row">
-    <div id="readings">Port Values:
-      <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
-      </div>
-      <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
-    </div>
-    <div id='sensorDisplays'>
-      <div class='sensorReading'>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span id="sensor1_value"></span>
-      </div>
-      <div class='sensorReading'>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span id="sensor2_value"></span>
-      </div>
-      <div class='sensorReading'>Ultrasonic: <span id="ultrasonic_value"></span></div>
-      <div class='sensorReading'>Gyro: <span id="gyro_value"></span></div>
-    </div>
-    <div id='sensorArray' class='rightFlex'>Sensor arrays:
-        <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
-        <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
-    </div>
-  </div>
+      <label for="xPos">X</label><input type="number" id="xPos" size=5>
+      <label for="yPos">Y</label><input type="number" id="yPos" size=5>
+      <label for="angle">Angle</label><input type="number" id="angle" size=5>
   </div>
 
   <div id="field"></div>
+
+
 
   <div id="robotConfigurator" class="closed">
     <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>
@@ -161,9 +173,13 @@
   </div>
 
   <div id='codeDisplay' class='closed'>
-    <textarea id='codeDisplayCode'></textarea>
+    <!--<textarea id='codeDisplayCode'></textarea>-->
+    <pre><code id='codeDisplayCode' class='language-python'></code></pre>
     <div class="buttons">
-      <div class="leftFlex"><button id="codeDisplayClose">Close</button></div>
+      <div class="leftFlex">
+        <button id="download">Save</button>
+        <button id="codeDisplayClose">Close</button>
+      </div>
     <div>
   </div>
 

@@ -118,23 +118,34 @@ bright_sound('square', 1.5);"""
       """
             self.shell.user_ns[args.sim].js_init(_js)
 
+
+        if args.pencolor is not None:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_penSelector = document.getElementById("penColor");
+        magic_penSelector.value = "{args.pencolor}";
+        var magic_event = new Event('change');
+        magic_penSelector.dispatchEvent(magic_event);
+      """
+            )
+            
+
+        if args.clear:
+            _js = "document.getElementById('clearTrace').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
         # TO DO: pull this out into a reusable function, eg to apply to chart too?
         if args.pendown:
             _penDown = "true"
         else:
             # Use pen up as a forced default...
             _penDown = "false"
-
-        if args.clear:
-            _js = "document.getElementById('clearTrace').click();"
-            self.shell.user_ns[args.sim].js_init(_js)
-
         _js = f"""
         var penSelector = document.getElementById('penDown');
         penSelector.checked = {_penDown};
         var event = new Event('change');
         penSelector.dispatchEvent(event);
-      """
+        """
         self.shell.user_ns[args.sim].js_init(_js)
 
         if args.chart:
@@ -146,6 +157,20 @@ bright_sound('square', 1.5);"""
         document.getElementById('clearChart').click();
         var chartSelector = document.getElementById('showChart');
         chartSelector.checked = {_chart};
+        var event = new Event('change');
+        chartSelector.dispatchEvent(event);
+
+      """
+        self.shell.user_ns[args.sim].js_init(_js)
+
+        if args.output:
+            _output = "true"
+        else:
+            _output = "false"
+
+        _js = f"""
+        var chartSelector = document.getElementById('showOutput');
+        chartSelector.checked = {_output};
         var event = new Event('change');
         chartSelector.dispatchEvent(event);
 
@@ -175,11 +200,16 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--pencolor", "-P", default=None, help="Set pen color")
     @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
+    @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
+    @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
+    @magic_arguments.argument("--move", "-m", action="store_true", help="Move robot back to start")
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -191,8 +221,21 @@ bright_sound('square', 1.5);"""
         except:
             print(f"Is {args.sim} defined?")
             return
-        if not args.quiet:
+        if not args.quiet and cell is not None:
             self.download_ping()
+
+
+        if args.move:
+            _js = "document.getElementById('move').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
+        if args.autorun:
+            _js = "document.getElementById('runCode').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
+        if args.stop:
+            _js = "document.getElementById('stop').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -217,12 +260,16 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--pencolor", "-P", default=None, help="Set pen color")
     @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
-    def sim_magic_imports(self, line, cell):
+    @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
+    @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
         preload = """
@@ -230,6 +277,9 @@ from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 """
+        if args.preview:
+            print(preload)
+            return
         try:
             cell = preload + cell
             self.shell.user_ns[args.sim].set_element("prog", cell)
@@ -240,6 +290,11 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
         if not args.quiet:
             self.download_ping()
 
+        if args.autorun:
+            _js = "document.getElementById('runCode').click();"
+            self.shell.user_ns[args.sim].js_init(_js)
+
+
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
@@ -263,12 +318,16 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     @magic_arguments.argument(
         "--pendown", "-p", action="store_true", help="Set pen down"
     )
+    @magic_arguments.argument("--pencolor", "-P", default=None, help="Set pen color")
     @magic_arguments.argument("--clear", "-C", action="store_true", help="Clear trace")
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
-    def sim_magic_preloaded(self, line, cell):
+    @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
+    @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
         preload = """
@@ -284,6 +343,10 @@ colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
 """
+        if args.preview:
+            print(preload)
+            return
+
         try:
             cell = preload + cell
             # self.linter(cell)
@@ -302,6 +365,10 @@ gyro = GyroSensor(INPUT_4)
             display(Javascript('console.log("here")'))
             if not args.quiet:
                 self.download_ping()
+
+            if args.autorun:
+                _js = "document.getElementById('runCode').click();"
+                self.shell.user_ns[args.sim].js_init(_js)
 
         except:
 

@@ -232,10 +232,10 @@ document.getElementById('showChart').addEventListener('change', function (e) {
 document.getElementById('showSensorValues').addEventListener('change', function (e) {
   if (e.target.checked) {
     sim.showSensorValues = true;
-    document.getElementById("sensorDisplays").style.display = 'block';
+    document.getElementById("readings").style.display = 'block';
   } else {
     sim.showSensorValues = false;
-    document.getElementById("sensorDisplays").style.display = 'none';
+    document.getElementById("readings").style.display = 'none';
   }
 });
 

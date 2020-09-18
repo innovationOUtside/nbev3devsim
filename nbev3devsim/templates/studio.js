@@ -513,7 +513,7 @@ document.getElementById('map').addEventListener('change', function () {
       sim.loadBackground(imagepath + '_number_sheet.png');
       sim.clearObstacles();
       sim.clearObstaclesLayer();
-      setPos(426, 56, 90, true);
+      setPos(400, 50, 90, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);

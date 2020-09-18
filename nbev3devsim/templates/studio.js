@@ -673,11 +673,16 @@ function outf(text) {
     // TO DO  - channel left or right
     // pass the image array
     var clock = sim.clock
-    _sd1 = sim.robotStates.sensor1dataArray;
-    _sd2 = sim.robotStates.sensor2dataArray;
-    report_image_data('left '+_sd1+' '+clock);
-    //report_image_data('right '+_sd2+' '+clock);
-    mypre.innerHTML = mypre.innerHTML + "Image data logged...";
+    _text = text.split(' ')
+    if ((_text[1]=='left')||(_text[1]=='both')){
+      _sd1 = sim.robotStates.sensor1dataArray;
+      report_image_data('left '+_sd1+' '+clock);
+    }
+    if ((_text[1]=='right')||(_text[1]=='both')){
+      _sd2 = sim.robotStates.sensor2dataArray;
+      report_image_data('right '+_sd2+' '+clock);
+    }
+    mypre.innerHTML = mypre.innerHTML + _text[1] +" image data logged...";
     mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
     return;
   }

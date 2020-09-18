@@ -128,7 +128,16 @@ bright_sound('square', 1.5);"""
         magic_penSelector.dispatchEvent(magic_event);
       """
             )
-            
+        
+        if args.sensornoise is not None and int(args.sensornoise) <=128:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_sensorNoise = document.getElementById("lightSensorNoiseSlider");
+        magic_sensorNoise.value = "{int(args.sensornoise)}";
+        var magic_event = new Event('input');
+        magic_sensorNoise.dispatchEvent(magic_event);
+      """
+            )
 
         if args.clear:
             _js = "document.getElementById('clearTrace').click();"
@@ -210,6 +219,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
     @magic_arguments.argument("--move", "-m", action="store_true", help="Move robot back to start")
+    @magic_arguments.argument("--sensornoise", "-N", default=None, help="sensor noise")
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -269,6 +279,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    @magic_arguments.argument("--sensornoise", "-N", default=None, help="sensor noise")
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -327,6 +338,7 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    @magic_arguments.argument("--sensornoise", "-N", default=None, help="sensor noise")
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)

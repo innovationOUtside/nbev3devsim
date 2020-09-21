@@ -126,17 +126,41 @@ def _test_display(MLP, sample, label):
 
 # +
 from .sensor_data import array_from_image
+from .sensor_data import zoom_img
 
 
-def class_predict_from_image(MLP, img, quiet=True):
+def prediction_class_chart(MLP, normalised_flat_image):
+    """Display prediction class chart."""
+    # Get the prediction for likelihood of class membership as a dataframe
+    _dfx = pd.DataFrame(MLP.predict_proba(normalised_flat_image)).T
+
+    #Plot the class predictions as a bar chart
+    _dfx.plot(kind='bar', legend=False, title="Confidence score for each class")
+
+
+from .sensor_data import generate_signature
+
+def class_predict_from_image(MLP, img, quiet=True, zoomview=False,
+                             confidence=False, signature=False):
     """Class prediction from an image."""
     flat_image = array_from_image(img).reshape(1, img.size[0]*img.size[1])
 
-    # We can normalise the values so they fall in the range 0..1
-    normalised_flat_image = normalize(flat_image, norm='max', axis=1)
+    if signature:
+        _signature = generate_signature(img, linear=True)
+        flat_signature = np.array(_signature).reshape(1, img.size[0]*4)
+        normalised_flat_image = normalize(flat_signature, norm='max', axis=1)
+    else:
+        # We can normalise the values so they fall in the range 0..1
+        normalised_flat_image = normalize(flat_image, norm='max', axis=1)
     
     if not quiet:
-        display(img)
+        if zoomview:
+            zoom_img(img)
+        else:
+            display(img)
+
+    if confidence:
+        prediction_class_chart(MLP, normalised_flat_image)
 
     return MLP.predict(normalised_flat_image)[0]
 
@@ -146,16 +170,19 @@ from .sensor_data import jiggle, crop_and_zoom_to_fit
 
 def predict_and_report_from_image(MLP, img, label='',
                                   jiggled=False, cropzoom=False,
-                                  quiet=False):
+                                  quiet=False, zoomview=False,
+                                  confidence=False,
+                                  signature=False):
     """Predict the class and report on its correctness."""
     if jiggled:
         img = jiggle(img)
     if cropzoom:
         img = crop_and_zoom_to_fit(img)
 
-    prediction = class_predict_from_image(MLP, img, quiet=quiet)
-    
-    if label:
+    prediction = class_predict_from_image(MLP, img, quiet=quiet,
+                                          zoomview=zoomview, confidence=confidence, signature=signature)
+
+    if label != '':
         print(f"MLP predicts {prediction} compared to label {label}; classification is {prediction == label}")
     else:
          print(f"MLP predicts {prediction}")
@@ -177,7 +204,7 @@ def test_display(MLP, img, label=''):
     
     prediction = MLP.predict(normalised_flat_image)[0]
     # Report the actual and predicted class labels
-    if label:
+    if label != '':
         print(f'Actual label: {label}')
         print(f'Predicted label: {prediction} [{prediction == label}]')
     else:
@@ -191,20 +218,23 @@ def test_display(MLP, img, label=''):
 # - test it;
 # - display it;
 # - display the test chart
-def image_class_predictor(MLP, img, label='',
+def image_class_predictor(MLP, img, label='', size=None,
                             greyscale_convert=True, eds_crop=False):
+    """Predict class from image.
+    The size parameter is a tuple."""
     if greyscale_convert:
         # Convert to grayscale
         img = img.convert('L')
         
     #This is currently a hack for TM129/nbev3devsim
     if (eds_crop and img.size==(20, 20)) or img.size==(20, 20):
-        print("Cropping..")
+        print("Cropping image focus..")
         img = img.crop((3, 3, 18, 18))
-        
-    if img.size!=(28, 28):
+    
+    # TO DO - can we detect the network input and resize to that?
+    if size and img.size!=size:
         print("Resizing")
-        img = img.resize((28, 28), Image.LANCZOS)
+        img = img.resize(resize, Image.LANCZOS)
     
     #resized_image_bw_list = list(img.getdata())
 
@@ -220,7 +250,7 @@ def image_class_predictor(MLP, img, label='',
 
     prediction = MLP.predict(normalised_resized_image_bw_array)[0]
     # Report the actual and predicted class labels
-    if label:
+    if label != '':
         # Report the actual and predicted class labels
         print(f'Actual label: {label}')
         print(f'Predicted label: {prediction} [{prediction == label}]')
@@ -230,6 +260,53 @@ def image_class_predictor(MLP, img, label='',
         
     # Display the sample as an image
     display(img)
+
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+
+def generate_N_random_samples(randfunc, num_samples=100):
+    """Generate a test collection on a specified number of samples."""
+    test_list = []
+    test_labels = [] 
+
+    for i in range(num_samples):
+        (_test_image, _test_label) = randfunc()
+        
+        if jiggled:
+            _test_image = jiggle(_test_image)
+        if cropzoomed:
+            _test_image = crop_and_zoom_to_fit(_test_image)
+
+        _im_array = array_from_image(_test_image)
+        test_list.append(array_from_image(_test_image).reshape(1, _test_image.size[0]*_test_image.size[1]))
+        test_labels.append(_test_label)
+    return test_list, test_labels
+
+
+def test_and_report_images(MLP, test_images, test_labels, 
+                           jiggled=False, cropzoomed=False):
+    """Test and report on pre-trained MLP using a provided set of test images."""
+    flat_image = np.array(test_images).reshape(len(test_images), test_images[0].size)
+
+    # Normalise the values in the list
+    # to bring them into the range 0..1
+    normalised_flat_images = normalize(flat_image, norm='max')
+    predictions = MLP.predict(normalised_flat_images)
+
+    print("Classification report:\n",
+          classification_report(test_labels, predictions))
+    print("\n\nConfusion matrix:\n",
+          confusion_matrix(test_labels, predictions))
+
+    print("Training set score: {}".format(MLP.score(normalised_flat_images, test_labels)))
+    print("Test set score: {}".format(MLP.score(normalised_flat_images, test_labels)))
+
+def test_and_report_random_images(MLP, randfunc, num_samples=100, 
+                                  jiggled=False, cropzoomed=False):
+    """Test and report on pre-trained MLP using specified number of random images."""
+
+    test_list, test_labels = generate_N_random_samples(randfunc=randfunc, num_samples=num_samples )
+    test_and_report_images(MLP, test_list, test_labels, jiggled, cropzoomed)
 
 
 # +
@@ -253,10 +330,10 @@ def cnn_load(fpath='./mnist.tflite',
         
     return (interpreter, tf_labels)
 
-cnn = cnn_load()
+#cnn = cnn_load()
 
 def cnn_get_details(cnn):
-    """Unpack details of tesnforflow-lite model."""
+    """Unpack details of tensorflow-lite model."""
     (interpreter, tf_labels) = cnn
     
     input_details = interpreter.get_input_details()
@@ -272,10 +349,16 @@ def cnn_get_details(cnn):
 
 #input_details, output_details, floating_model, height, width = cnn_get_details(cnn_interpreter)
 
-def cnn_rank_results(results):
-    """Display ordered list of top five cnn classification results."""
-       
-    top_k = results.argsort()[-5:][::-1]
+def cnn_rank_results(results, rank=5):
+    """Display ordered list of top cnn classification results."""
+    # Go defensive
+    rank = 5 if not isinstance(rank, int) else rank
+    rank = min(len(results), rank)
+    top_k = results.argsort()[-rank:][::-1]
+
+    # This is a hack
+    # We seem to be normalising wrt 255, so support that?
+    floating_model = max(sum(top_k, [])) > 1
 
     for i in top_k:
         if floating_model:
@@ -284,7 +367,7 @@ def cnn_rank_results(results):
             print('{:08.6f}: {}'.format(float(results[i] / 255.0), tf_labels[i]))
     
 
-def cnn_test_with_image(cnn, img, tf_labels='', retval=False):
+def cnn_test_with_image(cnn, img, tf_labels='', retval=False, rank=None):
     """Test an image against a pretrained tensorflow-lite CNN."""
     interpreter, _tf_labels = cnn
     if not tf_labels:
@@ -315,6 +398,10 @@ def cnn_test_with_image(cnn, img, tf_labels='', retval=False):
 
     results_df.plot(kind='bar', legend=False,
                     title="Confidence score for each class")
+
+    if rank:
+        cnn_rank_results(results, rank)
+
     if retval:
         return results
 

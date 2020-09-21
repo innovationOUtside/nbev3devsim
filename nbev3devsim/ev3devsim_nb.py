@@ -131,21 +131,58 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         self.js_init("ready();", ready=self.ready)
         
         self.results_log = []
-        self.image_data = []
+        self.raw_image_data = [] # log of image data records
 
         self.count = 0
     
-    
+    def _process_robot_image_data(self, data, mode='rgb'):
+        """Process the robot image data and return a dataframe."""
+        df = pd.DataFrame(columns=['side', 'vals', 'clock'])
+        for r in data:
+            _r = r.split()
+            if len(_r)==3:
+                tmp=_r[1].split(',')
+                k=4
+                del tmp[k-1::k]
+                
+                if mode=='reflected' or mode=='greyscale':
+                    # Get the first R component of the RGB signal
+                    tmp = tmp[0::3]
+                elif mode=='bw':
+                    # Get the first R component of the RGB signal
+                    tmp = tmp[0::3]
+                    # and convert it to a boolean value
+                    tmp = [str(int(int(x)>3)) for x in tmp]
+                else:
+                    if mode.upper()!='RGB':
+                        print('Unrecognised mode.')
+                df = pd.concat([df, pd.DataFrame([{'side':_r[0],
+                                                'vals': ','.join(tmp),
+                                                'clock':_r[2]}])])
+        df.reset_index(drop=True,inplace=True)
+        return df
+
+    def image_data(self, datatype='dataframe', mode='rgb'):
+        """
+        Return image data.
+        """
+        if datatype=='raw':
+            return self.raw_image_data
+        elif datatype=='dataframe':
+            _df = self._process_robot_image_data(self.raw_image_data, mode=mode)
+            return _df
+ 
+
     def clear_datalog(self):
         """Clear the datalog in the simulator ipywidget object."""
         self.results_log = []
-        self.image_data = []
+        self.raw_image_data = [] 
         self.count = 0
     
     def comms_image_data(self, obj):
         """Grab image data into a log."""
-        self.image_data.append(obj.replace('image_data','').strip())
-        #self.image_data.append({'index': datetime.utcnow(), 'simtime': clock, typ: val})
+        self.raw_image_data.append(obj.replace('image_data','').strip())
+        #self.raw_image_data.append({'index': datetime.utcnow(), 'simtime': clock, typ: val})
 
     def print_repr(self, obj):
         """Callback function when anything is written to the simulator print window."""
@@ -153,7 +190,8 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         # - log all sensor channels
         # - add timestamp
         # TO DO  - this would be cleaner if we say: log colour, log ultrasonic etc
-        if obj.startswith(('^log','Ultrasonic:', 'Colour:', 'Light_left:', 'Light_right:', 'Gyro:', 'Wheel_left:', 'Wheel_right:')):
+        if obj.startswith(('^log','Ultrasonic:', 'Colour:', 'Light_left:', 
+                           'Light_right:', 'Gyro:', 'Wheel_left:', 'Wheel_right:')):
             typ = obj.split(': ')[0]
             vals = obj.split(': ')[1].strip().split()
             val = float(vals[0])

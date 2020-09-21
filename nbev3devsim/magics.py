@@ -153,16 +153,6 @@ bright_sound('square', 1.5);"""
             _js = "document.getElementById('clearTrace').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
-        # TO DO: pull this out into a reusable function, eg to apply to chart too?
-        if args.pendown:
-            _penDown = "true"
-        else:
-            # Use pen up as a forced default...
-            _penDown = "false"
-        _js = f"""
-        var penSelector = document.getElementById('penDown');
-        penSelector.checked = {_penDown};
-        var event = new Event('change');
         penSelector.dispatchEvent(event);
         """
         self.shell.user_ns[args.sim].js_init(_js)
@@ -288,6 +278,7 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
     @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
@@ -368,6 +359,7 @@ colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
 """
+'''
         if args.preview:
             print(preload)
             return

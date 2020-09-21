@@ -49,6 +49,23 @@ bright_sound('square', 1.5);"""
         )
         clear_output()
 
+    # The focus is grabbed back to the cell after the run cell in the notebook
+    # after the cell is run?
+    #def give_focus_to_run(self):
+    #    """Give tab focus to the simulator run button."""
+    #    display(Javascript('document.getElementById("runCode").focus();'))
+
+    def check_element(self, sim, arg, item):
+        """Show a specified element."""
+        _state = "true" if arg else "false"
+        _js = f"""
+        var {item}Selector = document.getElementById('{item}');
+        {item}Selector.checked = {_state};
+        var {item}Event = new Event('change');
+        {item}Selector.dispatchEvent({item}Event);
+      """
+        self.shell.user_ns[sim].js_init(_js)
+
     def handle_args(self, args):
         """Handle arguments passed in via magic."""
         if args.robotSetup is not None:
@@ -153,38 +170,14 @@ bright_sound('square', 1.5);"""
             _js = "document.getElementById('clearTrace').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
-        penSelector.dispatchEvent(event);
-        """
-        self.shell.user_ns[args.sim].js_init(_js)
+    
+        self.check_element(args.sim, args.pendown, 'penDown')
 
-        if args.chart:
-            _chart = "true"
-        else:
-            _chart = "false"
-
-        _js = f"""
-        document.getElementById('clearChart').click();
-        var chartSelector = document.getElementById('showChart');
-        chartSelector.checked = {_chart};
-        var event = new Event('change');
-        chartSelector.dispatchEvent(event);
-
-      """
-        self.shell.user_ns[args.sim].js_init(_js)
-
-        if args.output:
-            _output = "true"
-        else:
-            _output = "false"
-
-        _js = f"""
-        var chartSelector = document.getElementById('showOutput');
-        chartSelector.checked = {_output};
-        var event = new Event('change');
-        chartSelector.dispatchEvent(event);
-
-      """
-        self.shell.user_ns[args.sim].js_init(_js)
+        self.check_element(args.sim, args.output, 'showOutput')
+        self.check_element(args.sim, args.chart, 'showChart')
+        self.check_element(args.sim, args.array, 'showSensorArray')
+        self.check_element(args.sim, args.sensorvals, 'showSensorValues')
+        self.check_element(args.sim, args.world, 'showWorld')
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -216,6 +209,9 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
     @magic_arguments.argument("--move", "-m", action="store_true", help="Move robot back to start")
@@ -278,6 +274,8 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
     @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
@@ -339,6 +337,9 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
     @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")

@@ -232,10 +232,10 @@ document.getElementById('showChart').addEventListener('change', function (e) {
 document.getElementById('showSensorValues').addEventListener('change', function (e) {
   if (e.target.checked) {
     sim.showSensorValues = true;
-    document.getElementById("sensorDisplays").style.display = 'block';
+    document.getElementById("readings").style.display = 'block';
   } else {
     sim.showSensorValues = false;
-    document.getElementById("sensorDisplays").style.display = 'none';
+    document.getElementById("readings").style.display = 'none';
   }
 });
 
@@ -513,7 +513,7 @@ document.getElementById('map').addEventListener('change', function () {
       sim.loadBackground(imagepath + '_number_sheet.png');
       sim.clearObstacles();
       sim.clearObstaclesLayer();
-      setPos(426, 56, 90, true);
+      setPos(400, 50, 90, true);
   } else if (map == 'Obstacles_Test') {
     sim.loadBackground(imagepath + 'Obstacles_Test.png');
     setPos(121, 125, 90, true);
@@ -673,11 +673,16 @@ function outf(text) {
     // TO DO  - channel left or right
     // pass the image array
     var clock = sim.clock
-    _sd1 = sim.robotStates.sensor1dataArray;
-    _sd2 = sim.robotStates.sensor2dataArray;
-    report_image_data('left '+_sd1+' '+clock);
-    //report_image_data('right '+_sd2+' '+clock);
-    mypre.innerHTML = mypre.innerHTML + "Image data logged...";
+    _text = text.split(' ')
+    if ((_text[1]=='left')||(_text[1]=='both')){
+      _sd1 = sim.robotStates.sensor1dataArray;
+      report_image_data('left '+_sd1+' '+clock);
+    }
+    if ((_text[1]=='right')||(_text[1]=='both')){
+      _sd2 = sim.robotStates.sensor2dataArray;
+      report_image_data('right '+_sd2+' '+clock);
+    }
+    mypre.innerHTML = mypre.innerHTML + _text[1] +" image data logged...";
     mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
     return;
   }

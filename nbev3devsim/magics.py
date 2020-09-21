@@ -49,6 +49,23 @@ bright_sound('square', 1.5);"""
         )
         clear_output()
 
+    # The focus is grabbed back to the cell after the run cell in the notebook
+    # after the cell is run?
+    #def give_focus_to_run(self):
+    #    """Give tab focus to the simulator run button."""
+    #    display(Javascript('document.getElementById("runCode").focus();'))
+
+    def check_element(self, sim, arg, item):
+        """Show a specified element."""
+        _state = "true" if arg else "false"
+        _js = f"""
+        var {item}Selector = document.getElementById('{item}');
+        {item}Selector.checked = {_state};
+        var {item}Event = new Event('change');
+        {item}Selector.dispatchEvent({item}Event);
+      """
+        self.shell.user_ns[sim].js_init(_js)
+
     def handle_args(self, args):
         """Handle arguments passed in via magic."""
         if args.robotSetup is not None:
@@ -128,54 +145,39 @@ bright_sound('square', 1.5);"""
         magic_penSelector.dispatchEvent(magic_event);
       """
             )
-            
+        
+        if args.sensornoise is not None and int(args.sensornoise) <=128:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_sensorNoise = document.getElementById("lightSensorNoiseSlider");
+        magic_sensorNoise.value = "{int(args.sensornoise)}";
+        var magic_event = new Event('input');
+        magic_sensorNoise.dispatchEvent(magic_event);
+      """
+            )
+
+        if args.motornoise is not None and int(args.motornoise) <=500:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_motorNoise = document.getElementById("wheelNoiseSlider");
+        magic_motorNoise.value = "{int(args.motornoise)}";
+        var magic_event = new Event('input');
+        magic_motorNoise.dispatchEvent(magic_event);
+      """
+            )
 
         if args.clear:
             _js = "document.getElementById('clearTrace').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
-        # TO DO: pull this out into a reusable function, eg to apply to chart too?
-        if args.pendown:
-            _penDown = "true"
-        else:
-            # Use pen up as a forced default...
-            _penDown = "false"
-        _js = f"""
-        var penSelector = document.getElementById('penDown');
-        penSelector.checked = {_penDown};
-        var event = new Event('change');
-        penSelector.dispatchEvent(event);
-        """
-        self.shell.user_ns[args.sim].js_init(_js)
+    
+        self.check_element(args.sim, args.pendown, 'penDown')
 
-        if args.chart:
-            _chart = "true"
-        else:
-            _chart = "false"
-
-        _js = f"""
-        document.getElementById('clearChart').click();
-        var chartSelector = document.getElementById('showChart');
-        chartSelector.checked = {_chart};
-        var event = new Event('change');
-        chartSelector.dispatchEvent(event);
-
-      """
-        self.shell.user_ns[args.sim].js_init(_js)
-
-        if args.output:
-            _output = "true"
-        else:
-            _output = "false"
-
-        _js = f"""
-        var chartSelector = document.getElementById('showOutput');
-        chartSelector.checked = {_output};
-        var event = new Event('change');
-        chartSelector.dispatchEvent(event);
-
-      """
-        self.shell.user_ns[args.sim].js_init(_js)
+        self.check_element(args.sim, args.output, 'showOutput')
+        self.check_element(args.sim, args.chart, 'showChart')
+        self.check_element(args.sim, args.array, 'showSensorArray')
+        self.check_element(args.sim, args.sensorvals, 'showSensorValues')
+        self.check_element(args.sim, args.world, 'showWorld')
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -207,9 +209,14 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
     @magic_arguments.argument("--move", "-m", action="store_true", help="Move robot back to start")
+    @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
+    @magic_arguments.argument("--motornoise", "-M", default=None, help="Motor noise, 0..500")
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -267,8 +274,13 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
+    @magic_arguments.argument("--motornoise", "-M", default=None, help="Motor noise, 0..500")
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -276,6 +288,7 @@ bright_sound('square', 1.5);"""
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
+from ev3dev2.sound import Sound
 """
         if args.preview:
             print(preload)
@@ -325,15 +338,26 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
+    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
     @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
     @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
+    @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
+    @magic_arguments.argument("--motornoise", "-M", default=None, help="Motor noise, 0..500")
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
-        preload = """
+        preload = '''
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
+from ev3dev2.sound import Sound
+
+speaker = Sound()
+def say(txt):
+    """Say a phrase without blocking code execution."""
+    speaker.speak(txt, play_type=1)
 
 tank_turn = MoveSteering(OUTPUT_B, OUTPUT_C)
 tank_drive = MoveTank(OUTPUT_B, OUTPUT_C)
@@ -342,7 +366,7 @@ ultrasonic = UltrasonicSensor(INPUT_1)
 colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
-"""
+'''
         if args.preview:
             print(preload)
             return

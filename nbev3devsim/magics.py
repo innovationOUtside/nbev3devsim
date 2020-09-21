@@ -288,6 +288,7 @@ bright_sound('square', 1.5);"""
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
+from ev3dev2.sound import Sound
 """
         if args.preview:
             print(preload)
@@ -347,10 +348,16 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
-        preload = """
+        preload = '''
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
+from ev3dev2.sound import Sound
+
+speaker = Sound()
+def say(txt):
+    """Say a phrase without blocking code execution."""
+    speaker.speak(txt, play_type=1)
 
 tank_turn = MoveSteering(OUTPUT_B, OUTPUT_C)
 tank_drive = MoveTank(OUTPUT_B, OUTPUT_C)
@@ -359,7 +366,6 @@ ultrasonic = UltrasonicSensor(INPUT_1)
 colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
-"""
 '''
         if args.preview:
             print(preload)

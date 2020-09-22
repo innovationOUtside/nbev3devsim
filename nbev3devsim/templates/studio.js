@@ -674,8 +674,8 @@ var interruptHandler = function (susp) {
 
 function runit() {
 
-  document.getElementById('sim_runStatus').classList.remove('led-red')
-  document.getElementById('sim_runStatus').classList.add('led-green')
+  document.getElementById('sim_runStatus').classList.remove('sim-stopped')
+  document.getElementById('sim_runStatus').classList.add('sim-running')
   // This function runs when the simulator Run button is clicked 
   if (typeof Sk.hardInterrupt != 'undefined') {
     delete Sk.hardInterrupt;

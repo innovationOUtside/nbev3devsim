@@ -230,6 +230,9 @@
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
 }
+.sim-running{background: green; border-radius: 50%; display: inline-block; height: 1rem; width: 1rem; }
+.sim-stopped{background: red; border-radius: 50%; display: inline-block; height: 1rem; width: 1rem; }
+
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */
 /* More LEDs: https://codepen.io/fskirschbaum/pen/MYJNaj */
 

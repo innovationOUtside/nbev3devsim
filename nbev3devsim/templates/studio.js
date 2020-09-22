@@ -266,6 +266,7 @@ function _setupToggleUpdate(toggleElement){
 
 function _setUpToggleOff(toggleElement){
   toggleElement.addEventListener('x-switch:off', function(e){
+    var target = rs_display_lookup[e.target.id];
     flag = false;
     if (target) document.querySelector(target).style.display = 'none';
   });

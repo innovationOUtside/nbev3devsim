@@ -1,3 +1,114 @@
+/*---- Custom elements ---*/
+
+class ValueSlider extends HTMLElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    const sliderId = `${this.id}-slider`;
+    const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
+    const labelId = `${this.id}-label`;
+    const valId = `${this.id}-val`;
+    const valmin = this.getAttribute('min');
+    const valmax = this.getAttribute('max');
+    const valinit = this.getAttribute('initial');
+    const maxlen = valmin.toString().length + 1
+    this.innerHTML = `
+    <span class="rs-valueslider-group">
+        <label class="checkboxLabel"for="${sliderId}">${label}:</label>
+        <input type="range"
+        id="${sliderId}" value="${valinit}" min="${valmin}" max="${valmax}">
+        <!--<div role="slider" aria-labelledby="${this.id}-label"
+        id="${sliderId}" aria-valuenow="${valinit}" aria-valuemin="${valmin}" aria-valuemax="${valmax}">-->
+        <!--<input type="text" id="${valId}" maxlength="${valmin}" size="${valmin}" value="${valinit}">-->
+        <input type="number" id="${valId}" value="${valinit}">
+      </span>
+    `;
+  }
+}
+
+if (!(customElements.get('value-slider'))) customElements.define('value-slider', ValueSlider, { extends: null });
+
+function setSlider(el, val) {
+  var magic_slider = document.getElementById(el + "-slider");
+  val = parseInt(val);
+  if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
+    {
+      magic_slider.value = val;
+      var magic_event = new Event('input');
+      magic_slider.dispatchEvent(magic_event);
+    }
+  }
+}
+
+function getSlider(el) {
+  var magic_slider = document.getElementById(el + "-slider");
+  return magic_slider.value;
+}
+
+function setupSliderVal(el, obj, ref) {
+  var sliderId = `#${el}-slider`;
+  var sliderSlider = document.querySelector(sliderId);
+
+  sliderSlider.oninput = function () {
+    const val = parseFloat(this.value);
+    //const val = parseFloat(this.getAttribute("aria-valuenow"));
+    obj[ref] = val;
+    document.querySelector(`#${el}-val`).value = val;
+  }
+  var sliderVal = document.querySelector(`#${el}-val`);
+  sliderVal.onchange = function () {
+    const val = parseFloat(this.value);
+    document.querySelector(sliderId).value = val;
+    //document.querySelector(sliderId).setAttribute("aria-valuenow", val);
+  };
+}
+
+/* Toggle switch - Nick Freear --*/
+class ToggleSwitch extends HTMLElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // write element functionality in here
+    const intID = `int--${this.id || 'x-switch-01'}`;
+    const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
+    const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
+
+    this.innerHTML = `
+      <span class="rs-toggle-group">
+        <label for="${intID}" class="x-switch">${label}: </label>
+        <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
+          <span>${this.getAttribute('off') || 'Off'}</span>
+          <span>${this.getAttribute('on') || 'On'}</span>
+        </button>
+      </span>
+    `;
+
+    const button = this.querySelector('button');
+
+    button.addEventListener('click', childEvent => {
+      const checked = button.getAttribute('aria-checked') === 'true'; // Old state.
+      const on = !checked; // New state.
+
+      button.setAttribute('aria-checked', checked ? 'false' : 'true');
+
+      const eventName = `x-switch:${checked ? 'off' : 'on'}`
+      const event = new CustomEvent(eventName, { detail: { childEvent, on } });
+
+      this.dispatchEvent(event);
+
+      // console.debug('Click:', eventName, childEvent, this);
+    });
+
+    //console.debug(this);
+  }
+}
+
+if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch', ToggleSwitch, { extends: null });
+
+/* --- */
+
 function setPos(x, y, angle, init = false, reset = false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
@@ -7,9 +118,12 @@ function setPos(x, y, angle, init = false, reset = false) {
   if (isNaN(y)) { y = 0; }
   if (isNaN(angleRadian)) { angleRadian = 0; angle = 0; }
 
-  document.getElementById('xPos').value = x;
-  document.getElementById('yPos').value = y;
-  document.getElementById('angle').value = angle;
+  setSlider("rs-display-xPos", x);
+  setSlider("rs-display-yPos", y);
+  setSlider("rs-display-angle", angle);
+  //document.getElementById('rs-display-xPos').value = x;
+  //document.getElementById('rs-display-yPos').value = y;
+  //document.getElementById('rs-display-angle').value = angle;
 
   if (init) {
     sim.robotStates._x = x;
@@ -34,6 +148,13 @@ function setPos(x, y, angle, init = false, reset = false) {
 
 var sim = new EV3devSim('field');
 
+// Initialise additional components
+setupSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
+setupSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise")
+setupSliderVal('rs-display-xPos', sim.robotSpecs, "sensorNoise")
+setupSliderVal('rs-display-yPos', sim.robotSpecs, "sensorNoise")
+setupSliderVal('rs-display-angle', sim.robotSpecs, "sensorNoise")
+
 // Set the default position from something?!
 setPos(1181, 571, 0);
 
@@ -43,18 +164,28 @@ document.getElementById('codeFromClipboard').addEventListener('click', function 
   navigator.clipboard.readText().then(text => console.log(text));
 });
 
-var lightSensorNoiseSlider = document.getElementById("lightSensorNoiseSlider");
+/*
+var lightSensorNoiseSlider = document.getElementById("rs-display-lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {
-  sim.robotSpecs.sensorNoise = parseFloat(this.value);
+  var val = parseFloat(this.value);
+  sim.robotSpecs.sensorNoise = val;
+  document.getElementById('rs-display-sensorNoiseVal').value = val;
   sim.getColorSensorsValues();
   sim.displaySensorValues();
 }
 
-var wheelNoiseSlider = document.getElementById("wheelNoiseSlider");
+var wheelNoiseSlider = document.getElementById("rs-display-wheelNoiseSlider");
 wheelNoiseSlider.oninput = function () {
-  sim.robotSpecs.wheelNoise = parseFloat(this.value);
+  var val = parseFloat(this.value);
+  sim.robotSpecs.wheelNoise = val;
+  document.getElementById('rs-display-wheelNoiseVal').value = val;
 }
-
+var wheelNoiseVal = document.getElementById("rs-display-wheelNoiseVal");
+wheelNoiseVal.onchange = function (){
+  var val = parseFloat(this.value);
+  document.getElementById('rs-display-wheelNoiseSlider').value = val;
+};
+*/
 
 document.getElementById('showCode').addEventListener('click', function () {
   console.log('showing code?')
@@ -160,19 +291,30 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   sim.robotStates.penDown = tmp;
 })
 
+
 document.getElementById('resetReset').addEventListener('click', function () {
-  sim.robotStates._x = document.getElementById('xPos').value;
-  sim.robotStates._y = document.getElementById('yPos').value;
-  sim.robotStates._angle = document.getElementById('angle').value;
+  /*
+  sim.robotStates._x = document.getElementById('rs-display-xPos').value;
+  sim.robotStates._y = document.getElementById('rs-display-yPos').value;
+  sim.robotStates._angle = document.getElementById('rs-display-angle').value;
+  */
+  sim.robotStates._x = getSlider('rs-display-xPos');
+  sim.robotStates._x = getSlider('rs-display-yPos');
+  sim.robotStates._x = getSlider('rs-display-angle');
 })
 
 document.getElementById('move').addEventListener('click', function () {
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
 
-  var x = document.getElementById('xPos').value;
-  var y = document.getElementById('yPos').value;
-  var angle = document.getElementById('angle').value;
+  /*
+  var x = document.getElementById('rs-display-xPos').value;
+  var y = document.getElementById('rs-display-yPos').value;
+  var angle = document.getElementById('rs-display-angle').value;
+  */
+  var x = getSlider('rs-display-xPos');
+  var y = getSlider('rs-display-yPos');
+  var angle = getSlider('rs-display-angle');
 
   setPos(x, y, angle, reset = true);
   sim.robotStates.penDown = tmp;
@@ -196,52 +338,6 @@ document.getElementById('reset').addEventListener('click', function () {
 });
 
 
-/* Toggle switch - Nick Freear --*/
-class ToggleSwitch extends HTMLElement {
-  constructor() {
-    // Always call super first in constructor
-    super();
-
-    // write element functionality in here
-    const intID = `int--${this.id || 'x-switch-01'}`;
-    const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
-    const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
-
-    this.innerHTML = `
-      <span class="rs-toggle-group">
-        <label for="${intID}" class="x-switch">${label}: </label>
-        <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
-          <span>${this.getAttribute('off') || 'Off'}</span>
-          <span>${this.getAttribute('on') || 'On'}</span>
-        </button>
-      </span>
-    `;
-
-    const button = this.querySelector('button');
-
-    button.addEventListener('click', childEvent => {
-      const checked = button.getAttribute('aria-checked') === 'true'; // Old state.
-      const on = !checked; // New state.
-
-      button.setAttribute('aria-checked', checked ? 'false' : 'true');
-
-      const eventName = `x-switch:${checked ? 'off' : 'on'}`
-      const event = new CustomEvent(eventName, { detail: { childEvent, on } });
-
-      this.dispatchEvent(event);
-
-      // console.debug('Click:', eventName, childEvent, this);
-    });
-
-    //console.debug(this);
-  }
-}
-
-
-
-if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch', ToggleSwitch, { extends: null });
-
-/* --- */
 
 /* ----------- START: define display toggles -----------*/
 
@@ -547,8 +643,8 @@ document.getElementById('robotConfiguratordownload').addEventListener('click', f
   hiddenElement.dispatchEvent(new MouseEvent('click'));
 });
 
-document.getElementById('penColor').addEventListener('change', function () {
-  sim.robotSpecs.pen.color = document.getElementById('penColor').value
+document.getElementById('rs-display-penColor').addEventListener('change', function (e) {
+  sim.robotSpecs.pen.color = document.getElementById(e.target.id).value
 });
 
 document.getElementById('robotConfiguratorupload').addEventListener('click', function () {

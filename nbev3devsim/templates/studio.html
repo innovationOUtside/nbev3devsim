@@ -60,7 +60,40 @@
   </div>
 
 
+  <div class="row rs-grouped-controls">
+    <div id="noise_controls">
+      <!--<label class="checkboxLabel" for="rs-display-lightSensorNoiseSlider">Light sensor noise</label><input type="range"
+        id="rs-display-lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="128"><input type="number" id="rs-display-sensorNoiseVal" maxlength="3" size="4">
+      <label class="checkboxLabel" for="rs-display-wheelNoiseSlider">Wheel noise</label><input type="range"
+        id="rs-display-wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500"><input type="number" id="rs-display-wheelNoiseVal" maxlength="3" size="4">
+      -->
+      <value-slider id="rs-display-lightSensorNoise" min="0" max="128" initial="0">Light sensor noise</span></value-slider>
+      <value-slider id="rs-display-wheelNoise" min="0" max="500" initial="0">Wheel noise</span></value-slider>
+    </div>
+    <select id="robotPreconfig">
+      <option>Default_Robot</option>
+      <option>Small_Robot</option>
+      <option>Small_Robot_Wide_Eyes</option>
+    </select>
+    <button id="robotConfiguratorOpen">Configure Robot</button>
+  </div>
   <div class="row">
+    <div class="leftFlex rs-grouped-controls">
+      <span id='sim_runStatus' class="sim-stopped"></span>
+      <toggle-switch id="roboSim-display-runstop" on="Stop" off="Run" initial="off">Sim</span></toggle-switch>
+      <button id="showCode">Show Code</button>
+      <button id='codeFromClipboard'>Paste</button>
+      <toggle-switch id="roboSim-pen-updown" on="down" off="up" initial="off">Pen</toggle-switch>
+      <select id="rs-display-penColor">
+        <option>red</option>
+        <option>orange</option>
+        <option>green</option>
+      </select>
+      <button id="clearTrace">Clear Trace</button>
+    </div>
+  </div>
+
+  <div class="row rs-grouped-controls">
     <toggle-switch id="roboSim-display-world" on="Show" off="Hide" initial="on">World</toggle-switch>
     <select id="map">
       <option selected="selected">Empty_Map</option>
@@ -94,47 +127,19 @@
     </select>
     <button id="upload">Load</button>
     <button id="configureObstacles">Obstacles...</button>
-
   </div>
 
-  <div class="row">
-    <div id="noise_controls" class="row">
-      <label class="checkboxLabel" for="lightSensorNoiseSlider">Light sensor noise</label><input type="range"
-        id="lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="128">
-      <label class="checkboxLabel" for="wheelNoiseSlider">Wheel noise</label><input type="range" id="wheelNoiseSlider"
-        name="wheelNoiseSlider" value="0" min="0" max="500">
-    </div>
-    <select id="robotPreconfig">
-      <option>Default_Robot</option>
-      <option>Small_Robot</option>
-      <option>Small_Robot_Wide_Eyes</option>
-    </select>
-    <button id="robotConfiguratorOpen">Configure Robot</button>
-  </div>
-
-  <div class="row">
-    <div class="leftFlex">
-      <span id='sim_runStatus' class="sim-stopped"></span>
-      <toggle-switch id="roboSim-display-runstop" on="Stop" off="Run" initial="off">Sim</span></toggle-switch>
-      <button id="showCode">Show Code</button>
-      <button id='codeFromClipboard'>Paste</button>
-      <toggle-switch id="roboSim-pen-updown" on="down" off="up" initial="off">Pen</toggle-switch>
-      <select id="penColor">
-        <option>red</option>
-        <option>orange</option>
-        <option>green</option>
-      </select>
-      <button id="clearTrace">Clear Trace</button>
-    </div>
-  </div>
   <div class="row rs-grouped-controls">
     <button id="move">Move</button>
     <button id="reset">Reset</button>
     <button id="resetReset" style="display: none;">ResetReset</button>
     <button id="randomLocation" style="display: none;">Random Location</button>
-    <label for="xPos">X</label><input type="number" id="xPos" size=5>
-    <label for="yPos">Y</label><input type="number" id="yPos" size=5>
-    <label for="angle">Angle</label><input type="number" id="angle" size=5>
+    <value-slider id="rs-display-xPos" min="0" max="2362" initial="0">X</span></value-slider>
+    <value-slider id="rs-display-yPos" min="0" max="1143" initial="0">Y</span></value-slider>
+    <value-slider id="rs-display-angle" min="0" max="360" initial="0">Angle</span></value-slider>
+    <!--<label for="rs-display-xPos">X</label><input type="number" id="rs-display-xPos" maxlength="4" size="5">
+    <label for="rs-display-yPos">Y</label><input type="number" id="rs-display-yPos" maxlength="4" size="5">
+    <label for="rs-display-angle">Angle</label><input type="number" id="rs-display-angle" maxlength="3" size="5">-->
   </div>
 
   <div id="field"></div>

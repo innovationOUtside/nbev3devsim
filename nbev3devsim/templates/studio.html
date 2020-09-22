@@ -1,7 +1,7 @@
 <div id="roboSim_root" class="roboSim" onmouseover="Jupyter.keyboard_manager.disable()"
   onmouseout="Jupyter.keyboard_manager.enable()">
 
-  <div class="row">
+  <div class="row rs-grouped-controls" id="roboSim-display-show-controls">
     <toggle-switch id="roboSim-display-output" on="Show" off="Hide" initial="on">Output</toggle-switch>
     <toggle-switch id="roboSim-display-sensor-values" on="Show" off="Hide" initial="off">Sensor Values</toggle-switch>
     <toggle-switch id="roboSim-display-sensor-array" on="Show" off="Hide" initial="off">Sensor Array</toggle-switch>
@@ -18,7 +18,7 @@
   <div class="row">
     <div id="charter">
       <button id="clearChart">Clear Chart</button>
-      <div id="chartTraces">
+      <div id="chartTraces" class="rs-grouped-controls">
         <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour" checked>Colour</label>
         <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light" checked>Left
           light</label>
@@ -38,7 +38,7 @@
 
   <div class="row">
     <div id='sensorDisplays'>
-      <div id="readings">Port Values:
+      <div id="readings" class="rs-grouped-controls">Port Values:
         <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
         </div>
         <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
@@ -52,7 +52,7 @@
         <div class='sensorReading'>Ultrasonic: <span id="ultrasonic_value"></span></div>
         <div class='sensorReading'>Gyro: <span id="gyro_value"></span></div>
       </div>
-      <div id='sensorArray' class='rightFlex'>Sensor arrays:
+      <div id='sensorArray' class='rightFlex rs-grouped-controls'>Sensor arrays:
         <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
         <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
       </div>
@@ -127,7 +127,7 @@
       <button id="clearTrace">Clear Trace</button>
     </div>
   </div>
-  <div class="row">
+  <div class="row rs-grouped-controls">
     <button id="move">Move</button>
     <button id="reset">Reset</button>
     <button id="resetReset" style="display: none;">ResetReset</button>
@@ -138,8 +138,6 @@
   </div>
 
   <div id="field"></div>
-
-
 
   <div id="robotConfigurator" class="closed">
     <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>

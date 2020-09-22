@@ -303,6 +303,12 @@ label.x-switch {
   width: 1rem;
 }
 
+.rs-grouped-controls {
+  border: 2px solid lightgrey;
+  padding: 10px;
+  border-radius: 12px;
+}
+
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */
 /* More LEDs: https://codepen.io/fskirschbaum/pen/MYJNaj */
 

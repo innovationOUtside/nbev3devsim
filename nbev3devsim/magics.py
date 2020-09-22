@@ -58,11 +58,13 @@ bright_sound('square', 1.5);"""
     def check_element(self, sim, arg, item):
         """Show a specified element."""
         _state = "true" if arg else "false"
+        _selected = f"{item.replace('-', '')}Selector"
+        _selector = f"#int--{item}"
         _js = f"""
-        var {item}Selector = document.getElementById('{item}');
-        {item}Selector.checked = {_state};
-        var {item}Event = new Event('change');
-        {item}Selector.dispatchEvent({item}Event);
+        var {_selected} = document.querySelector("{_selector}");
+        {_selected}.setAttribute('aria-checked', {_state});
+        var toggleCheckEvent = new CustomEvent("x-switch:update");
+        document.getElementById("{item}").dispatchEvent(toggleCheckEvent);
       """
         self.shell.user_ns[sim].js_init(_js)
 
@@ -171,13 +173,13 @@ bright_sound('square', 1.5);"""
             self.shell.user_ns[args.sim].js_init(_js)
 
     
-        self.check_element(args.sim, args.pendown, 'penDown')
+        self.check_element(args.sim, args.pendown, 'roboSim-pen-updown')
 
-        self.check_element(args.sim, args.output, 'showOutput')
-        self.check_element(args.sim, args.chart, 'showChart')
-        self.check_element(args.sim, args.array, 'showSensorArray')
-        self.check_element(args.sim, args.sensorvals, 'showSensorValues')
-        self.check_element(args.sim, args.world, 'showWorld')
+        self.check_element(args.sim, args.output, 'roboSim-display-output')
+        self.check_element(args.sim, args.chart, 'roboSim-display-chart')
+        self.check_element(args.sim, args.array, 'roboSim-display-sensor-array')
+        self.check_element(args.sim, args.sensorvals, 'roboSim-display-sensor-values')
+        self.check_element(args.sim, args.world, 'roboSim-display-world')
 
     @line_cell_magic
     @magic_arguments.magic_arguments()

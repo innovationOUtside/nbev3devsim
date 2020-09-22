@@ -207,13 +207,13 @@ class ToggleSwitch extends HTMLElement {
     const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
 
     this.innerHTML = `
-      <div class="rs-toggle-group">
+      <span class="rs-toggle-group">
         <label for="${intID}" class="x-switch">${label}: </label>
         <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
           <span>${this.getAttribute('off') || 'Off'}</span>
           <span>${this.getAttribute('on')  || 'On' }</span>
         </button>
-      </div>
+      </span>
     `;
 
     const button = this.querySelector('button');
@@ -232,9 +232,11 @@ class ToggleSwitch extends HTMLElement {
       // console.debug('Click:', eventName, childEvent, this);
     });
 
-    console.debug(this);
+    //console.debug(this);
   }
 }
+
+
 
 if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch', ToggleSwitch, { extends: null });
 
@@ -242,16 +244,41 @@ if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch
 
 /* ----------- START: define display toggles -----------*/
 
+
+var rs_display_lookup = {"roboSim-display-world": "#field",
+                  "roboSim-display-chart": "#charter",
+                  "roboSim-display-output":"#output",
+                  "roboSim-display-sensor-values": "#readings",
+                  "roboSim-display-sensor-array":"#sensorArray"
+                };
+
+function _setupToggleUpdate(toggleElement){
+  toggleElement.addEventListener('x-switch:update', function(e){
+    var target = rs_display_lookup[e.target.id];
+    var button = "#int--"+e.target.id;
+    if (target) {
+      var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
+      if (flag) document.querySelector(target).style.display = 'block';
+      else document.querySelector(target).style.display = 'none';
+    }
+  });
+}
+
+function _setUpToggleOff(toggleElement){
+  toggleElement.addEventListener('x-switch:off', function(e){
+    flag = false;
+    if (target) document.querySelector(target).style.display = 'none';
+  });
+}
+
 function setupToggleHandler(el, flag, target){
   var toggleElement =  document.querySelector(el);
   toggleElement.addEventListener('x-switch:on',  function(e){
     flag = true;
     if (target) document.querySelector(target).style.display = 'block';
   });
-  toggleElement.addEventListener('x-switch:off', function(e){
-    flag = false;
-    if (target) document.querySelector(target).style.display = 'none';
-  });
+  _setupToggleUpdate(toggleElement);
+  _setUpToggleOff(toggleElement);
 }
 
 function setupChartToggleHandler(el, flag, target){
@@ -261,10 +288,8 @@ function setupChartToggleHandler(el, flag, target){
     if (!($( "#plotlyDiv" ).length )) Plotly.newPlot('plotlyDiv', chart_lines);
     if (target) document.querySelector(target).style.display = 'block';
   });
-  toggleElement.addEventListener('x-switch:off', function(e){
-    flag = false;
-    if (target) document.querySelector(target).style.display = 'none';
-  });
+  _setupToggleUpdate(toggleElement);
+  _setUpToggleOff(toggleElement);
 }
 
 setupToggleHandler('#roboSim-display-output', sim.showOutput, "#output" )
@@ -774,20 +799,28 @@ document.getElementById('clearChart').addEventListener('click', function() {
 
 
 /* We can't call the event defined on the element
-   becuase it toggles the display? */
-function rs_initialise_display(el, target){
-  var intID = "#int--"+el;
-  var initElement =  document.querySelector(intID)
-  var on = initElement.getAttribute('aria-checked') === 'true';
-  if (on){
-    document.querySelector(target).style.display = 'block';
-  } else {
-    document.querySelector(target).style.display = 'none';
+   because it toggles the display? */
+
+
+function rs_initialise_display(el){
+  if (el=='roboSim-display-chart')
+    rs_initialise_chart_display(el)
+  else {
+    var intID = "#int--"+el;
+    var target = rs_display_lookup[el];
+    var initElement =  document.querySelector(intID)
+    var on = initElement.getAttribute('aria-checked') === 'true';
+    if (on){
+      document.querySelector(target).style.display = 'block';
+    } else {
+      document.querySelector(target).style.display = 'none';
+    }
   }
 }
 
-function rs_initialise_chart_display(el, target){
+function rs_initialise_chart_display(el){
   var intID = "#int--"+el;
+  var target = rs_display_lookup[el];
   var initElement =  document.querySelector(intID);
   var on = initElement.getAttribute('aria-checked') === 'true';
   if (on){
@@ -798,11 +831,11 @@ function rs_initialise_chart_display(el, target){
   }
 }
 
-rs_initialise_display('roboSim-display-world', "#field");
-rs_initialise_chart_display('roboSim-display-chart',  "#charter" );
-rs_initialise_display('roboSim-display-output', "#output" );
-rs_initialise_display('roboSim-display-sensor-values', "#readings" );
-rs_initialise_display('roboSim-display-sensor-array',  "#sensorArray");
+rs_initialise_display("roboSim-display-world");
+rs_initialise_chart_display("roboSim-display-chart" );
+rs_initialise_display("roboSim-display-output" );
+rs_initialise_display("roboSim-display-sensor-values" );
+rs_initialise_display("roboSim-display-sensor-array");
 
 // For some reason, we need this to let py retrieve vals from js sim
 // What it seems to do in bring a sim var into scope?

@@ -1,5 +1,5 @@
-.roboSim button{
-  background:AliceBlue;
+.roboSim button {
+  background: AliceBlue;
 }
 
 .row {
@@ -37,7 +37,7 @@
   margin-right: 1em;
 }
 
-.right input[type=number] {
+.right input[type="number"] {
   width: 4em;
   text-align: right;
 }
@@ -75,7 +75,7 @@
   width: 55em;
 }
 
-#editor.long > #pythonCode{
+#editor.long > #pythonCode {
   height: 95vh;
 }
 
@@ -103,7 +103,8 @@
 }
 
 .sensorGrid {
-  width: 150px; height: 150px;
+  width: 150px;
+  height: 150px;
 }
 
 #sensorArrayLeft {
@@ -113,7 +114,9 @@
   border: 2px solid green;
 }
 
-#robotConfigurator, #obstaclesConfigurator, #codeDisplay {
+#robotConfigurator,
+#obstaclesConfigurator,
+#codeDisplay {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -147,7 +150,9 @@
   flex-direction: column;
 }
 
-#robotConfiguratorEditor,  #obstaclesConfiguratorEditor, #codeDisplayCode {
+#robotConfiguratorEditor,
+#obstaclesConfiguratorEditor,
+#codeDisplayCode {
   background: white;
   width: 100%;
   height: 100%;
@@ -190,7 +195,7 @@
   border-spacing: 0;
 }
 #window td {
-  padding:0.5em;
+  padding: 0.5em;
 }
 #window thead {
   background: lightgray;
@@ -232,7 +237,9 @@
 }
 
 /*--- Toggle switch - Nick Freear*/
-x-switch { zoom: 1; }
+x-switch {
+  zoom: 1;
+}
 
 .rs-toggle-group {
   border: 1px solid lightgrey;
@@ -258,14 +265,14 @@ button.x-switch span {
   pointer-events: none;
 }
 
-[role = switch][aria-checked = false] :first-child,
-[role = switch][aria-checked = true ] :last-child {
-  background: #262;
+[role="switch"][aria-checked="false"] :first-child,
+[role="switch"][aria-checked="true"] :last-child {
+  background: rgb(120, 120, 120);
   color: #eef;
 }
 
-[role = switch][aria-checked = false] :last-child,
-[role = switch][aria-checked = true ] :first-child {
+[role="switch"][aria-checked="false"] :last-child,
+[role="switch"][aria-checked="true"] :first-child {
   color: #bbd;
 }
 /*
@@ -275,18 +282,29 @@ label.x-switch {
   user-select: none;
   vertical-align: middle;
 } */
-  /* Also for label.x-switch :
+/* Also for label.x-switch :
     -moz-user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
   -o-user-select: none; */
 /*---*/
-.sim-running{background: green; border-radius: 50%; display: inline-block; height: 1rem; width: 1rem; }
-.sim-stopped{background: red; border-radius: 50%; display: inline-block; height: 1rem; width: 1rem; }
+.sim-running {
+  background: green;
+  border-radius: 50%;
+  display: inline-block;
+  height: 1rem;
+  width: 1rem;
+}
+.sim-stopped {
+  background: red;
+  border-radius: 50%;
+  display: inline-block;
+  height: 1rem;
+  width: 1rem;
+}
 
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */
 /* More LEDs: https://codepen.io/fskirschbaum/pen/MYJNaj */
-
 
 /* https://cssdeck.com/labs/css-leds */
 .led-red {
@@ -296,7 +314,7 @@ label.x-switch {
   height: 12px;
   background-color: rgb(173, 51, 13);
   border-radius: 50%;
-  box-shadow: #000 0 -1px 7px 1px, inset #600 0 -1px 9px, #F00 0 2px 12px;
+  box-shadow: #000 0 -1px 7px 1px, inset #600 0 -1px 9px, #f00 0 2px 12px;
 }
 
 .led-yellow {
@@ -306,7 +324,7 @@ label.x-switch {
   height: 12px;
   background-color: rgb(228, 207, 20);
   border-radius: 50%;
-  box-shadow: #000 0 -1px 7px 1px, inset #660 0 -1px 9px, #DD0 0 2px 12px;
+  box-shadow: #000 0 -1px 7px 1px, inset #660 0 -1px 9px, #dd0 0 2px 12px;
 }
 
 .led-green {
@@ -316,5 +334,5 @@ label.x-switch {
   height: 12px;
   background-color: rgb(18, 250, 18);
   border-radius: 50%;
-  box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7D0 0 2px 12px;
+  box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7d0 0 2px 12px;
 }

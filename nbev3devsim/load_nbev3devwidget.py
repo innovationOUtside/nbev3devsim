@@ -11,6 +11,7 @@ display(HTML("<style>#notebook-container { width:50%; float:left !important;}</s
 
 #Launch the simulator
 from nbev3devsim import ev3devsim_nb as eds
+
 #%load_ext nbev3devsim
 
 roboSim = eds.Ev3DevWidget()

@@ -1,11 +1,11 @@
 <div id="roboSim_root" class="roboSim" onmouseover="Jupyter.keyboard_manager.disable()" onmouseout="Jupyter.keyboard_manager.enable()">
 
   <div class="row">
-    <label class="checkboxLabel" for="showOutput">Show output</label><input type="checkbox" id="showOutput">
-    <label class="checkboxLabel" for="showSensorValues">Show sensor values</label><input type="checkbox" id="showSensorValues">
-    <label class="checkboxLabel" for="showChart">Show chart</label><input type="checkbox" id="showChart">
-    <label class="checkboxLabel" for="showSensorArray">Show sensor array</label><input type="checkbox" id="showSensorArray">
-    <label class="checkboxLabel" for="collaborative">Collaborative</label><input type="checkbox" id="collaborative">
+    <toggle-switch id="roboSim-display-output" on="Show" off="Hide" initial="on">Output</toggle-switch>
+    <toggle-switch id="roboSim-display-sensor-values" on="Show" off="Hide" initial="off">Sensor Values</toggle-switch>
+    <toggle-switch id="roboSim-display-sensor-array" on="Show" off="Hide" initial="off">Sensor Array</toggle-switch>
+    <toggle-switch id="roboSim-display-chart" on="Show" off="Hide" initial="off">Chart</toggle-switch>
+    <toggle-switch id="roboSim-state-collaborative" on="On" off="Off" initial="off">Collaborative</toggle-switch>
   </div>
 
   <div class="row">
@@ -53,7 +53,7 @@
 
 
   <div class="row">
-    <label class="checkboxLabel" for="showWorld">Show world</label><input type="checkbox" id="showWorld" checked>
+    <toggle-switch id="roboSim-display-world" on="Show" off="Hide" initial="on">World</toggle-switch>
     <select id="map">
       <option selected="selected">Empty_Map</option>
       <option>Loop</option>
@@ -104,12 +104,12 @@
 
   <div class="row">
     <div class="leftFlex">
-      <span id='sim_runStatus' class="led-red"></span>
+      <span id='sim_runStatus' class="sim-stopped"></span>
       <button id="runCode">Run</button>
       <button id="stop">Stop</button>
       <button id="showCode">Show Code</button>
       <button id='codeFromClipboard'>Paste</button>
-      <label class="checkboxLabel" for="penDown">Pen Down</label><input type="checkbox" id="penDown">
+      <toggle-switch id="roboSim-pen-updown" on="down" off="up" initial="off">Pen</toggle-switch>
       <select id="penColor">
         <option>red</option>
         <option>orange</option>

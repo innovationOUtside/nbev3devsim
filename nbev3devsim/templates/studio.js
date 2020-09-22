@@ -1,4 +1,4 @@
-function setPos(x, y, angle, init=false, reset=false) {
+function setPos(x, y, angle, init = false, reset = false) {
   var x = parseFloat(x);
   var y = parseFloat(y);
   var angleRadian = parseFloat(angle) / 180 * Math.PI;
@@ -60,8 +60,9 @@ document.getElementById('showCode').addEventListener('click', function () {
   console.log('showing code?')
   var _code = element.prog;
   // Strip out any prefix magic line
-  _code = _code.split('\n').filter(function(line){ 
-    return line.indexOf( "%" ) != 0; }).join('\n')
+  _code = _code.split('\n').filter(function (line) {
+    return line.indexOf("%") != 0;
+  }).join('\n')
   //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
   document.getElementById('codeDisplayCode').textContent = _code;
   document.getElementById('codeDisplay').classList.remove('closed');
@@ -149,13 +150,13 @@ document.getElementById('obstacles').addEventListener('click', function () {
 
 document.getElementById('randomLocation').addEventListener('click', function () {
   var _x = Math.floor(Math.random() * sim.WIDTH);
-  var _y = Math.floor(Math.random() * sim.HEIGHT); 
+  var _y = Math.floor(Math.random() * sim.HEIGHT);
   var _angle = Math.floor(Math.random() * 360);
 
   // TO DO - make a "noPenMove" function to take coords/angle and move w/ no pen
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
-  setPos(_x, _y, _angle, reset=true);
+  setPos(_x, _y, _angle, reset = true);
   sim.robotStates.penDown = tmp;
 })
 
@@ -173,7 +174,7 @@ document.getElementById('move').addEventListener('click', function () {
   var y = document.getElementById('yPos').value;
   var angle = document.getElementById('angle').value;
 
-  setPos(x, y, angle, reset=true);
+  setPos(x, y, angle, reset = true);
   sim.robotStates.penDown = tmp;
 
   sim.getColorSensorsValues();
@@ -184,12 +185,12 @@ document.getElementById('reset').addEventListener('click', function () {
   // Don't draw the trace when we reset the robot position
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
-  
+
   setPos(
     sim.robotStates._x,
     sim.robotStates._y,
     sim.robotStates._angle,
-    reset=true
+    reset = true
   );
   sim.robotStates.penDown = tmp;
 });
@@ -211,7 +212,7 @@ class ToggleSwitch extends HTMLElement {
         <label for="${intID}" class="x-switch">${label}: </label>
         <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
           <span>${this.getAttribute('off') || 'Off'}</span>
-          <span>${this.getAttribute('on')  || 'On' }</span>
+          <span>${this.getAttribute('on') || 'On'}</span>
         </button>
       </span>
     `;
@@ -245,17 +246,18 @@ if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch
 /* ----------- START: define display toggles -----------*/
 
 
-var rs_display_lookup = {"roboSim-display-world": "#field",
-                  "roboSim-display-chart": "#charter",
-                  "roboSim-display-output":"#output",
-                  "roboSim-display-sensor-values": "#readings",
-                  "roboSim-display-sensor-array":"#sensorArray"
-                };
+var rs_display_lookup = {
+  "roboSim-display-world": "#field",
+  "roboSim-display-chart": "#charter",
+  "roboSim-display-output": "#output",
+  "roboSim-display-sensor-values": "#readings",
+  "roboSim-display-sensor-array": "#sensorArray"
+};
 
-function _setupToggleUpdate(toggleElement){
-  toggleElement.addEventListener('x-switch:update', function(e){
+function _setupToggleUpdate(toggleElement) {
+  toggleElement.addEventListener('x-switch:update', function (e) {
     var target = rs_display_lookup[e.target.id];
-    var button = "#int--"+e.target.id;
+    var button = "#int--" + e.target.id;
     if (target) {
       var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
       if (flag) document.querySelector(target).style.display = 'block';
@@ -264,17 +266,17 @@ function _setupToggleUpdate(toggleElement){
   });
 }
 
-function _setUpToggleOff(toggleElement){
-  toggleElement.addEventListener('x-switch:off', function(e){
+function _setUpToggleOff(toggleElement) {
+  toggleElement.addEventListener('x-switch:off', function (e) {
     var target = rs_display_lookup[e.target.id];
     flag = false;
     if (target) document.querySelector(target).style.display = 'none';
   });
 }
 
-function setupToggleHandler(el, flag, target){
-  var toggleElement =  document.querySelector(el);
-  toggleElement.addEventListener('x-switch:on',  function(e){
+function setupToggleHandler(el, flag, target) {
+  var toggleElement = document.querySelector(el);
+  toggleElement.addEventListener('x-switch:on', function (e) {
     flag = true;
     if (target) document.querySelector(target).style.display = 'block';
   });
@@ -282,24 +284,24 @@ function setupToggleHandler(el, flag, target){
   _setUpToggleOff(toggleElement);
 }
 
-function setupChartToggleHandler(el, flag, target){
-  var toggleElement =  document.querySelector(el);
-  toggleElement.addEventListener('x-switch:on',  function(e){
+function setupChartToggleHandler(el, flag, target) {
+  var toggleElement = document.querySelector(el);
+  toggleElement.addEventListener('x-switch:on', function (e) {
     flag = true;
-    if (!($( "#plotlyDiv" ).length )) Plotly.newPlot('plotlyDiv', chart_lines);
+    if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
     if (target) document.querySelector(target).style.display = 'block';
   });
   _setupToggleUpdate(toggleElement);
   _setUpToggleOff(toggleElement);
 }
 
-setupToggleHandler('#roboSim-display-output', sim.showOutput, "#output" )
-setupToggleHandler('#roboSim-display-sensor-values', sim.showSensorValues, "#readings" )
-setupToggleHandler('#roboSim-display-sensor-array', sim.showSensorArray, "#sensorArray" )
-setupChartToggleHandler('#roboSim-display-chart', sim.showChart, "#charter" )
-setupToggleHandler('#roboSim-display-world', sim.showWorld, "#field" )
-setupToggleHandler('#roboSim-pen-updown',  sim.robotStates.penDown, null )
-setupToggleHandler('#roboSim-state-collaborative', sim.collaborative, null )
+setupToggleHandler('#roboSim-display-output', sim.showOutput, "#output")
+setupToggleHandler('#roboSim-display-sensor-values', sim.showSensorValues, "#readings")
+setupToggleHandler('#roboSim-display-sensor-array', sim.showSensorArray, "#sensorArray")
+setupChartToggleHandler('#roboSim-display-chart', sim.showChart, "#charter")
+setupToggleHandler('#roboSim-display-world', sim.showWorld, "#field")
+setupToggleHandler('#roboSim-pen-updown', sim.robotStates.penDown, null)
+setupToggleHandler('#roboSim-state-collaborative', sim.collaborative, null)
 
 
 /*----------- END: define display toggles -----------*/
@@ -332,45 +334,45 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
   var robotSpec = sim.default_robot_spec;
   var preconfig = document.getElementById('robotPreconfig').value;
   //TO DO - need to capture current robot location then reset to that
-  if (preconfig == 'Default_Robot'){
+  if (preconfig == 'Default_Robot') {
     robotSpecs = sim.default_robot_spec;
-  } else if ((preconfig == 'Small_Robot') || (preconfig == 'Small_Robot_Wide_Eyes') ) {
-      robotSpecs = {
-        "wheeldiameter": 28,
-        "wheelSpacing": 90,
-        "wheelNoise": 0,
-        "back": -60,
-        "pen": {
-          "x": 0,
-          "y": 0,
-          "color": "red",
-          "width": 6
-        },
-        "weight": "weightless",
-        "sensorNoise": 0,
-        "sensor1": {
-          "enabled": true,
-          "x": -10,
-          "y": 15,
-          "diameter": 10
-        },
-        "sensor2": {
-          "enabled": true,
-          "x": 10,
-          "y": 15,
-          "diameter": 10
-        },
-        "ultrasonic": {
-          "enabled": true,
-          "x": 0,
-          "y": 10,
-          "angle": 0,
-          "noise": 0
-        },
-        "gyro": {
-          "enabled": true
-        }
-      };
+  } else if ((preconfig == 'Small_Robot') || (preconfig == 'Small_Robot_Wide_Eyes')) {
+    robotSpecs = {
+      "wheeldiameter": 28,
+      "wheelSpacing": 90,
+      "wheelNoise": 0,
+      "back": -60,
+      "pen": {
+        "x": 0,
+        "y": 0,
+        "color": "red",
+        "width": 6
+      },
+      "weight": "weightless",
+      "sensorNoise": 0,
+      "sensor1": {
+        "enabled": true,
+        "x": -10,
+        "y": 15,
+        "diameter": 10
+      },
+      "sensor2": {
+        "enabled": true,
+        "x": 10,
+        "y": 15,
+        "diameter": 10
+      },
+      "ultrasonic": {
+        "enabled": true,
+        "x": 0,
+        "y": 10,
+        "angle": 0,
+        "noise": 0
+      },
+      "gyro": {
+        "enabled": true
+      }
+    };
   } else robotSpecs = sim.default_robot_spec;
 
   if (preconfig == 'Small_Robot_Wide_Eyes') {
@@ -390,28 +392,28 @@ document.getElementById('robotPreconfig').addEventListener('change', function ()
 document.getElementById('obstaclesPreset').addEventListener('change', function () {
   var preset = document.getElementById('obstaclesPreset').value;
   var obstacles = ''
-  if (preset=='Central_post') {
+  if (preset == 'Central_post') {
     obstacles = '[[900, 500, 200, 200]]'
-  } else if (preset=='Square_posts') {
+  } else if (preset == 'Square_posts') {
     obstacles = '[[500, 200, 100, 100], [500, 700, 100, 100], [1500, 200, 100, 100], [1500, 700, 100, 100]]'
-  } else if (preset =='Wall'){
+  } else if (preset == 'Wall') {
     obstacles = '[[1500, 200, 200, 800]]'
-  } else if (preset == 'Square'){
+  } else if (preset == 'Square') {
 
   } else if (preset == 'U') {
 
   } else if (preset == 'L') {
 
-  } else if (preset=='maze') {
+  } else if (preset == 'maze') {
     // TO DO
   }
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 });
 
 //var imagepath = '/notebooks/backgrounds/'
-var imagepath = '/'+window.location.pathname.split('/')[1]+'/backgrounds/'
+var imagepath = '/' + window.location.pathname.split('/')[1] + '/backgrounds/'
 
-function init_background(background, pos, clearObstacles=true, clearObstaclesLayer=true) {
+function init_background(background, pos, clearObstacles = true, clearObstaclesLayer = true) {
   sim.loadBackground(imagepath + background);
   if (clearObstacles) sim.clearObstacles();
   if (clearObstaclesLayer) sim.clearObstaclesLayer();
@@ -423,17 +425,17 @@ document.getElementById('map').addEventListener('change', function () {
   var map = document.getElementById('map').value;
 
   if (map == 'WRO_2019_Regular_Junior') {
-    init_background('WRO-2019-Regular-Junior.jpg', [2215, 150, 90, true] );
+    init_background('WRO-2019-Regular-Junior.jpg', [2215, 150, 90, true]);
   } else if (map == 'Loop') {
-    init_background('_loop.png', [1000, 500, 90, true] );
+    init_background('_loop.png', [1000, 500, 90, true]);
   } else if (map == 'Two_shapes') {
-    init_background('_two_shapes.png', [1000, 500, 90, true] );
+    init_background('_two_shapes.png', [1000, 500, 90, true]);
   } else if (map == 'Grey_bands') {
-    init_background('_greys.png', [400, 500, 0, true] );
+    init_background('_greys.png', [400, 500, 0, true]);
   } else if (map == 'Linear_grey') {
-    init_background('_linear_grey.png', [1000, 50, 90, true] );
+    init_background('_linear_grey.png', [1000, 50, 90, true]);
   } else if (map == 'Radial_grey') {
-    init_background('_radial_grey.png', [100, 400, 0, true] );
+    init_background('_radial_grey.png', [100, 400, 0, true]);
     //Update robot config
     sim.robotSpecs.sensor1.x = -60;
     sim.robotSpecs.sensor2.x = 60;
@@ -442,41 +444,41 @@ document.getElementById('map').addEventListener('change', function () {
     //Set initial location
     setPos(100, 400, 0, true);
   } else if (map == 'Radial_red') {
-    init_background('_radial_red.png', [100, 400, 0, true] );
+    init_background('_radial_red.png', [100, 400, 0, true]);
   } else if (map == 'Coloured_bands') {
-    init_background('_coloured_bands.png', [500, 500, 0, true] );
+    init_background('_coloured_bands.png', [500, 500, 0, true]);
   } else if (map == 'Rainbow_bands') {
-    init_background('_rainbow_bands.png', [150, 500, 0, true] );
+    init_background('_rainbow_bands.png', [150, 500, 0, true]);
   } else if (map == 'Grey_and_black') {
-    init_background('_grey_and_black.png', [500, 250, 90, true] );
+    init_background('_grey_and_black.png', [500, 250, 90, true]);
   } else if (map == 'Lollipop') {
-    init_background('_line_follower_track.png', [750, 375, -180, true] );
+    init_background('_line_follower_track.png', [750, 375, -180, true]);
   } else if (map == 'Noisy_Lollipop') {
-    init_background('_noisy_line_follower_track.png', [750, 375, -180, true] );
+    init_background('_noisy_line_follower_track.png', [750, 375, -180, true]);
   } else if (map == 'Testcard') {
-    init_background('FuBK_testcard_vectorized.png', [500, 250, 90, true] );
+    init_background('FuBK_testcard_vectorized.png', [500, 250, 90, true]);
   } else if (map == 'Square') {
-    init_background('_square.png', [775, 500, -90, true] );
+    init_background('_square.png', [775, 500, -90, true]);
   } else if (map == 'WRO_2018_Regular_Junior') {
-    init_background('WRO-2018-Regular-Junior.png', [1181, 150, 90, true] );
+    init_background('WRO-2018-Regular-Junior.png', [1181, 150, 90, true]);
   } else if (map == 'FLL_2019_City_Shaper') {
-    init_background('FLL2019.jpg', [500, 150, 90, true] );
+    init_background('FLL2019.jpg', [500, 150, 90, true]);
   } else if (map == 'FLL_2018_Into_Orbit') {
-    init_background('FLL2018.jpg', [150, 150, 90, true] );
+    init_background('FLL2018.jpg', [150, 150, 90, true]);
   } else if (map == 'Line_Following_Test') {
-    init_background('Line_Following_Test.png', [141, 125, 90, true] );
+    init_background('Line_Following_Test.png', [141, 125, 90, true]);
   } else if (map == 'Junction_Handling_Test') {
-    init_background('Junction_Handling_Test.png', [698, 130, 90, true] );
+    init_background('Junction_Handling_Test.png', [698, 130, 90, true]);
   } else if (map == 'Sensor_Diameter_Test') {
-    init_background('_sensor_diameter_test.png', [550, 450, 90, true] );
+    init_background('_sensor_diameter_test.png', [550, 450, 90, true]);
   } else if (map == 'Simple_Shapes') {
-    init_background('_simple_shapes.png', [800, 400, 0, true] );
-  }  else if (map == 'Thruxton_Circuit') {
-    init_background('thruxton_track.png', [457, 242, 120, true] );
-  }  else if (map == 'MNIST_Digits') {
-    init_background('_number_sheet.png', [400, 50, 90, true] );
+    init_background('_simple_shapes.png', [800, 400, 0, true]);
+  } else if (map == 'Thruxton_Circuit') {
+    init_background('thruxton_track.png', [457, 242, 120, true]);
+  } else if (map == 'MNIST_Digits') {
+    init_background('_number_sheet.png', [400, 50, 90, true]);
   } else if (map == 'Obstacles_Test') {
-    init_background('Obstacles_Test.png', [121, 125, 90, true] );
+    init_background('Obstacles_Test.png', [121, 125, 90, true]);
     sim.loadObstacles([
       [46, 388, 150, 150],
       [479, 704, 150, 150],
@@ -487,7 +489,7 @@ document.getElementById('map').addEventListener('change', function () {
     ]);
   }
   else if (map == 'Topo_map') {
-    init_background('Topo_map.png', [698, 130, 90, true] );
+    init_background('Topo_map.png', [698, 130, 90, true]);
   } else if (map == 'Upload Image (2362x1143px)...') {
     console.log('upload');
     var hiddenElement = document.createElement('input');
@@ -511,7 +513,7 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearBackground();
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(2362/2, 1143/2, 0, true);
+    setPos(2362 / 2, 1143 / 2, 0, true);
   }
 });
 
@@ -596,7 +598,7 @@ var chart_sensor_traces = [
 
 var chart_lines = [];
 
-function set_chartlines(){
+function set_chartlines() {
   chart_lines = []
   for (var j = 0; j < chart_sensor_traces.length; j++) {
     _tmp = {
@@ -623,21 +625,21 @@ function outf(text) {
   report_callback(text);
   // Can we also send something back to py context and then get something back from py in return?
   // Note there are quite a lot of delays in round trip
-  if ((sim.collaborative) && (text.trim()!='')) report_callback_responder(text);
+  if ((sim.collaborative) && (text.trim() != '')) report_callback_responder(text);
   if (text.startsWith('image_data')) {
     // TO DO  - channel left or right
     // pass the image array
     var clock = sim.clock
     _text = text.split(' ')
-    if ((_text[1]=='left')||(_text[1]=='both')){
+    if ((_text[1] == 'left') || (_text[1] == 'both')) {
       _sd1 = sim.robotStates.sensor1dataArray;
-      report_image_data('left '+_sd1+' '+clock);
+      report_image_data('left ' + _sd1 + ' ' + clock);
     }
-    if ((_text[1]=='right')||(_text[1]=='both')){
+    if ((_text[1] == 'right') || (_text[1] == 'both')) {
       _sd2 = sim.robotStates.sensor2dataArray;
-      report_image_data('right '+_sd2+' '+clock);
+      report_image_data('right ' + _sd2 + ' ' + clock);
     }
-    mypre.innerHTML = mypre.innerHTML + _text[1] +" image data logged...";
+    mypre.innerHTML = mypre.innerHTML + _text[1] + " image data logged...";
     mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
     return;
   }
@@ -675,7 +677,7 @@ function outf(text) {
       if (typeof element.response !== 'undefined') {
         // The response element contains state sent from the Python environment
         var response = element.response;
-        if (response != '') { 
+        if (response != '') {
           // For now, just show what we've got back from py
           mypre.innerHTML = mypre.innerHTML + response;
           mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
@@ -708,16 +710,16 @@ var interruptHandler = function (susp) {
   }
 };
 
-function stopit(hard=true) {
+function stopit(hard = true) {
   document.getElementById("sim_runStatus").classList.remove("sim-running")
   document.getElementById("sim_runStatus").classList.add("sim-stopped")
   sim.stopAnimation();
   Sk.running = false;
 
   var _turnoffId = "roboSim-display-runstop";
-  var turnoff = document.querySelector("#int--"+_turnoffId);
+  var turnoff = document.querySelector("#int--" + _turnoffId);
   turnoff.setAttribute("aria-checked", "false");
-// TO DO - do we need this?
+  // TO DO - do we need this?
   if (hard) Sk.hardInterrupt = true;
 }
 
@@ -732,7 +734,7 @@ function runit() {
     return;
   }
   Sk.running = true;
-  
+
   if (sim.showChart) Plotly.newPlot('plotlyDiv', chart_lines);
 
   sim.reset();
@@ -766,7 +768,7 @@ function runit() {
       //document.getElementById('sim_runStatus').classList.add('sim-stopped')
       //Sk.running = false;
       // set the on switch to off...
-      stopit(hard=false)
+      stopit(hard = false)
 
     },
     // The following handles errors that arise when executing
@@ -779,7 +781,7 @@ function runit() {
       //document.getElementById('sim_runStatus').classList.remove('sim-running')
       //document.getElementById('sim_runStatus').classList.add('sim-stopped')
       //sim.stopAnimation();
-      stopit(hard=false)
+      stopit(hard = false)
       var mypre = document.getElementById("output");
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
@@ -789,16 +791,16 @@ function runit() {
 
 
 
-function setupRunToggleHandler(el){
-  var toggleElement =  document.querySelector(el);
-  toggleElement.addEventListener('x-switch:on',  function(e){
+function setupRunToggleHandler(el) {
+  var toggleElement = document.querySelector(el);
+  toggleElement.addEventListener('x-switch:on', function (e) {
     runit();
   });
-  toggleElement.addEventListener('x-switch:off',  function(e){
+  toggleElement.addEventListener('x-switch:off', function (e) {
     stopit();
   });
-  toggleElement.addEventListener('x-switch:update',  function(e){
-    var button = "#int--"+e.target.id;
+  toggleElement.addEventListener('x-switch:update', function (e) {
+    var button = "#int--" + e.target.id;
     var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
     if (flag) runit();
     //else stopit();
@@ -809,17 +811,17 @@ function setupRunToggleHandler(el){
 //document.getElementById('stop').addEventListener('click', stopit );
 setupRunToggleHandler('#roboSim-display-runstop')
 
-document.getElementById('clearTrace').addEventListener('click', function() {sim.clearPenLayer()} )
+document.getElementById('clearTrace').addEventListener('click', function () { sim.clearPenLayer() })
 
-function clearChart(){
+function clearChart() {
   sim.previousChartTraces = [];
   set_chartlines()
   Plotly.newPlot('plotlyDiv', chart_lines);
 }
 
-document.getElementById('clearChart').addEventListener('click', function() {
+document.getElementById('clearChart').addEventListener('click', function () {
   clearChart();
-} )
+})
 
 
 /* Initialise display */

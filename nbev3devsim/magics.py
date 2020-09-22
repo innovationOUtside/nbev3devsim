@@ -51,7 +51,7 @@ bright_sound('square', 1.5);"""
 
     # The focus is grabbed back to the cell after the run cell in the notebook
     # after the cell is run?
-    #def give_focus_to_run(self):
+    # def give_focus_to_run(self):
     #    """Give tab focus to the simulator run button."""
     #    display(Javascript('document.getElementById("runCode").focus();'))
 
@@ -137,7 +137,6 @@ bright_sound('square', 1.5);"""
       """
             self.shell.user_ns[args.sim].js_init(_js)
 
-
         if args.pencolor is not None:
             self.shell.user_ns[args.sim].js_init(
                 f"""
@@ -147,8 +146,8 @@ bright_sound('square', 1.5);"""
         magic_penSelector.dispatchEvent(magic_event);
       """
             )
-        
-        if args.sensornoise is not None and int(args.sensornoise) <=128:
+
+        if args.sensornoise is not None and int(args.sensornoise) <= 128:
             self.shell.user_ns[args.sim].js_init(
                 f"""
         var magic_sensorNoise = document.getElementById("lightSensorNoiseSlider");
@@ -158,7 +157,7 @@ bright_sound('square', 1.5);"""
       """
             )
 
-        if args.motornoise is not None and int(args.motornoise) <=500:
+        if args.motornoise is not None and int(args.motornoise) <= 500:
             self.shell.user_ns[args.sim].js_init(
                 f"""
         var magic_motorNoise = document.getElementById("wheelNoiseSlider");
@@ -172,14 +171,13 @@ bright_sound('square', 1.5);"""
             _js = "document.getElementById('clearTrace').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
-    
-        self.check_element(args.sim, args.pendown, 'roboSim-pen-updown')
+        self.check_element(args.sim, args.pendown, "roboSim-pen-updown")
 
-        self.check_element(args.sim, args.output, 'roboSim-display-output')
-        self.check_element(args.sim, args.chart, 'roboSim-display-chart')
-        self.check_element(args.sim, args.array, 'roboSim-display-sensor-array')
-        self.check_element(args.sim, args.sensorvals, 'roboSim-display-sensor-values')
-        self.check_element(args.sim, args.world, 'roboSim-display-world')
+        self.check_element(args.sim, args.output, "roboSim-display-output")
+        self.check_element(args.sim, args.chart, "roboSim-display-chart")
+        self.check_element(args.sim, args.array, "roboSim-display-sensor-array")
+        self.check_element(args.sim, args.sensorvals, "roboSim-display-sensor-values")
+        self.check_element(args.sim, args.world, "roboSim-display-world")
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -211,14 +209,28 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
-    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument(
+        "--array", "-A", action="store_true", help="Show sensor array"
+    )
     @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
-    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
-    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
-    @magic_arguments.argument("--stop", "-S", action="store_true", help="Stop simulator code execution")
-    @magic_arguments.argument("--move", "-m", action="store_true", help="Move robot back to start")
-    @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
-    @magic_arguments.argument("--motornoise", "-M", default=None, help="Motor noise, 0..500")
+    @magic_arguments.argument(
+        "--sensorvals", "-V", action="store_true", help="Show sensor values"
+    )
+    @magic_arguments.argument(
+        "--autorun", "-R", action="store_true", help="Autorun simulator code"
+    )
+    @magic_arguments.argument(
+        "--stop", "-S", action="store_true", help="Stop simulator code execution"
+    )
+    @magic_arguments.argument(
+        "--move", "-m", action="store_true", help="Move robot back to start"
+    )
+    @magic_arguments.argument(
+        "--sensornoise", "-N", default=None, help="Sensor noise, 0..128"
+    )
+    @magic_arguments.argument(
+        "--motornoise", "-M", default=None, help="Motor noise, 0..500"
+    )
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
@@ -233,14 +245,15 @@ bright_sound('square', 1.5);"""
         if not args.quiet and cell is not None:
             self.download_ping()
 
+        # if cell is not None:
+        #    self.give_focus_to_run()
 
         if args.move:
             _js = "document.getElementById('move').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
         if args.autorun:
-            _js = "document.getElementById('runCode').click();"
-            self.shell.user_ns[args.sim].js_init(_js)
+            self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
 
         if args.stop:
             _js = "document.getElementById('stop').click();"
@@ -276,13 +289,25 @@ bright_sound('square', 1.5);"""
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
-    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument(
+        "--array", "-A", action="store_true", help="Show sensor array"
+    )
     @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
-    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
-    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
-    @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
-    @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
-    @magic_arguments.argument("--motornoise", "-M", default=None, help="Motor noise, 0..500")
+    @magic_arguments.argument(
+        "--sensorvals", "-V", action="store_true", help="Show sensor values"
+    )
+    @magic_arguments.argument(
+        "--autorun", "-R", action="store_true", help="Autorun simulator code"
+    )
+    @magic_arguments.argument(
+        "--preview", "-v", action="store_true", help="Preview preloaded code"
+    )
+    @magic_arguments.argument(
+        "--sensornoise", "-N", default=None, help="Sensor noise, 0..128"
+    )
+    @magic_arguments.argument(
+        "--motornoise", "-M", default=None, help="Motor noise, 0..500"
+    )
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -305,10 +330,9 @@ from ev3dev2.sound import Sound
         if not args.quiet:
             self.download_ping()
 
+        # self.give_focus_to_run()
         if args.autorun:
-            _js = "document.getElementById('runCode').click();"
-            self.shell.user_ns[args.sim].js_init(_js)
-
+            self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -340,13 +364,25 @@ from ev3dev2.sound import Sound
     )
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
-    @magic_arguments.argument("--array", "-A", action="store_true", help="Show sensor array")
+    @magic_arguments.argument(
+        "--array", "-A", action="store_true", help="Show sensor array"
+    )
     @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
-    @magic_arguments.argument("--sensorvals", "-V", action="store_true", help="Show sensor values")
-    @magic_arguments.argument("--autorun", "-R", action="store_true", help="Autorun simulator code")
-    @magic_arguments.argument("--preview", "-v", action="store_true", help="Preview preloaded code")
-    @magic_arguments.argument("--sensornoise", "-N", default=None, help="Sensor noise, 0..128")
-    @magic_arguments.argument("--motornoise", "-M", default=None, help="Motor noise, 0..500")
+    @magic_arguments.argument(
+        "--sensorvals", "-V", action="store_true", help="Show sensor values"
+    )
+    @magic_arguments.argument(
+        "--autorun", "-R", action="store_true", help="Autorun simulator code"
+    )
+    @magic_arguments.argument(
+        "--preview", "-v", action="store_true", help="Preview preloaded code"
+    )
+    @magic_arguments.argument(
+        "--sensornoise", "-N", default=None, help="Sensor noise, 0..128"
+    )
+    @magic_arguments.argument(
+        "--motornoise", "-M", default=None, help="Motor noise, 0..500"
+    )
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
@@ -392,9 +428,9 @@ gyro = GyroSensor(INPUT_4)
             if not args.quiet:
                 self.download_ping()
 
+            # self.give_focus_to_run()
             if args.autorun:
-                _js = "document.getElementById('runCode').click();"
-                self.shell.user_ns[args.sim].js_init(_js)
+                self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
 
         except:
 

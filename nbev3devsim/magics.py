@@ -67,7 +67,23 @@ bright_sound('square', 1.5);"""
         document.getElementById("{item}").dispatchEvent(toggleCheckEvent);
       """
         self.shell.user_ns[sim].js_init(_js)
-
+    
+    def sliderUpdate(self, sim, arg, item):
+        """Update sliderVal component."""
+        _slider = f"{item.replace('-', '')}Slider"
+        _selector = f"#{item}-slider"
+        if arg is not None:
+            self.shell.user_ns[sim].js_init(
+                f"""
+            var {_slider} = document.querySelector("{_selector}");
+            if (({int(arg)}>=parseInt({_slider}.min)) && ({int(arg)}<=parseInt({_slider}.max))) {{
+                {_slider}.value = {int(arg)};
+                var sliderEvent = new Event('input');
+                {_slider}.dispatchEvent(sliderEvent);
+            }}
+        """
+            )
+    
     def handle_args(self, args):
         """Handle arguments passed in via magic."""
         if args.robotSetup is not None:
@@ -100,11 +116,21 @@ bright_sound('square', 1.5);"""
       document.getElementById("obstaclesConfiguratorApply").click();
       """
             )
-
+        
+        self.sliderUpdate(args.sim, args.xpos, "rs-display-xPos")
+        
+        self.sliderUpdate(args.sim, args.ypos, "rs-display-yPos")
+        self.sliderUpdate(args.sim, args.angle, "rs-display-angle")
+        self.sliderUpdate(
+            args.sim, args.sensornoise, "rs-display-lightSensorNoiseSlider"
+        )
+        self.sliderUpdate(args.sim, args.motornoise, "rs-display-wheelNoise")
+        
+        '''
         if args.xpos is not None:
             self.shell.user_ns[args.sim].js_init(
                 f"""
-        document.getElementById('xPos').value = {args.xpos};
+        document.getElementById('rs-display-xPos').value = {args.xpos};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
         document.getElementById('move').click();
@@ -113,7 +139,7 @@ bright_sound('square', 1.5);"""
         if args.ypos is not None:
             self.shell.user_ns[args.sim].js_init(
                 f"""
-        document.getElementById('yPos').value = {args.ypos};
+        document.getElementById('rs-display-yPos').value = {args.ypos};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
         document.getElementById('move').click();
@@ -121,12 +147,33 @@ bright_sound('square', 1.5);"""
             )
         if args.angle is not None:
             _js = f"""
-        document.getElementById('angle').value = {args.angle};
+        document.getElementById('rs-display-angle').value = {args.angle};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
         document.getElementById('move').click();
       """
             self.shell.user_ns[args.sim].js_init(_js)
+
+        if args.sensornoise is not None and int(args.sensornoise) <= 128:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_sensorNoise = document.getElementById("rs-display-lightSensorNoiseSlider");
+        magic_sensorNoise.value = "{int(args.sensornoise)}";
+        var magic_event = new Event('input');
+        magic_sensorNoise.dispatchEvent(magic_event);
+      """
+            )
+
+        if args.motornoise is not None and int(args.motornoise) <= 500:
+            self.shell.user_ns[args.sim].js_init(
+                f"""
+        var magic_motorNoise = document.getElementById("rs-display-wheelNoiseSlider");
+        magic_motorNoise.value = "{int(args.motornoise)}";
+        var magic_event = new Event('input');
+        magic_motorNoise.dispatchEvent(magic_event);
+      """
+            )
+        '''
 
         if args.ultrasound:
             _js = f"""
@@ -140,30 +187,10 @@ bright_sound('square', 1.5);"""
         if args.pencolor is not None:
             self.shell.user_ns[args.sim].js_init(
                 f"""
-        var magic_penSelector = document.getElementById("penColor");
+        var magic_penSelector = document.getElementById("rs-display-penColor");
         magic_penSelector.value = "{args.pencolor}";
         var magic_event = new Event('change');
         magic_penSelector.dispatchEvent(magic_event);
-      """
-            )
-
-        if args.sensornoise is not None and int(args.sensornoise) <= 128:
-            self.shell.user_ns[args.sim].js_init(
-                f"""
-        var magic_sensorNoise = document.getElementById("lightSensorNoiseSlider");
-        magic_sensorNoise.value = "{int(args.sensornoise)}";
-        var magic_event = new Event('input');
-        magic_sensorNoise.dispatchEvent(magic_event);
-      """
-            )
-
-        if args.motornoise is not None and int(args.motornoise) <= 500:
-            self.shell.user_ns[args.sim].js_init(
-                f"""
-        var magic_motorNoise = document.getElementById("wheelNoiseSlider");
-        magic_motorNoise.value = "{int(args.motornoise)}";
-        var magic_event = new Event('input');
-        magic_motorNoise.dispatchEvent(magic_event);
       """
             )
 

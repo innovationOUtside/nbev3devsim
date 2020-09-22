@@ -203,7 +203,7 @@ class ToggleSwitch extends HTMLElement {
 
     // write element functionality in here
     const intID = `int--${this.id || 'x-switch-01'}`;
-    const label = this.getAttribute('label') || this.textContent || 'MY LABEL';
+    const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
     const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
 
     this.innerHTML = `
@@ -708,8 +708,20 @@ var interruptHandler = function (susp) {
   }
 };
 
-function runit() {
+function stopit(hard=true) {
+  document.getElementById("sim_runStatus").classList.remove("sim-running")
+  document.getElementById("sim_runStatus").classList.add("sim-stopped")
+  sim.stopAnimation();
+  Sk.running = false;
 
+  var _turnoffId = "roboSim-display-runstop";
+  var turnoff = document.querySelector("#int--"+_turnoffId);
+  turnoff.setAttribute("aria-checked", "false");
+// TO DO - do we need this?
+  if (hard) Sk.hardInterrupt = true;
+}
+
+function runit() {
   document.getElementById('sim_runStatus').classList.remove('sim-stopped')
   document.getElementById('sim_runStatus').classList.add('sim-running')
   // This function runs when the simulator Run button is clicked 
@@ -749,10 +761,13 @@ function runit() {
   );
   myPromise.then(
     function (mod) {
-      sim.stopAnimation();
-      document.getElementById('sim_runStatus').classList.remove('led-green')
-      document.getElementById('sim_runStatus').classList.add('led-red')
-      Sk.running = false;
+      //sim.stopAnimation();
+      //document.getElementById('sim_runStatus').classList.remove('sim-running')
+      //document.getElementById('sim_runStatus').classList.add('sim-stopped')
+      //Sk.running = false;
+      // set the on switch to off...
+      stopit(hard=false)
+
     },
     // The following handles errors that arise when executing
     // a robot control program in the simulator.
@@ -760,10 +775,11 @@ function runit() {
     // of the code cell whose downloaded code we are running?
     // Related issue: https://github.com/innovationOUtside/nbev3devsim/issues/49
     function (err) {
-      Sk.running = false;
-      document.getElementById('sim_runStatus').classList.remove('led-green')
-      document.getElementById('sim_runStatus').classList.add('led-red')
-      sim.stopAnimation();
+      //Sk.running = false;
+      //document.getElementById('sim_runStatus').classList.remove('sim-running')
+      //document.getElementById('sim_runStatus').classList.add('sim-stopped')
+      //sim.stopAnimation();
+      stopit(hard=false)
       var mypre = document.getElementById("output");
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
@@ -771,16 +787,27 @@ function runit() {
   );
 }
 
-document.getElementById('runCode').addEventListener('click', runit);
 
-function stopit() {
-  document.getElementById('sim_runStatus').classList.remove('led-green')
-  document.getElementById('sim_runStatus').classList.add('led-red')
-  sim.stopAnimation();
-  Sk.hardInterrupt = true;
+
+function setupRunToggleHandler(el){
+  var toggleElement =  document.querySelector(el);
+  toggleElement.addEventListener('x-switch:on',  function(e){
+    runit();
+  });
+  toggleElement.addEventListener('x-switch:off',  function(e){
+    stopit();
+  });
+  toggleElement.addEventListener('x-switch:update',  function(e){
+    var button = "#int--"+e.target.id;
+    var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
+    if (flag) runit();
+    //else stopit();
+  });
+
 }
-
-document.getElementById('stop').addEventListener('click', stopit );
+//document.getElementById('runCode').addEventListener('click', runit);
+//document.getElementById('stop').addEventListener('click', stopit );
+setupRunToggleHandler('#roboSim-display-runstop')
 
 document.getElementById('clearTrace').addEventListener('click', function() {sim.clearPenLayer()} )
 
@@ -795,48 +822,20 @@ document.getElementById('clearChart').addEventListener('click', function() {
 } )
 
 
-
-//Initialisation
-
-
-/* We can't call the event defined on the element
-   because it toggles the display? */
-
-
-function rs_initialise_display(el){
-  if (el=='roboSim-display-chart')
-    rs_initialise_chart_display(el)
-  else {
-    var intID = "#int--"+el;
-    var target = rs_display_lookup[el];
-    var initElement =  document.querySelector(intID)
-    var on = initElement.getAttribute('aria-checked') === 'true';
-    if (on){
-      document.querySelector(target).style.display = 'block';
-    } else {
-      document.querySelector(target).style.display = 'none';
-    }
-  }
-}
-
-function rs_initialise_chart_display(el){
-  var intID = "#int--"+el;
-  var target = rs_display_lookup[el];
-  var initElement =  document.querySelector(intID);
-  var on = initElement.getAttribute('aria-checked') === 'true';
-  if (on){
-    if (!($( "#plotlyDiv" ).length )) Plotly.newPlot('plotlyDiv', chart_lines);
-    document.querySelector(target).style.display = 'block';
-  } else {
-    document.querySelector(target).style.display = 'none';
-  }
-}
-
-rs_initialise_display("roboSim-display-world");
-rs_initialise_chart_display("roboSim-display-chart" );
-rs_initialise_display("roboSim-display-output" );
-rs_initialise_display("roboSim-display-sensor-values" );
-rs_initialise_display("roboSim-display-sensor-array");
+/* Initialise display */
+// Can we use the same event over and over?
+var toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-world").dispatchEvent(toggleCheckEvent);
+toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-chart").dispatchEvent(toggleCheckEvent);
+toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-output").dispatchEvent(toggleCheckEvent);
+toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-sensor-values").dispatchEvent(toggleCheckEvent);
+toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-sensor-array").dispatchEvent(toggleCheckEvent);
+toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-pen-updown").dispatchEvent(toggleCheckEvent);
 
 // For some reason, we need this to let py retrieve vals from js sim
 // What it seems to do in bring a sim var into scope?

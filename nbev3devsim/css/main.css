@@ -260,7 +260,7 @@ button.x-switch span {
 
 [role = switch][aria-checked = false] :first-child,
 [role = switch][aria-checked = true ] :last-child {
-  background: #262;
+  background: rgb(120, 120, 120);
   color: #eef;
 }
 

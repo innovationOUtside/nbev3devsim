@@ -230,6 +230,57 @@
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
 }
+
+/*--- Toggle switch - Nick Freear*/
+x-switch { zoom: 1; }
+
+.rs-toggle-group {
+  border: 1px solid lightgrey;
+}
+
+/*
+button.x-switch {
+  margin: 0;
+  padding: 0;
+  width: 6rem;
+  height: 2rem;
+  border: 2px solid black;
+  display: inline-block;
+  margin-right: 0.25em;
+  line-height: 1.5rem; 
+  vertical-align: middle;
+  text-align: center;
+  font: .9rem sans-serif;
+}
+*/
+button.x-switch span {
+  padding: 1px 4px;
+  pointer-events: none;
+}
+
+[role = switch][aria-checked = false] :first-child,
+[role = switch][aria-checked = true ] :last-child {
+  background: #262;
+  color: #eef;
+}
+
+[role = switch][aria-checked = false] :last-child,
+[role = switch][aria-checked = true ] :first-child {
+  color: #bbd;
+}
+/*
+label.x-switch {
+  font: 1rem sans-serif;
+  line-height: 1.5rem;
+  user-select: none;
+  vertical-align: middle;
+} */
+  /* Also for label.x-switch :
+    -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none; */
+/*---*/
 .sim-running{background: green; border-radius: 50%; display: inline-block; height: 1rem; width: 1rem; }
 .sim-stopped{background: red; border-radius: 50%; display: inline-block; height: 1rem; width: 1rem; }
 

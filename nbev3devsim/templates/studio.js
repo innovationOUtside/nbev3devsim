@@ -120,14 +120,6 @@ document.getElementById('obstaclesConfiguratorupload').addEventListener('click',
   });
 });
 
-document.getElementById('collaborative').addEventListener('click', function () {
-  if (document.getElementById('collaborative').checked) {
-    sim.collaborative = true;
-  } else {
-    sim.collaborative = false;
-  }
-});
-
 document.getElementById('showRays').addEventListener('click', function () {
   if (document.getElementById('showRays').checked) {
     sim.drawUltrasonic = true;
@@ -202,73 +194,91 @@ document.getElementById('reset').addEventListener('click', function () {
   sim.robotStates.penDown = tmp;
 });
 
-document.getElementById('penDown').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    sim.robotStates.penDown = true;;
-  } else {
-    sim.robotStates.penDown = false;;
+
+/* Toggle switch - Nick Freear --*/
+class ToggleSwitch extends HTMLElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // write element functionality in here
+    const intID = `int--${this.id || 'x-switch-01'}`;
+    const label = this.getAttribute('label') || this.textContent || 'MY LABEL';
+    const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
+
+    this.innerHTML = `
+      <div class="rs-toggle-group">
+        <label for="${intID}" class="x-switch">${label}: </label>
+        <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
+          <span>${this.getAttribute('off') || 'Off'}</span>
+          <span>${this.getAttribute('on')  || 'On' }</span>
+        </button>
+      </div>
+    `;
+
+    const button = this.querySelector('button');
+
+    button.addEventListener('click', childEvent => {
+      const checked = button.getAttribute('aria-checked') === 'true'; // Old state.
+      const on = !checked; // New state.
+
+      button.setAttribute('aria-checked', checked ? 'false' : 'true');
+
+      const eventName = `x-switch:${checked ? 'off' : 'on'}`
+      const event = new CustomEvent(eventName, { detail: { childEvent, on } });
+
+      this.dispatchEvent(event);
+
+      // console.debug('Click:', eventName, childEvent, this);
+    });
+
+    console.debug(this);
   }
-});
+}
 
-// TO DO - need to set these based on form values when everything is loaded
-//sim.showChart = false; //showChart
-//sim.showSensorValues = true; //showSensorValues
-//sim.showSensorArray = false; //showSensorArray
-//sim.showWorld = true; //showWorld
-//sim.showOutput = true; //showOutput
+if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch', ToggleSwitch, { extends: null });
 
-document.getElementById('showChart').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    sim.showChart = true;
+/* --- */
+
+/* ----------- START: define display toggles -----------*/
+
+function setupToggleHandler(el, flag, target){
+  var toggleElement =  document.querySelector(el);
+  toggleElement.addEventListener('x-switch:on',  function(e){
+    flag = true;
+    if (target) document.querySelector(target).style.display = 'block';
+  });
+  toggleElement.addEventListener('x-switch:off', function(e){
+    flag = false;
+    if (target) document.querySelector(target).style.display = 'none';
+  });
+}
+
+function setupChartToggleHandler(el, flag, target){
+  var toggleElement =  document.querySelector(el);
+  toggleElement.addEventListener('x-switch:on',  function(e){
+    flag = true;
     if (!($( "#plotlyDiv" ).length )) Plotly.newPlot('plotlyDiv', chart_lines);
-    document.getElementById("charter").style.display = 'block';
-  } else {
-    sim.showChart = false;
-    document.getElementById("charter").style.display = 'none';
-    //$("#charter").empty();
-  }
-});
+    if (target) document.querySelector(target).style.display = 'block';
+  });
+  toggleElement.addEventListener('x-switch:off', function(e){
+    flag = false;
+    if (target) document.querySelector(target).style.display = 'none';
+  });
+}
 
-document.getElementById('showSensorValues').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    sim.showSensorValues = true;
-    document.getElementById("readings").style.display = 'block';
-  } else {
-    sim.showSensorValues = false;
-    document.getElementById("readings").style.display = 'none';
-  }
-});
+setupToggleHandler('#roboSim-display-output', sim.showOutput, "#output" )
+setupToggleHandler('#roboSim-display-sensor-values', sim.showSensorValues, "#readings" )
+setupToggleHandler('#roboSim-display-sensor-array', sim.showSensorArray, "#sensorArray" )
+setupChartToggleHandler('#roboSim-display-chart', sim.showChart, "#charter" )
+setupToggleHandler('#roboSim-display-world', sim.showWorld, "#field" )
+setupToggleHandler('#roboSim-pen-updown',  sim.robotStates.penDown, null )
+setupToggleHandler('#roboSim-state-collaborative', sim.collaborative, null )
 
-document.getElementById('showSensorArray').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    sim.showSensorArray = true;
-    document.getElementById("sensorArray").style.display = 'block';
-  } else {
-    sim.showSensorArray = false;
-    document.getElementById("sensorArray").style.display = 'none';
-  }
-});
 
-document.getElementById('showWorld').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    sim.showWorld = true;
-    document.getElementById("field").style.display = 'block';
-  } else {
-    sim.showWorld = false;
-    document.getElementById("field").style.display = 'none';
+/*----------- END: define display toggles -----------*/
 
-  }
-});
 
-document.getElementById('showOutput').addEventListener('change', function (e) {
-  if (e.target.checked) {
-    sim.showOutput = true;
-    document.getElementById("output").style.display = 'block';
-  } else {
-    sim.showOutput = false;
-    document.getElementById("output").style.display = 'none';
-  }
-});
 
 document.getElementById('download').addEventListener('click', function () {
   var hiddenElement = document.createElement('a');
@@ -761,16 +771,38 @@ document.getElementById('clearChart').addEventListener('click', function() {
 
 
 //Initialisation
-var event = new Event('change');
-document.getElementById('showChart').dispatchEvent(event);
-event = new Event('change');
-document.getElementById('showWorld').dispatchEvent(event);
-event = new Event('change');
-document.getElementById('showOutput').dispatchEvent(event);
-event = new Event('change');
-document.getElementById('showSensorValues').dispatchEvent(event);
-event = new Event('change');
-document.getElementById('showSensorArray').dispatchEvent(event);
+
+
+/* We can't call the event defined on the element
+   becuase it toggles the display? */
+function rs_initialise_display(el, target){
+  var intID = "#int--"+el;
+  var initElement =  document.querySelector(intID)
+  var on = initElement.getAttribute('aria-checked') === 'true';
+  if (on){
+    document.querySelector(target).style.display = 'block';
+  } else {
+    document.querySelector(target).style.display = 'none';
+  }
+}
+
+function rs_initialise_chart_display(el, target){
+  var intID = "#int--"+el;
+  var initElement =  document.querySelector(intID);
+  var on = initElement.getAttribute('aria-checked') === 'true';
+  if (on){
+    if (!($( "#plotlyDiv" ).length )) Plotly.newPlot('plotlyDiv', chart_lines);
+    document.querySelector(target).style.display = 'block';
+  } else {
+    document.querySelector(target).style.display = 'none';
+  }
+}
+
+rs_initialise_display('roboSim-display-world', "#field");
+rs_initialise_chart_display('roboSim-display-chart',  "#charter" );
+rs_initialise_display('roboSim-display-output', "#output" );
+rs_initialise_display('roboSim-display-sensor-values', "#readings" );
+rs_initialise_display('roboSim-display-sensor-array',  "#sensorArray");
 
 // For some reason, we need this to let py retrieve vals from js sim
 // What it seems to do in bring a sim var into scope?

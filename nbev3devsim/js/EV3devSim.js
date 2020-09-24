@@ -94,6 +94,19 @@ function EV3devSim(id) {
   // TO DO: refactor this as a function that lets us create a layer more straightforwardly
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
+
+    function simpleLayerSetup(layerId, w=WIDTH, h=HEIGHT){
+      console.debug("Setting up", layerId);
+      var el = document.createElement('canvas');
+      el.setAttribute('id', layerId);
+      el.width = w;
+      el.height = h;
+      el.style.position = 'absolute';
+      el.style.transform = scaler;
+      el.style.transformOrigin = '0 0';
+      return el
+    }
+    /*
     self.background = document.createElement('canvas');
     self.obstaclesLayer = document.createElement('canvas');
     self.lightLayer = document.createElement('canvas');
@@ -108,7 +121,6 @@ function EV3devSim(id) {
     self.lightLayer.setAttribute('id', 'lightLayer');
     self.foreground.setAttribute('id', 'foreground');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
- 
 
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
@@ -124,10 +136,19 @@ function EV3devSim(id) {
     // pen down
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
-
+    */
     self.scale = 0.4
     scaler = 'scale(' + self.scale + ')'
 
+    self.background = simpleLayerSetup('background');
+    self.penLayer = simpleLayerSetup('penLayer');
+    self.obstaclesLayer = simpleLayerSetup('obstaclesLayer');
+    self.lightLayer = simpleLayerSetup('lightLayer');
+    self.foreground = simpleLayerSetup('foreground');
+    self.measurementLayer = simpleLayerSetup('measurementLayer');
+
+    console.debug("Layer setup complete");
+    /*
     self.background.style.position = 'absolute';
     self.background.style.transform = scaler;
     self.background.style.transformOrigin = '0 0';
@@ -151,28 +172,64 @@ function EV3devSim(id) {
     self.measurementLayer.style.position = 'absolute';
     self.measurementLayer.style.transform = scaler;
     self.measurementLayer.style.transformOrigin = '0 0';
+    */
+    
     self.measurementLayer.style.cursor = 'crosshair';
 
-    self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
-    //No smoothing - see pixels cleanly
-    //https://miguelmota.com/blog/pixelate-images-with-canvas/
-    self.sensorArrayLeft.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
-                         'image-rendering: -moz-crisp-edges;' + // FireFox
-                         'image-rendering: -o-crisp-edges;' +  // Opera
-                         'image-rendering: -webkit-crisp-edges;' + // Chrome
-                         'image-rendering: crisp-edges;' + // Chrome
-                         'image-rendering: -webkit-optimize-contrast;' + // Safari
-                         'image-rendering: pixelated; ' + // Future browsers
-                         '-ms-interpolation-mode: nearest-neighbor;'; // IE
-    self.sensorArrayLeft.height = SENSOR_DIAMETER;
-    self.sensorArrayLeft.width = SENSOR_DIAMETER;
-    self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
-    self.sensorArrayLeftCtx.webkitImageSmoothingEnabled = false;
-    self.sensorArrayLeftCtx.mozImageSmoothingEnabled = false;
-    self.sensorArrayLeftCtx.msImageSmoothingEnabled = false;
-    self.sensorArrayLeftCtx.imageSmoothingEnabled = false;
+    console.debug("Now trying to set up sensor arrays...");
 
-    self.sensorArrayRight = document.getElementById('sensorArrayRight');
+    function sensorArraySetup(elId) {
+      console.debug("Setting up", elId);
+      var el = document.getElementById(elId);
+      //No smoothing - see pixels cleanly
+      //https://miguelmota.com/blog/pixelate-images-with-canvas/
+      el.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+        'image-rendering: -moz-crisp-edges;' + // FireFox
+        'image-rendering: -o-crisp-edges;' +  // Opera
+        'image-rendering: -webkit-crisp-edges;' + // Chrome
+        'image-rendering: crisp-edges;' + // Chrome
+        'image-rendering: -webkit-optimize-contrast;' + // Safari
+        'image-rendering: pixelated; ' + // Future browsers
+        '-ms-interpolation-mode: nearest-neighbor;'; // IE
+      el.height = SENSOR_DIAMETER;
+      el.width = SENSOR_DIAMETER;
+      return el
+    }
+
+    function initSensorArrayCtx(el) {
+      var ctx = self.sensorArrayLeft.getContext('2d');
+      ctx.webkitImageSmoothingEnabled = false;
+      ctx.mozImageSmoothingEnabled = false;
+      ctx.msImageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = false;
+      return ctx
+    }
+
+    self.sensorArrayLeft = sensorArraySetup('sensorArrayLeft');
+    self.sensorArrayLeftCtx = initSensorArrayCtx(self.sensorArrayLeft);
+
+    self.sensorArrayRight = sensorArraySetup('sensorArrayRight');
+    self.sensorArrayRightCtx = initSensorArrayCtx(self.sensorArrayRight);
+
+
+    /*self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
+     self.sensorArrayLeft.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+                          'image-rendering: -moz-crisp-edges;' + // FireFox
+                          'image-rendering: -o-crisp-edges;' +  // Opera
+                          'image-rendering: -webkit-crisp-edges;' + // Chrome
+                          'image-rendering: crisp-edges;' + // Chrome
+                          'image-rendering: -webkit-optimize-contrast;' + // Safari
+                          'image-rendering: pixelated; ' + // Future browsers
+                          '-ms-interpolation-mode: nearest-neighbor;'; // IE
+     self.sensorArrayLeft.height = SENSOR_DIAMETER;
+     self.sensorArrayLeft.width = SENSOR_DIAMETER;
+     self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
+     self.sensorArrayLeftCtx.webkitImageSmoothingEnabled = false;
+     self.sensorArrayLeftCtx.mozImageSmoothingEnabled = false;
+     self.sensorArrayLeftCtx.msImageSmoothingEnabled = false;
+     self.sensorArrayLeftCtx.imageSmoothingEnabled = false; */
+
+    /*self.sensorArrayRight = document.getElementById('sensorArrayRight');
     self.sensorArrayRight.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
     'image-rendering: -moz-crisp-edges;' + // FireFox
     'image-rendering: -o-crisp-edges;' +  // Opera
@@ -188,7 +245,7 @@ function EV3devSim(id) {
     self.sensorArrayRightCtx.mozImageSmoothingEnabled = false;
     self.sensorArrayRightCtx.msImageSmoothingEnabled = false;
     self.sensorArrayRightCtx.imageSmoothingEnabled = false;
-
+*/
     //self.background.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
     //'image-rendering: -moz-crisp-edges;' + // FireFox
     //'image-rendering: -o-crisp-edges;' +  // Opera
@@ -203,6 +260,18 @@ function EV3devSim(id) {
     self.backgroundCtx.msImageSmoothingEnabled = false;
     self.backgroundCtx.imageSmoothingEnabled = false;
 
+    function canvasSimpleCtx(el, h=HEIGHT){
+      var ctx = el.getContext('2d');
+      ctx.translate(0, h);
+      ctx.scale(1, -1);
+      return ctx
+    }
+
+    self.obstaclesLayerCtx = canvasSimpleCtx(self.obstaclesLayer)
+    self.lightLayerCtx = canvasSimpleCtx(self.lightLayer)
+    self.foregroundCtx = canvasSimpleCtx(self.foreground)
+    self.penLayerCtx = canvasSimpleCtx(self.penLayer)
+    /*
     self.obstaclesLayerCtx = self.obstaclesLayer.getContext('2d');
     self.obstaclesLayerCtx.translate(0, HEIGHT);
     self.obstaclesLayerCtx.scale(1, -1);
@@ -218,6 +287,7 @@ function EV3devSim(id) {
     self.penLayerCtx = self.penLayer.getContext('2d');
     self.penLayerCtx.translate(0, HEIGHT);
     self.penLayerCtx.scale(1, -1);
+    */
 
     self.measurementLayerCtx = self.measurementLayer.getContext('2d');
 

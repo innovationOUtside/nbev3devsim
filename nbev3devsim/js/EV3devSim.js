@@ -51,7 +51,7 @@ function EV3devSim(id) {
       enabled: true,
       x: -LIGHT_SENSOR_DEFAULT_ABS,
       y: 30,
-      diameter: SENSOR_DIAMETER, 
+      diameter: SENSOR_DIAMETER,
     },
     sensor2: {
       enabled: true,
@@ -311,8 +311,8 @@ function EV3devSim(id) {
     self.measurementLayer.addEventListener('mousemove', self.myMove);
 
   };
-  
-  this.resetSensorDiameter = function() {
+
+  this.resetSensorDiameter = function () {
     self.sensorArrayLeft.height = self.robotSpecs.sensor1.diameter;
     self.sensorArrayLeft.width = self.robotSpecs.sensor1.diameter;
     self.sensorArrayRight.height = self.robotSpecs.sensor2.diameter;
@@ -689,11 +689,11 @@ function EV3devSim(id) {
     // The max speed seems to be set to 1050 in motor.py 
     // Can we access it programmatically?
     var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise)
-    if (_tmp>0) wheel.speed = Math.min(Math.round(_tmp), 1050);
-    else if (_tmp>0) wheel.speed = Math.max(Math.round(_tmp), -1050);
+    if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
+    else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
   };
 
-  this.bigDraw = function() {
+  this.bigDraw = function () {
     self.drawAll();
     self.displayMotorValues();
     self.getColorSensorsValues();
@@ -932,7 +932,7 @@ function EV3devSim(id) {
     self.obstaclesLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
 
-  this.setPenCoords = function() {
+  this.setPenCoords = function () {
     // Reflect the orientation of the robot
     var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
     var sin = Math.sin(self.robotStates.angle - Math.PI / 2);
@@ -990,14 +990,14 @@ function EV3devSim(id) {
   };
 
   //Central limit estimate of normal distribution
-  this.gaussianRand = function() {
+  this.gaussianRand = function () {
     var rand = 0;
     for (var i = 0; i < 6; i += 1) {
       rand += Math.random();
     }
     return rand / 6;
   }
-  
+
   //Create a simple noise component in range +/-1
   this.simpleNoise = function (noise = 1) {
     if (noise > 0) {
@@ -1015,8 +1015,8 @@ function EV3devSim(id) {
 
     return raw;
   }
-  
-  this.getSensorValues = function (x, y, diameter=SENSOR_DIAMETER, sensor='') {
+
+  this.getSensorValues = function (x, y, diameter = SENSOR_DIAMETER, sensor = '') {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
 
@@ -1030,24 +1030,24 @@ function EV3devSim(id) {
     );
     var sensorViewCtx;
     var sensorView;
-    if (sensor=='sensor1') {
+    if (sensor == 'sensor1') {
       self.sensorArrayLeftCtx.drawImage(self.background,
-                    Math.min(Math.max(0, x - radius ), WIDTH-diameter),
-                    Math.min(Math.max(0, y - radius), HEIGHT-diameter),
-                    diameter, diameter,
-                    0, 0,
-                    diameter, diameter);
+        Math.min(Math.max(0, x - radius), WIDTH - diameter),
+        Math.min(Math.max(0, y - radius), HEIGHT - diameter),
+        diameter, diameter,
+        0, 0,
+        diameter, diameter);
       sensorViewCtx = self.sensorArrayLeftCtx;
       sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
       //self.robotStates.sensor1dataArray = sensorBox.data.toString();
     }
-    else if (sensor='sensor2') {
+    else if (sensor = 'sensor2') {
       self.sensorArrayRightCtx.drawImage(self.background,
-                    Math.min(Math.max(0, x - radius ), WIDTH-diameter),
-                    Math.min(Math.max(0, y - radius), HEIGHT-diameter),
-                    diameter, diameter,
-                    0, 0,
-                    diameter, diameter);
+        Math.min(Math.max(0, x - radius), WIDTH - diameter),
+        Math.min(Math.max(0, y - radius), HEIGHT - diameter),
+        diameter, diameter,
+        0, 0,
+        diameter, diameter);
       sensorViewCtx = self.sensorArrayRightCtx;
       sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
       //self.robotStates.sensor2dataArray = sensorBox.data.toString();
@@ -1070,7 +1070,7 @@ function EV3devSim(id) {
       for (let row = 0; row < diameter; row++) {
         let offset = (row * (diameter * 4) + col * 4);
         if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
-          
+
           redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
           redTotal += redNoise;
           greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
@@ -1078,53 +1078,53 @@ function EV3devSim(id) {
           blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotSpecs.sensorNoise);
           blueTotal += blueNoise;
           sensorView.data[offset] = redNoise;
-          sensorView.data[offset+1] = greenNoise;
-          sensorView.data[offset+2] = blueNoise;
+          sensorView.data[offset + 1] = greenNoise;
+          sensorView.data[offset + 2] = blueNoise;
           count++;
         } else {
           sensorView.data[offset] = 245;
-          sensorView.data[offset+1] = 226;
-          sensorView.data[offset+2] = 225;
+          sensorView.data[offset + 1] = 226;
+          sensorView.data[offset + 2] = 225;
         }
       }
     }
 
-    if (sensor=='sensor1')
+    if (sensor == 'sensor1')
       self.robotStates.sensor1dataArray = sensorView.data.toString();
-    else if (sensor=='sensor2')
+    else if (sensor == 'sensor2')
       self.robotStates.sensor2dataArray = sensorView.data.toString();
 
     sensorViewCtx.putImageData(sensorView, 0, 0);
-    
+
     // TO DO - we could do a much simple noise estimate and just add noise here?
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 
   //https://stackoverflow.com/a/14323127/454773
-  this.rgb = function (r,g,b) {
-    return 'rgb(' + [(r||0),(g||0),(b||0)].join(',') + ')';
+  this.rgb = function (r, g, b) {
+    return 'rgb(' + [(r || 0), (g || 0), (b || 0)].join(',') + ')';
   }
 
-  this.getRGBInt = function(val){
+  this.getRGBInt = function (val) {
     return [parseInt(val[0]), parseInt(val[1]), parseInt(val[2])]
   }
 
-  this.getRGB = function(val){
+  this.getRGB = function (val) {
     return self.rgb(self.getRGBInt(val));
   }
 
 
   // Return triband reflected light
-  this.getReflectedLight = function(val) {
+  this.getReflectedLight = function (val) {
     var sum = 0;
-    for( var i = 0; i < val.length; i++ ){
-      sum += parseInt(val[i]); 
+    for (var i = 0; i < val.length; i++) {
+      sum += parseInt(val[i]);
     }
     return 100.0 * sum / 765
   }
 
   // Return pure (R) reflected light
-  this.getReflectedLightR = function(val) {
+  this.getReflectedLightR = function (val) {
     //Value of reflected light (i.e. reflected R component) as percentage
     return 100.0 * parseInt(val[0]) / 255
   }
@@ -1139,12 +1139,12 @@ function EV3devSim(id) {
   this.displaySensorValues = function () {
     var _sensor1 = self.robotStates.sensor1;
     var _sensor2 = self.robotStates.sensor2;
-    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLightR(_sensor1)).toFixed(2) + '|' + (self.getReflectedLight(_sensor1)).toFixed(2) + ' ('+_sensor1[0].toFixed() +', ' + _sensor1[1].toFixed() + ', ' + _sensor1[2].toFixed()+')';
-    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLightR(_sensor2)).toFixed(2) + '|' + (self.getReflectedLight(_sensor2)).toFixed(2) + ' ('+ _sensor2[0].toFixed() +', ' + _sensor2[1].toFixed() + ', ' + _sensor2[2].toFixed()+')';
-  
+    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLightR(_sensor1)).toFixed(2) + '|' + (self.getReflectedLight(_sensor1)).toFixed(2) + ' (' + _sensor1[0].toFixed() + ', ' + _sensor1[1].toFixed() + ', ' + _sensor1[2].toFixed() + ')';
+    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLightR(_sensor2)).toFixed(2) + '|' + (self.getReflectedLight(_sensor2)).toFixed(2) + ' (' + _sensor2[0].toFixed() + ', ' + _sensor2[1].toFixed() + ', ' + _sensor2[2].toFixed() + ')';
+
     document.getElementById('ultrasonic_value').innerHTML = self.robotStates.ultrasonic.toFixed(2);
-    document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) +", "+self.robotStates.gyro[1].toFixed(2) ;
-  
+    document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) + ", " + self.robotStates.gyro[1].toFixed(2);
+
     if (!self.dragok) {
       document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(_sensor1);
       document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(_sensor2);
@@ -1166,7 +1166,7 @@ function EV3devSim(id) {
     var rW = self.robotSpecs.width / 2
     var rH = self.robotSpecs.height / 2
     if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
-    //console.log('Drag enable...');
+      //console.log('Drag enable...');
       self.dragok = true;
       self.isDragging = true;
     }
@@ -1211,7 +1211,7 @@ function EV3devSim(id) {
 
   // handle mouse moves
   this.myMove = function (e) {
-    
+
     var cursorCoords = self.cursorCanvasCoords(e)
     var mx = cursorCoords.mx
     var my = cursorCoords.my

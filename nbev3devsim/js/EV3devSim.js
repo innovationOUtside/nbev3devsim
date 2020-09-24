@@ -1,4 +1,19 @@
+//this is actually from studio.js
+function setSliderVal(el, val) {
+  const magic_slider = document.getElementById(el + "-slider");
+  val = parseInt(val);
+  if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
+    {
+      magic_slider.value = val;
+      const magic_event = new Event('input');
+      magic_slider.dispatchEvent(magic_event);
+    }
+  }
+}
+
+
 /* exported EV3devSim */
+
 
 // +
 function EV3devSim(id) {
@@ -1247,8 +1262,10 @@ function EV3devSim(id) {
       self.robotStates.x = mx;
       self.robotStates.y = my;
 
-      document.getElementById('xPos').value = self.robotStates.x;
-      document.getElementById('yPos').value = self.robotStates.y;
+      //document.getElementById('xPos').value = self.robotStates.x;
+      //document.getElementById('yPos').value = self.robotStates.y;
+      setSliderVal("rs-display-xPos", self.robotStates.x);
+      setSliderVal("rs-display-yPos", self.robotStates.x);
 
       // redraw the scene with the new rect positions
       self.drawAll();

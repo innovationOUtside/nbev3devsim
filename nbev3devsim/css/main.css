@@ -1,3 +1,7 @@
+/* We want a responsive layout,
+   but a minimum width is sensible? */
+.roboSim { min-width: 200px;}
+
 .roboSim button {
   background: AliceBlue;
 }
@@ -8,6 +12,23 @@
   width: 1181;
   /* margin-top: 0.5em; */
   margin: 0.2em 0;
+}
+
+
+.rs-grouped-controls legend, .rs-world legend {
+  margin-bottom: 0px;
+  border-bottom: none;
+  width: auto;
+  font-size: inherit;
+  padding: 0.5rem;
+  color: lightgrey;
+}
+
+.rs-grouped-controlset {
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-basis: auto;
+  justify-content: space-between;
 }
 
 .menu {
@@ -88,6 +109,7 @@
   justify-content: space-between;
   margin-top: 0.2em;
   width: 100%;
+  align-items: baseline;
 }
 
 .sensorReading {
@@ -114,6 +136,8 @@
   border: 2px solid green;
 }
 
+toggle-switch span {white-space: nowrap;}
+/*
 #robotConfigurator,
 #obstaclesConfigurator,
 #codeDisplay {
@@ -122,7 +146,6 @@
   flex-direction: column;
   justify-content: space-between;
   top: 50px;
-  /* left: 200px; */
   width: 80%;
   height: 80%;
   border: solid 2px black;
@@ -226,9 +249,11 @@
   top: -2000px !important;
 }
 
+
 #run {
   background-color: yellow;
 }
+*/
 
 #background {
   image-rendering: pixelated;
@@ -241,8 +266,16 @@ x-switch {
   zoom: 1;
 }
 
+toggle-switch {
+  display:inline-block;
+  padding:0
+  .7rem;
+}
+
 .rs-toggle-group {
   border: 1px solid lightgrey;
+  padding: 1rem;
+  margin: 1rem;
 }
 
 /*
@@ -307,6 +340,7 @@ label.x-switch {
   border: 2px solid lightgrey;
   padding: 10px;
   border-radius: 12px;
+  width:100%;
 }
 
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */
@@ -342,3 +376,21 @@ label.x-switch {
   border-radius: 50%;
   box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7d0 0 2px 12px;
 }
+
+
+/* ------- Handling issues --------- */
+
+/* input[number] doesn't let you limit width as a form control */
+input[type=number]{
+  width: 7rem;
+} 
+
+/* Input element overflows parent div - this still doesn't work */
+input {
+  padding: 0.2em; 
+  box-sizing: border-box;
+  width: 100% 
+} 
+
+/* select elements go large...*/
+select {max-height: 3rem;}

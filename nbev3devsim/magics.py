@@ -55,6 +55,14 @@ bright_sound('square', 1.5);"""
     #    """Give tab focus to the simulator run button."""
     #    display(Javascript('document.getElementById("runCode").focus();'))
 
+    def showHide(self, sim, arg, item):
+        """Toggle diplay of an element."""
+        _js = f"""
+        if ({int(arg)}) document.getElementById("{item}").style.display = 'none';
+        else document.getElementById("{item}").style.display = 'block';
+        """
+        self.shell.user_ns[sim].js_init(_js)
+    
     def check_element(self, sim, arg, item):
         """Show a specified element."""
         _state = "true" if arg else "false"
@@ -63,26 +71,27 @@ bright_sound('square', 1.5);"""
         _js = f"""
         var {_selected} = document.querySelector("{_selector}");
         {_selected}.setAttribute('aria-checked', {_state});
-        var toggleCheckEvent = new CustomEvent("x-switch:update");
+        const toggleCheckEvent = new CustomEvent("x-switch:update");
         document.getElementById("{item}").dispatchEvent(toggleCheckEvent);
       """
         self.shell.user_ns[sim].js_init(_js)
     
-    def sliderUpdate(self, sim, arg, item):
+    def sliderUpdate(self, sim, arg, item, mover=False):
         """Update sliderVal component."""
         _slider = f"{item.replace('-', '')}Slider"
-        _selector = f"#{item}-slider"
+        _selector = f"{item}-slider"
         if arg is not None:
             self.shell.user_ns[sim].js_init(
                 f"""
-            var {_slider} = document.querySelector("{_selector}");
-            if (({int(arg)}>=parseInt({_slider}.min)) && ({int(arg)}<=parseInt({_slider}.max))) {{
-                {_slider}.value = {int(arg)};
-                var sliderEvent = new Event('input');
-                {_slider}.dispatchEvent(sliderEvent);
-            }}
-        """
+            const {_slider} = document.getElementById("{_selector}");
+            {_slider}.value = {int(arg)};
+            //console.debug("Magic slider update", "{_selector}", {int(arg)});
+            const event = new Event('input');
+            {_slider}.dispatchEvent(event);
+            """
+            #const event = new CustomEvent('value-slider:change', {{ detail: {{ value: {int(arg)} }} }});
             )
+
     
     def handle_args(self, args):
         """Handle arguments passed in via magic."""
@@ -91,7 +100,7 @@ bright_sound('square', 1.5);"""
                 f"""
         var bgSelector = document.getElementById("robotPreconfig");
         bgSelector.value = "{args.robotSetup}";
-        var event = new Event('change');
+        const event = new Event('change');
         bgSelector.dispatchEvent(event);
       """
             )
@@ -117,10 +126,9 @@ bright_sound('square', 1.5);"""
       """
             )
         
-        self.sliderUpdate(args.sim, args.xpos, "rs-display-xPos")
-        
-        self.sliderUpdate(args.sim, args.ypos, "rs-display-yPos")
-        self.sliderUpdate(args.sim, args.angle, "rs-display-angle")
+        self.sliderUpdate(args.sim, args.xpos, "rs-display-xPos", mover=True)
+        self.sliderUpdate(args.sim, args.ypos, "rs-display-yPos", mover=True)
+        self.sliderUpdate(args.sim, args.angle, "rs-display-angle", mover=True)
         self.sliderUpdate(
             args.sim, args.sensornoise, "rs-display-lightSensorNoiseSlider"
         )
@@ -133,7 +141,9 @@ bright_sound('square', 1.5);"""
         document.getElementById('rs-display-xPos').value = {args.xpos};
         document.getElementById('resetReset').click();
         document.getElementById('reset').click();
-        document.getElementById('move').click();
+        //document.getElementById('move').click();
+        var event = new Event('click');
+        document.getElementById('move').dispatchEvent(event);
       """
             )
         if args.ypos is not None:
@@ -205,6 +215,10 @@ bright_sound('square', 1.5);"""
         self.check_element(args.sim, args.array, "roboSim-display-sensor-array")
         self.check_element(args.sim, args.sensorvals, "roboSim-display-sensor-values")
         self.check_element(args.sim, args.world, "roboSim-display-world")
+        self.check_element(args.sim, args.noisecontrols, "roboSim-display-noise-controls")
+        self.check_element(args.sim, args.worldcontrols, "roboSim-display-world-controls")
+
+        self.showHide(args.sim, args.hide, "roboSim-display-show-controls")
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -234,12 +248,15 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
+    @magic_arguments.argument("--hide", "-H", action="store_true", help="Show controls")
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument(
         "--array", "-A", action="store_true", help="Show sensor array"
     )
-    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
+    @magic_arguments.argument("--worldcontrols", "-Z", action="store_true", help="Show world controls")
+    @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument(
         "--sensorvals", "-V", action="store_true", help="Show sensor values"
     )
@@ -314,12 +331,15 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
+    @magic_arguments.argument("--hide", "-H", action="store_true", help="Show controls")
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument(
         "--array", "-A", action="store_true", help="Show sensor array"
     )
-    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
+    @magic_arguments.argument("--worldcontrols", "-Z", action="store_true", help="Show world controls")
+    @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument(
         "--sensorvals", "-V", action="store_true", help="Show sensor values"
     )
@@ -344,7 +364,7 @@ from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 from ev3dev2.sound import Sound
 """
-        if args.preview:
+        if args.preview  or cell is None:
             print(preload)
             return
         try:
@@ -389,12 +409,15 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
+    @magic_arguments.argument("--hide", "-H", action="store_true", help="Show controls")
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument(
         "--array", "-A", action="store_true", help="Show sensor array"
     )
-    @magic_arguments.argument("--world", "-W", action="store_true", help="Show world")
+    @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
+    @magic_arguments.argument("--worldcontrols", "-Z", action="store_true", help="Show world controls")
+    @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument(
         "--sensorvals", "-V", action="store_true", help="Show sensor values"
     )
@@ -432,7 +455,7 @@ colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
 '''
-        if args.preview:
+        if args.preview or cell is None:
             print(preload)
             return
 

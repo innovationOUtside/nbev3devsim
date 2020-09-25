@@ -72,7 +72,7 @@ function setSliderVal(el, val) {
   if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
     {
       magic_slider.value = val;
-      const magic_event = new Event('input');
+      var magic_event = new Event('input');
       magic_slider.dispatchEvent(magic_event);
     }
   }
@@ -1231,7 +1231,7 @@ function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   } else {
     clicker.setAttribute("aria-checked", state==="true" ? "true" : "false");
   }
-  const toggleClickEvent = new CustomEvent("x-switch:update");
+  var toggleClickEvent = new CustomEvent("x-switch:update");
   document.getElementById(elID).dispatchEvent(toggleClickEvent);
 }
 
@@ -1243,7 +1243,7 @@ rs_root.addEventListener("mouseenter", function (e) {
 });
 
 document.addEventListener("keydown", function (e) {
-  const key = e.key;
+  var key = e.key;
   if (uiSettings["enableKeyboardShortcuts"]) {
     switch (key) {
       case 'R': rs_click_togglebutton("roboSim-display-runstop"); break;

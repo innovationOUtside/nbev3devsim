@@ -1,11 +1,11 @@
 //this is actually from studio.js
 function setSliderVal(el, val) {
-  const magic_slider = document.getElementById(el + "-slider");
+  var magic_slider = document.getElementById(el + "-slider");
   val = parseInt(val);
   if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
     {
       magic_slider.value = val;
-      const magic_event = new Event('input');
+      var magic_event = new Event('input');
       magic_slider.dispatchEvent(magic_event);
     }
   }
@@ -1274,6 +1274,8 @@ function EV3devSim(id) {
 
       //document.getElementById('xPos').value = self.robotStates.x;
       //document.getElementById('yPos').value = self.robotStates.y;
+
+      // TO DO - do these events collide? Only one slider seems to get updated
       setSliderVal("rs-display-xPos", self.robotStates.x);
       setSliderVal("rs-display-yPos", self.robotStates.y);
 

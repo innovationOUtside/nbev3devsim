@@ -1,13 +1,12 @@
 //this is actually from studio.js
+// to do while dragging we need to suppress move
 function setSliderVal(el, val) {
   var magic_slider = document.getElementById(el + "-slider");
   val = parseInt(val);
   if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
-    {
       magic_slider.value = val;
       var magic_event = new Event('input');
       magic_slider.dispatchEvent(magic_event);
-    }
   }
 }
 
@@ -1194,6 +1193,7 @@ function EV3devSim(id) {
       //console.log('Drag enable...');
       self.dragok = true;
       self.isDragging = true;
+      self.robotStates._dragok = true;
     }
 
     // save the current mouse position
@@ -1212,6 +1212,7 @@ function EV3devSim(id) {
     // clear the dragging flag
     self.dragok = false;
     self.isDragging = false;
+    self.robotStates._dragok = false;
 
     self.setPenCoords()
     self.robotStates.pen_prev_x = self.robotStates.pen_x;
@@ -1220,6 +1221,9 @@ function EV3devSim(id) {
     // Get and and display color sensor values
     self.getColorSensorsValues();
     self.displaySensorValues();
+
+    // Read the sensors and do the full move thing now the drag is stopped
+    document.getElementById("move").click();
   }
 
   //TH attempt at mapping mouse cursor co-ordinates onto the sim canvas co-ordinates
@@ -1275,9 +1279,8 @@ function EV3devSim(id) {
       //document.getElementById('xPos').value = self.robotStates.x;
       //document.getElementById('yPos').value = self.robotStates.y;
 
-      // TO DO - do these events collide? Only one slider seems to get updated
-      setSliderVal("rs-display-xPos", self.robotStates.x);
-      setSliderVal("rs-display-yPos", self.robotStates.y);
+      setSliderVal("rs-display-xPos", mx);
+      setSliderVal("rs-display-yPos", my);
 
       // redraw the scene with the new rect positions
       self.drawAll();

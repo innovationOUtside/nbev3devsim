@@ -65,9 +65,10 @@ if (!(customElements.get('value-slider'))) {
   customElements.define('value-slider', ValueSlider, { extends: null });
 }
 
-//this function is duplciated in ev3devsim.js
+//this function is duplicated in ev3devsim.js
 function setSliderVal(el, val) {
-  const magic_slider = document.getElementById(el + "-slider");
+  console.debug("here", el, val)
+  var magic_slider = document.getElementById(el + "-slider");
   val = parseInt(val);
   if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
     {
@@ -79,7 +80,7 @@ function setSliderVal(el, val) {
 }
 
 function getSliderVal(el) {
-  const magic_slider = document.getElementById(el + "-slider");
+  var magic_slider = document.getElementById(el + "-slider");
   return magic_slider.value;
 }
 
@@ -91,7 +92,7 @@ function initSliderVal(el, obj, ref, mover = false) {
     //console.debug(VALUE_SLIDER_CHANGE_EVENT, ':~', ev.detail.value, ev);
     obj[ref] = ev.detail.value;
     mover = mover || ev.detail.mover;
-    if (mover) {
+    if ((mover) && (!obj._dragok)) {
       document.getElementById('move').click();
     }
   });
@@ -583,9 +584,7 @@ function setupFunctionToggleHandler(el, fn, obj = null, attr = null) {
   else target = null;
   toggleElement.addEventListener('x-switch:on', function (e) {
     if ((obj) && (attr)) obj[attr] = true;
-    console.debug("try generic fn")
     fn();
-    console.debug("done generic fn")
     if (target) document.querySelector(target).style.display = 'block';
   });
   _setupToggleUpdate(toggleElement, obj, attr);

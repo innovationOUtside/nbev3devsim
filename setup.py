@@ -11,7 +11,8 @@ setup(
         'jp_proxy_widget',
         'nest_asyncio',
         'pandas',
-        'seaborn'
+        'seaborn',
+        'tqdm'
     ],
     data_files=[
         # like `jupyter nbextension install --sys-prefix`

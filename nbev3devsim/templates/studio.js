@@ -421,8 +421,8 @@ document.getElementById('resetReset').addEventListener('click', function () {
   sim.robotStates._angle = document.getElementById('rs-display-angle').value;
   */
   sim.robotStates._x = getSliderVal('rs-display-xPos');
-  sim.robotStates._x = getSliderVal('rs-display-yPos');
-  sim.robotStates._x = getSliderVal('rs-display-angle');
+  sim.robotStates._y = getSliderVal('rs-display-yPos');
+  sim.robotStates._angle = getSliderVal('rs-display-angle');
 })
 
 document.getElementById('move').addEventListener('click', function () {

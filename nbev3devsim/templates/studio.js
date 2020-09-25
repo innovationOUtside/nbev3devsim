@@ -1,3 +1,5 @@
+
+
 /*---- Custom elements ---*/
 
 
@@ -5,7 +7,7 @@
 const VALUE_SLIDER_CHANGE_EVENT = 'value-slider:change';
 
 class ValueSlider extends HTMLElement {
-  constructor () {
+  constructor() {
     // Always call super first in constructor
     super();
 
@@ -17,11 +19,10 @@ class ValueSlider extends HTMLElement {
     const valmin = this.getAttribute('min');
     const valmax = this.getAttribute('max');
     const valinit = this.getAttribute('initial');
-    const maxlen = valmax.toString().length + 1; // Was: 'valmin' .. + 1;
 
     this.innerHTML = `
     <span>
-      <label class="checkboxLabel" for="${sliderId}">${label}:</label>
+      <label class="checkboxLabel" for="${sliderId}">${label} </label>
       <input type="range"
         id="${sliderId}" min="${valmin}" max="${valmax}" value="${valinit}" />
       <input type="number" aria-label="${label} - simple input"
@@ -37,7 +38,7 @@ class ValueSlider extends HTMLElement {
     this.setupSliderVal();
   }
 
-  setupSliderVal () {
+  setupSliderVal() {
     this.sliderElem.addEventListener('input', ev => {
       const value = parseFloat(ev.target.value);
       //console.debug("slider updating", value)
@@ -83,14 +84,14 @@ function getSliderVal(el) {
 }
 
 
-function initSliderVal(el, obj, ref, mover=false) {
+function initSliderVal(el, obj, ref, mover = false) {
   const sliderId = `#${el}`;
   const sliderSlider = document.querySelector(sliderId);
   sliderSlider.addEventListener(VALUE_SLIDER_CHANGE_EVENT, ev => {
     //console.debug(VALUE_SLIDER_CHANGE_EVENT, ':~', ev.detail.value, ev);
     obj[ref] = ev.detail.value;
     mover = mover || ev.detail.mover;
-    if (mover){
+    if (mover) {
       document.getElementById('move').click();
     }
   });
@@ -196,7 +197,7 @@ document.getElementById('codeFromClipboard').addEventListener('click', function 
   navigator.clipboard.readText().then(text => console.log(text));
 });
 
-/*
+/* to delete
 var lightSensorNoiseSlider = document.getElementById("rs-display-lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {
   var val = parseFloat(this.value);
@@ -217,8 +218,7 @@ wheelNoiseVal.onchange = function (){
   var val = parseFloat(this.value);
   document.getElementById('rs-display-wheelNoiseSlider').value = val;
 };
-*/
-/*
+
 document.getElementById('showCode').addEventListener('click', function () {
   console.log('showing code?')
   var _code = element.prog;
@@ -390,7 +390,7 @@ var rs_display_lookup = {
   "roboSim-display-obstacles-configurator": "#obstaclesConfigurator"
 };
 
-function _setupToggleUpdate(toggleElement, obj=null, attr=null) {
+function _setupToggleUpdate(toggleElement, obj = null, attr = null) {
   // Event handler to update a toggle element
   toggleElement.addEventListener('x-switch:update', function (e) {
     var target = rs_display_lookup[e.target.id];
@@ -409,7 +409,7 @@ function _setupToggleUpdate(toggleElement, obj=null, attr=null) {
   });
 }
 
-function _setUpToggleOff(toggleElement, obj=null, attr=null) {
+function _setUpToggleOff(toggleElement, obj = null, attr = null) {
   toggleElement.addEventListener('x-switch:off', function (e) {
     var target = rs_display_lookup[e.target.id];
     if ((obj) && (attr)) obj[attr] = false;
@@ -417,7 +417,8 @@ function _setUpToggleOff(toggleElement, obj=null, attr=null) {
   });
 }
 
-function setupToggleHandler(el, obj=null, attr=null) {
+// TO DO - the toggle handlers can perhaps be reconciled?
+function setupToggleHandler(el, obj = null, attr = null) {
   var toggleElement = document.getElementById(el);
   var target;
   if (rs_display_lookup.hasOwnProperty(el))
@@ -431,7 +432,8 @@ function setupToggleHandler(el, obj=null, attr=null) {
   _setUpToggleOff(toggleElement, obj, attr);
 }
 
-function setupChartToggleHandler(el, obj=null, attr=null) {
+/* to delete
+function setupChartToggleHandler(el, obj = null, attr = null) {
   var toggleElement = document.getElementById(el);
   var target;
   if (rs_display_lookup.hasOwnProperty(el))
@@ -446,13 +448,14 @@ function setupChartToggleHandler(el, obj=null, attr=null) {
   _setUpToggleOff(toggleElement, obj, attr);
 }
 
-function setupObstaclesConfigView(){
+console.debug("setup viewer buttons");
+function setupObstaclesConfigView() {
   const obstacles = JSON.stringify(sim.obstacles, null, 2);
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
-function setupCodeView(){
-  const _code = element.prog;
+function setupCodeView() {
+  var _code = element.prog;
   // Strip out any prefix magic line
   _code = _code.split('\n').filter(function (line) {
     return line.indexOf("%") != 0;
@@ -461,17 +464,17 @@ function setupCodeView(){
   document.getElementById('codeDisplayCode').textContent = _code;
 }
 
-function setupRobotConfigView(){
+function setupRobotConfigView() {
   console.debug("Trying robot config")
   const code = JSON.stringify(sim.robotSpecs, null, 2);
   document.getElementById('robotConfiguratorEditor').value = code;
 }
 
-function setupChartView(){
+function setupChartView() {
   if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
 }
 
-function setupFunctionToggleHandler(el, fn, obj=null, attr=null) {
+function setupFunctionToggleHandler(el, fn, obj = null, attr = null) {
   var toggleElement = document.getElementById(el);
   var target;
   if (rs_display_lookup.hasOwnProperty(el))
@@ -487,7 +490,8 @@ function setupFunctionToggleHandler(el, fn, obj=null, attr=null) {
   _setupToggleUpdate(toggleElement, obj, attr);
   _setUpToggleOff(toggleElement, obj, attr);
 }
-function setupObstaclesToggleHandler(el, obj=null, attr=null) {
+/* to delete
+function setupObstaclesToggleHandler(el, obj = null, attr = null) {
   var toggleElement = document.getElementById(el);
   var target;
   if (rs_display_lookup.hasOwnProperty(el))
@@ -501,44 +505,47 @@ function setupObstaclesToggleHandler(el, obj=null, attr=null) {
   _setupToggleUpdate(toggleElement, obj, attr);
   _setUpToggleOff(toggleElement, obj, attr);
 }
-
+*/
 
 // TO DO iterate through these; add and and el to rs_display_lookup
 // TO DO one line to register things with rs_display_lookup
 // If we take the above approach, everything will be configured just from setup array
-setupToggleHandler('roboSim-display-output')
-setupToggleHandler('roboSim-display-sensor-values')
-setupToggleHandler('roboSim-display-sensor-array')
-setupChartToggleHandler('roboSim-display-chart')
-setupToggleHandler('roboSim-display-world')
-setupFunctionToggleHandler('roboSim-display-code', setupCodeView) //this needs additional handing
-setupFunctionToggleHandler('roboSim-display-robot-configurator', setupRobotConfigView) // this needs additional handling
-setupObstaclesToggleHandler('roboSim-display-obstacles-configurator') // this needs additional handling
+setupToggleHandler("roboSim-display-output");
+setupToggleHandler("roboSim-display-sensor-values");
+setupToggleHandler("roboSim-display-sensor-array");
+setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
+setupToggleHandler("roboSim-display-world");
+setupToggleHandler("roboSim-display-positioning");
+setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
+setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView);
+setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView);
+setupToggleHandler("roboSim-display-noise-controls");
+setupToggleHandler("roboSim-display-config-controls");
+setupToggleHandler("roboSim-pen-updown", sim.robotStates, "penDown");
+setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
+setupToggleHandler("roboSim-display-sim-controls");
+//setupToggleHandler('roboSim-display-display-controls');
 
-setupToggleHandler('roboSim-display-noise-controls')
-setupToggleHandler('roboSim-display-world-controls')
-setupToggleHandler('roboSim-pen-updown', sim.robotStates, "penDown")
-setupToggleHandler('roboSim-state-collaborative', sim, "collaborative")
 
-
+console.debug("Done: toggle buttons");
 /*----------- END: define display toggles -----------*/
 
 
 
-document.getElementById('download').addEventListener('click', function () {
-  var hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:text/x-python;base64,' + btoa(element.prog);
-  hiddenElement.target = '_blank';
-  hiddenElement.download = 'robot.py';
-  hiddenElement.dispatchEvent(new MouseEvent('click'));
+document.getElementById("download").addEventListener("click", function () {
+  var hiddenElement = document.createElement("a");
+  hiddenElement.href = "data:text/x-python;base64," + btoa(element.prog);
+  hiddenElement.target = "_blank";
+  hiddenElement.download = "robot.py";
+  hiddenElement.dispatchEvent(new MouseEvent("click"));
 });
 
-document.getElementById('upload').addEventListener('click', function () {
+document.getElementById("upload").addEventListener("click", function () {
   var hiddenElement = document.createElement('input');
-  hiddenElement.type = 'file';
-  hiddenElement.accept = 'text/x-python,.py';
-  hiddenElement.dispatchEvent(new MouseEvent('click'));
-  hiddenElement.addEventListener('change', function (e) {
+  hiddenElement.type = "file";
+  hiddenElement.accept = "text/x-python,.py";
+  hiddenElement.dispatchEvent(new MouseEvent("click"));
+  hiddenElement.addEventListener("change", function (e) {
     var reader = new FileReader();
     reader.onload = function () {
       element.prog = this.result;
@@ -547,13 +554,13 @@ document.getElementById('upload').addEventListener('click', function () {
   });
 });
 
-document.getElementById('robotPreconfig').addEventListener('change', function () {
+document.getElementById("robotPreconfig").addEventListener("change", function () {
   var robotSpec = sim.default_robot_spec;
   var preconfig = document.getElementById('robotPreconfig').value;
   //TO DO - need to capture current robot location then reset to that
-  if (preconfig == 'Default_Robot') {
+  if (preconfig == "Default_Robot") {
     robotSpecs = sim.default_robot_spec;
-  } else if ((preconfig == 'Small_Robot') || (preconfig == 'Small_Robot_Wide_Eyes')) {
+  } else if ((preconfig == "Small_Robot") || (preconfig == "Small_Robot_Wide_Eyes")) {
     robotSpecs = {
       "wheeldiameter": 28,
       "wheelSpacing": 90,
@@ -637,6 +644,7 @@ function init_background(background, pos, clearObstacles = true, clearObstaclesL
   setPos(pos[0], pos[1], pos[2], pos[3]);
 }
 
+console.debug("Initialise background loader.")
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('change', function () {
   var map = document.getElementById('map').value;
@@ -734,7 +742,7 @@ document.getElementById('map').addEventListener('change', function () {
   }
 });
 
-/*
+/* to delete
 document.getElementById('robotConfiguratorOpen').addEventListener('click', function () {
   document.getElementById('robotConfiguratorEditor').value = JSON.stringify(sim.robotSpecs, null, 2);
   document.getElementById('robotConfigurator').classList.remove('closed');
@@ -1049,7 +1057,8 @@ Check the simulator UI settings and render areas accordingly.
 */
 // Can we use the same event over and over?
 
-/*var toggleCheckEvent = new CustomEvent("x-switch:update");
+/* to delete
+var toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-display-world").dispatchEvent(toggleCheckEvent);
 toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-display-chart").dispatchEvent(toggleCheckEvent);

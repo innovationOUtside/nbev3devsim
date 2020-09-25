@@ -13,7 +13,7 @@ function setSliderVal(el, val) {
 
 
 /* exported EV3devSim */
-
+console.debug("Loading ev3devsim...");
 
 // +
 function EV3devSim(id) {
@@ -106,11 +106,10 @@ function EV3devSim(id) {
 
   self.measurePts = [null, null];
 
-  // TO DO: refactor this as a function that lets us create a layer more straightforwardly
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
 
-    function simpleLayerSetup(layerId, w=WIDTH, h=HEIGHT){
+    function simpleLayerSetup(layerId, w = WIDTH, h = HEIGHT) {
       console.debug("Setting up", layerId);
       var el = document.createElement('canvas');
       el.setAttribute('id', layerId);
@@ -152,8 +151,8 @@ function EV3devSim(id) {
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
     */
-    self.scale = 0.4
-    scaler = 'scale(' + self.scale + ')'
+    self.scale = 0.4;
+    scaler = 'scale(' + self.scale + ')';
 
     self.background = simpleLayerSetup('background');
     self.penLayer = simpleLayerSetup('penLayer');
@@ -188,7 +187,7 @@ function EV3devSim(id) {
     self.measurementLayer.style.transform = scaler;
     self.measurementLayer.style.transformOrigin = '0 0';
     */
-    
+
     self.measurementLayer.style.cursor = 'crosshair';
 
     console.debug("Now trying to set up sensor arrays...");
@@ -269,23 +268,25 @@ function EV3devSim(id) {
     //'image-rendering: -webkit-optimize-contrast;' + // Safari
     //'image-rendering: pixelated; ' + // Future browsers
     //'-ms-interpolation-mode: nearest-neighbor;';
+
+    console.debug("Setting up background ctx");
     self.backgroundCtx = self.background.getContext('2d');
     self.backgroundCtx.webkitImageSmoothingEnabled = false;
     self.backgroundCtx.mozImageSmoothingEnabled = false;
     self.backgroundCtx.msImageSmoothingEnabled = false;
     self.backgroundCtx.imageSmoothingEnabled = false;
 
-    function canvasSimpleCtx(el, h=HEIGHT){
+    function canvasSimpleCtx(el, h = HEIGHT) {
       var ctx = el.getContext('2d');
       ctx.translate(0, h);
       ctx.scale(1, -1);
       return ctx
     }
 
-    self.obstaclesLayerCtx = canvasSimpleCtx(self.obstaclesLayer)
-    self.lightLayerCtx = canvasSimpleCtx(self.lightLayer)
-    self.foregroundCtx = canvasSimpleCtx(self.foreground)
-    self.penLayerCtx = canvasSimpleCtx(self.penLayer)
+    self.obstaclesLayerCtx = canvasSimpleCtx(self.obstaclesLayer);
+    self.lightLayerCtx = canvasSimpleCtx(self.lightLayer);
+    self.foregroundCtx = canvasSimpleCtx(self.foreground);
+    self.penLayerCtx = canvasSimpleCtx(self.penLayer);
     /*
     self.obstaclesLayerCtx = self.obstaclesLayer.getContext('2d');
     self.obstaclesLayerCtx.translate(0, HEIGHT);
@@ -304,6 +305,7 @@ function EV3devSim(id) {
     self.penLayerCtx.scale(1, -1);
     */
 
+    console.debug("Setting up measurement layer");
     self.measurementLayerCtx = self.measurementLayer.getContext('2d');
 
     self.parent = document.getElementById(id);
@@ -332,7 +334,7 @@ function EV3devSim(id) {
     self.sensorArrayLeft.width = self.robotSpecs.sensor1.diameter;
     self.sensorArrayRight.height = self.robotSpecs.sensor2.diameter;
     self.sensorArrayRight.width = self.robotSpecs.sensor2.diameter;
-  }
+  };
 
 
   this.measurementClick = function (e) {
@@ -437,7 +439,7 @@ function EV3devSim(id) {
 
   this.clearPenLayer = function () {
     self.penLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
-  }
+  };
 
   // Clear the background
   this.clearBackground = function () {
@@ -541,7 +543,7 @@ function EV3devSim(id) {
     self.robotSpecs.height = height;
 
     self.robotCanvas = document.createElement('canvas');
-    self.robotCanvas.id = 'simone'
+    self.robotCanvas.id = 'simone';
     self.robotCanvas.width = width;
     self.robotCanvas.height = height;
 
@@ -703,7 +705,7 @@ function EV3devSim(id) {
     }
     // The max speed seems to be set to 1050 in motor.py 
     // Can we access it programmatically?
-    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise)
+    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise);
     if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
     else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
   };
@@ -713,7 +715,7 @@ function EV3devSim(id) {
     self.displayMotorValues();
     self.getColorSensorsValues();
     self.displaySensorValues();
-  }
+  };
 
   this.animate = function () {
     self.clock++;
@@ -746,7 +748,7 @@ function EV3devSim(id) {
     self.drawRobot();
     if (self.robotStates.penDown) {
       self.drawPen()
-    }
+    };
     self.calcUltrasonic();
   };
 
@@ -1288,4 +1290,6 @@ function EV3devSim(id) {
   self.loadRobot();
   self.drawRobot();
   self.drawObstacles();
+
+  console.debug("Ev3devsim.js loaded");
 }

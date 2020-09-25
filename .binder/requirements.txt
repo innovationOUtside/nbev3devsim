@@ -1,6 +1,10 @@
 #This repo
 .
 
+
+# For notebook helpers
+tqdm
+
 #For demos
 pandas
 matplotlib

@@ -1,4 +1,19 @@
+//this is actually from studio.js
+function setSliderVal(el, val) {
+  var magic_slider = document.getElementById(el + "-slider");
+  val = parseInt(val);
+  if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
+    {
+      magic_slider.value = val;
+      var magic_event = new Event('input');
+      magic_slider.dispatchEvent(magic_event);
+    }
+  }
+}
+
+
 /* exported EV3devSim */
+console.debug("Loading ev3devsim...");
 
 // +
 function EV3devSim(id) {
@@ -51,7 +66,7 @@ function EV3devSim(id) {
       enabled: true,
       x: -LIGHT_SENSOR_DEFAULT_ABS,
       y: 30,
-      diameter: SENSOR_DIAMETER, 
+      diameter: SENSOR_DIAMETER,
     },
     sensor2: {
       enabled: true,
@@ -91,9 +106,21 @@ function EV3devSim(id) {
 
   self.measurePts = [null, null];
 
-  // TO DO: refactor this as a function that lets us create a layer more straightforwardly
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
+
+    function simpleLayerSetup(layerId, w = WIDTH, h = HEIGHT) {
+      console.debug("Setting up", layerId);
+      var el = document.createElement('canvas');
+      el.setAttribute('id', layerId);
+      el.width = w;
+      el.height = h;
+      el.style.position = 'absolute';
+      el.style.transform = scaler;
+      el.style.transformOrigin = '0 0';
+      return el
+    }
+    /*
     self.background = document.createElement('canvas');
     self.obstaclesLayer = document.createElement('canvas');
     self.lightLayer = document.createElement('canvas');
@@ -108,7 +135,6 @@ function EV3devSim(id) {
     self.lightLayer.setAttribute('id', 'lightLayer');
     self.foreground.setAttribute('id', 'foreground');
     self.measurementLayer.setAttribute('id', 'measurementLayer');
- 
 
     self.background.width = WIDTH;
     self.background.height = HEIGHT;
@@ -124,10 +150,19 @@ function EV3devSim(id) {
     // pen down
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
+    */
+    self.scale = 0.4;
+    scaler = 'scale(' + self.scale + ')';
 
-    self.scale = 0.4
-    scaler = 'scale(' + self.scale + ')'
+    self.background = simpleLayerSetup('background');
+    self.penLayer = simpleLayerSetup('penLayer');
+    self.obstaclesLayer = simpleLayerSetup('obstaclesLayer');
+    self.lightLayer = simpleLayerSetup('lightLayer');
+    self.foreground = simpleLayerSetup('foreground');
+    self.measurementLayer = simpleLayerSetup('measurementLayer');
 
+    console.debug("Layer setup complete");
+    /*
     self.background.style.position = 'absolute';
     self.background.style.transform = scaler;
     self.background.style.transformOrigin = '0 0';
@@ -151,28 +186,64 @@ function EV3devSim(id) {
     self.measurementLayer.style.position = 'absolute';
     self.measurementLayer.style.transform = scaler;
     self.measurementLayer.style.transformOrigin = '0 0';
+    */
+
     self.measurementLayer.style.cursor = 'crosshair';
 
-    self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
-    //No smoothing - see pixels cleanly
-    //https://miguelmota.com/blog/pixelate-images-with-canvas/
-    self.sensorArrayLeft.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
-                         'image-rendering: -moz-crisp-edges;' + // FireFox
-                         'image-rendering: -o-crisp-edges;' +  // Opera
-                         'image-rendering: -webkit-crisp-edges;' + // Chrome
-                         'image-rendering: crisp-edges;' + // Chrome
-                         'image-rendering: -webkit-optimize-contrast;' + // Safari
-                         'image-rendering: pixelated; ' + // Future browsers
-                         '-ms-interpolation-mode: nearest-neighbor;'; // IE
-    self.sensorArrayLeft.height = SENSOR_DIAMETER;
-    self.sensorArrayLeft.width = SENSOR_DIAMETER;
-    self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
-    self.sensorArrayLeftCtx.webkitImageSmoothingEnabled = false;
-    self.sensorArrayLeftCtx.mozImageSmoothingEnabled = false;
-    self.sensorArrayLeftCtx.msImageSmoothingEnabled = false;
-    self.sensorArrayLeftCtx.imageSmoothingEnabled = false;
+    console.debug("Now trying to set up sensor arrays...");
 
-    self.sensorArrayRight = document.getElementById('sensorArrayRight');
+    function sensorArraySetup(elId) {
+      console.debug("Setting up", elId);
+      var el = document.getElementById(elId);
+      //No smoothing - see pixels cleanly
+      //https://miguelmota.com/blog/pixelate-images-with-canvas/
+      el.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+        'image-rendering: -moz-crisp-edges;' + // FireFox
+        'image-rendering: -o-crisp-edges;' +  // Opera
+        'image-rendering: -webkit-crisp-edges;' + // Chrome
+        'image-rendering: crisp-edges;' + // Chrome
+        'image-rendering: -webkit-optimize-contrast;' + // Safari
+        'image-rendering: pixelated; ' + // Future browsers
+        '-ms-interpolation-mode: nearest-neighbor;'; // IE
+      el.height = SENSOR_DIAMETER;
+      el.width = SENSOR_DIAMETER;
+      return el
+    }
+
+    function initSensorArrayCtx(el) {
+      var ctx = el.getContext('2d');
+      ctx.webkitImageSmoothingEnabled = false;
+      ctx.mozImageSmoothingEnabled = false;
+      ctx.msImageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = false;
+      return ctx
+    }
+
+    self.sensorArrayLeft = sensorArraySetup('sensorArrayLeft');
+    self.sensorArrayLeftCtx = initSensorArrayCtx(self.sensorArrayLeft);
+
+    self.sensorArrayRight = sensorArraySetup('sensorArrayRight');
+    self.sensorArrayRightCtx = initSensorArrayCtx(self.sensorArrayRight);
+
+
+    /*self.sensorArrayLeft = document.getElementById('sensorArrayLeft');
+     self.sensorArrayLeft.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
+                          'image-rendering: -moz-crisp-edges;' + // FireFox
+                          'image-rendering: -o-crisp-edges;' +  // Opera
+                          'image-rendering: -webkit-crisp-edges;' + // Chrome
+                          'image-rendering: crisp-edges;' + // Chrome
+                          'image-rendering: -webkit-optimize-contrast;' + // Safari
+                          'image-rendering: pixelated; ' + // Future browsers
+                          '-ms-interpolation-mode: nearest-neighbor;'; // IE
+     self.sensorArrayLeft.height = SENSOR_DIAMETER;
+     self.sensorArrayLeft.width = SENSOR_DIAMETER;
+     self.sensorArrayLeftCtx = self.sensorArrayLeft.getContext('2d');
+     self.sensorArrayLeftCtx.webkitImageSmoothingEnabled = false;
+     self.sensorArrayLeftCtx.mozImageSmoothingEnabled = false;
+     self.sensorArrayLeftCtx.msImageSmoothingEnabled = false;
+     self.sensorArrayLeftCtx.imageSmoothingEnabled = false; */
+
+    /*self.sensorArrayRight = document.getElementById('sensorArrayRight');
     self.sensorArrayRight.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
     'image-rendering: -moz-crisp-edges;' + // FireFox
     'image-rendering: -o-crisp-edges;' +  // Opera
@@ -188,7 +259,7 @@ function EV3devSim(id) {
     self.sensorArrayRightCtx.mozImageSmoothingEnabled = false;
     self.sensorArrayRightCtx.msImageSmoothingEnabled = false;
     self.sensorArrayRightCtx.imageSmoothingEnabled = false;
-
+*/
     //self.background.style.cssText = 'image-rendering: optimizeSpeed;' + // FireFox < 6.0
     //'image-rendering: -moz-crisp-edges;' + // FireFox
     //'image-rendering: -o-crisp-edges;' +  // Opera
@@ -197,12 +268,26 @@ function EV3devSim(id) {
     //'image-rendering: -webkit-optimize-contrast;' + // Safari
     //'image-rendering: pixelated; ' + // Future browsers
     //'-ms-interpolation-mode: nearest-neighbor;';
+
+    console.debug("Setting up background ctx");
     self.backgroundCtx = self.background.getContext('2d');
     self.backgroundCtx.webkitImageSmoothingEnabled = false;
     self.backgroundCtx.mozImageSmoothingEnabled = false;
     self.backgroundCtx.msImageSmoothingEnabled = false;
     self.backgroundCtx.imageSmoothingEnabled = false;
 
+    function canvasSimpleCtx(el, h = HEIGHT) {
+      var ctx = el.getContext('2d');
+      ctx.translate(0, h);
+      ctx.scale(1, -1);
+      return ctx
+    }
+
+    self.obstaclesLayerCtx = canvasSimpleCtx(self.obstaclesLayer);
+    self.lightLayerCtx = canvasSimpleCtx(self.lightLayer);
+    self.foregroundCtx = canvasSimpleCtx(self.foreground);
+    self.penLayerCtx = canvasSimpleCtx(self.penLayer);
+    /*
     self.obstaclesLayerCtx = self.obstaclesLayer.getContext('2d');
     self.obstaclesLayerCtx.translate(0, HEIGHT);
     self.obstaclesLayerCtx.scale(1, -1);
@@ -218,7 +303,9 @@ function EV3devSim(id) {
     self.penLayerCtx = self.penLayer.getContext('2d');
     self.penLayerCtx.translate(0, HEIGHT);
     self.penLayerCtx.scale(1, -1);
+    */
 
+    console.debug("Setting up measurement layer");
     self.measurementLayerCtx = self.measurementLayer.getContext('2d');
 
     self.parent = document.getElementById(id);
@@ -241,13 +328,13 @@ function EV3devSim(id) {
     self.measurementLayer.addEventListener('mousemove', self.myMove);
 
   };
-  
-  this.resetSensorDiameter = function() {
+
+  this.resetSensorDiameter = function () {
     self.sensorArrayLeft.height = self.robotSpecs.sensor1.diameter;
     self.sensorArrayLeft.width = self.robotSpecs.sensor1.diameter;
     self.sensorArrayRight.height = self.robotSpecs.sensor2.diameter;
     self.sensorArrayRight.width = self.robotSpecs.sensor2.diameter;
-  }
+  };
 
 
   this.measurementClick = function (e) {
@@ -352,7 +439,7 @@ function EV3devSim(id) {
 
   this.clearPenLayer = function () {
     self.penLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
-  }
+  };
 
   // Clear the background
   this.clearBackground = function () {
@@ -456,7 +543,7 @@ function EV3devSim(id) {
     self.robotSpecs.height = height;
 
     self.robotCanvas = document.createElement('canvas');
-    self.robotCanvas.id = 'simone'
+    self.robotCanvas.id = 'simone';
     self.robotCanvas.width = width;
     self.robotCanvas.height = height;
 
@@ -618,17 +705,17 @@ function EV3devSim(id) {
     }
     // The max speed seems to be set to 1050 in motor.py 
     // Can we access it programmatically?
-    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise)
-    if (_tmp>0) wheel.speed = Math.min(Math.round(_tmp), 1050);
-    else if (_tmp>0) wheel.speed = Math.max(Math.round(_tmp), -1050);
+    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise);
+    if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
+    else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
   };
 
-  this.bigDraw = function() {
+  this.bigDraw = function () {
     self.drawAll();
     self.displayMotorValues();
     self.getColorSensorsValues();
     self.displaySensorValues();
-  }
+  };
 
   this.animate = function () {
     self.clock++;
@@ -661,7 +748,7 @@ function EV3devSim(id) {
     self.drawRobot();
     if (self.robotStates.penDown) {
       self.drawPen()
-    }
+    };
     self.calcUltrasonic();
   };
 
@@ -836,6 +923,13 @@ function EV3devSim(id) {
     self.timer = null;
   };
 
+  this.updateUIControls = function () {
+    document.getElementById('rs-display-xPos-slider').value = self.robotStates.x;
+    document.getElementById('rs-display-xPos-val').value = self.robotStates.x;
+    document.getElementById('rs-display-yPos-slider').value = self.robotStates.y;
+    document.getElementById('rs-display-yPos-val').value = self.robotStates.y;
+  }
+
   this.drawRobot = function () {
     self.foregroundCtx.save();
     self.foregroundCtx.translate(self.robotStates.x, self.robotStates.y);
@@ -846,6 +940,7 @@ function EV3devSim(id) {
       -self.ROBOT_Y_CENTER
     );
     self.foregroundCtx.restore();
+    self.updateUIControls()
   };
 
   this.drawObstacles = function () {
@@ -862,7 +957,7 @@ function EV3devSim(id) {
     self.obstaclesLayerCtx.clearRect(0, 0, WIDTH, HEIGHT);
   };
 
-  this.setPenCoords = function() {
+  this.setPenCoords = function () {
     // Reflect the orientation of the robot
     var cos = Math.cos(self.robotStates.angle - Math.PI / 2);
     var sin = Math.sin(self.robotStates.angle - Math.PI / 2);
@@ -920,14 +1015,14 @@ function EV3devSim(id) {
   };
 
   //Central limit estimate of normal distribution
-  this.gaussianRand = function() {
+  this.gaussianRand = function () {
     var rand = 0;
     for (var i = 0; i < 6; i += 1) {
       rand += Math.random();
     }
     return rand / 6;
   }
-  
+
   //Create a simple noise component in range +/-1
   this.simpleNoise = function (noise = 1) {
     if (noise > 0) {
@@ -945,8 +1040,8 @@ function EV3devSim(id) {
 
     return raw;
   }
-  
-  this.getSensorValues = function (x, y, diameter=SENSOR_DIAMETER, sensor='') {
+
+  this.getSensorValues = function (x, y, diameter = SENSOR_DIAMETER, sensor = '') {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
 
@@ -960,24 +1055,24 @@ function EV3devSim(id) {
     );
     var sensorViewCtx;
     var sensorView;
-    if (sensor=='sensor1') {
+    if (sensor == 'sensor1') {
       self.sensorArrayLeftCtx.drawImage(self.background,
-                    Math.min(Math.max(0, x - radius ), WIDTH-diameter),
-                    Math.min(Math.max(0, y - radius), HEIGHT-diameter),
-                    diameter, diameter,
-                    0, 0,
-                    diameter, diameter);
+        Math.min(Math.max(0, x - radius), WIDTH - diameter),
+        Math.min(Math.max(0, y - radius), HEIGHT - diameter),
+        diameter, diameter,
+        0, 0,
+        diameter, diameter);
       sensorViewCtx = self.sensorArrayLeftCtx;
       sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
       //self.robotStates.sensor1dataArray = sensorBox.data.toString();
     }
-    else if (sensor='sensor2') {
+    else if (sensor = 'sensor2') {
       self.sensorArrayRightCtx.drawImage(self.background,
-                    Math.min(Math.max(0, x - radius ), WIDTH-diameter),
-                    Math.min(Math.max(0, y - radius), HEIGHT-diameter),
-                    diameter, diameter,
-                    0, 0,
-                    diameter, diameter);
+        Math.min(Math.max(0, x - radius), WIDTH - diameter),
+        Math.min(Math.max(0, y - radius), HEIGHT - diameter),
+        diameter, diameter,
+        0, 0,
+        diameter, diameter);
       sensorViewCtx = self.sensorArrayRightCtx;
       sensorView = sensorViewCtx.getImageData(0, 0, diameter, diameter);
       //self.robotStates.sensor2dataArray = sensorBox.data.toString();
@@ -1000,7 +1095,7 @@ function EV3devSim(id) {
       for (let row = 0; row < diameter; row++) {
         let offset = (row * (diameter * 4) + col * 4);
         if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
-          
+
           redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
           redTotal += redNoise;
           greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
@@ -1008,53 +1103,53 @@ function EV3devSim(id) {
           blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotSpecs.sensorNoise);
           blueTotal += blueNoise;
           sensorView.data[offset] = redNoise;
-          sensorView.data[offset+1] = greenNoise;
-          sensorView.data[offset+2] = blueNoise;
+          sensorView.data[offset + 1] = greenNoise;
+          sensorView.data[offset + 2] = blueNoise;
           count++;
         } else {
           sensorView.data[offset] = 245;
-          sensorView.data[offset+1] = 226;
-          sensorView.data[offset+2] = 225;
+          sensorView.data[offset + 1] = 226;
+          sensorView.data[offset + 2] = 225;
         }
       }
     }
 
-    if (sensor=='sensor1')
+    if (sensor == 'sensor1')
       self.robotStates.sensor1dataArray = sensorView.data.toString();
-    else if (sensor=='sensor2')
+    else if (sensor == 'sensor2')
       self.robotStates.sensor2dataArray = sensorView.data.toString();
 
     sensorViewCtx.putImageData(sensorView, 0, 0);
-    
+
     // TO DO - we could do a much simple noise estimate and just add noise here?
     return [redTotal / count, greenTotal / count, blueTotal / count];
   };
 
   //https://stackoverflow.com/a/14323127/454773
-  this.rgb = function (r,g,b) {
-    return 'rgb(' + [(r||0),(g||0),(b||0)].join(',') + ')';
+  this.rgb = function (r, g, b) {
+    return 'rgb(' + [(r || 0), (g || 0), (b || 0)].join(',') + ')';
   }
 
-  this.getRGBInt = function(val){
+  this.getRGBInt = function (val) {
     return [parseInt(val[0]), parseInt(val[1]), parseInt(val[2])]
   }
 
-  this.getRGB = function(val){
+  this.getRGB = function (val) {
     return self.rgb(self.getRGBInt(val));
   }
 
 
   // Return triband reflected light
-  this.getReflectedLight = function(val) {
+  this.getReflectedLight = function (val) {
     var sum = 0;
-    for( var i = 0; i < val.length; i++ ){
-      sum += parseInt(val[i]); 
+    for (var i = 0; i < val.length; i++) {
+      sum += parseInt(val[i]);
     }
     return 100.0 * sum / 765
   }
 
   // Return pure (R) reflected light
-  this.getReflectedLightR = function(val) {
+  this.getReflectedLightR = function (val) {
     //Value of reflected light (i.e. reflected R component) as percentage
     return 100.0 * parseInt(val[0]) / 255
   }
@@ -1069,12 +1164,12 @@ function EV3devSim(id) {
   this.displaySensorValues = function () {
     var _sensor1 = self.robotStates.sensor1;
     var _sensor2 = self.robotStates.sensor2;
-    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLightR(_sensor1)).toFixed(2) + '|' + (self.getReflectedLight(_sensor1)).toFixed(2) + ' ('+_sensor1[0].toFixed() +', ' + _sensor1[1].toFixed() + ', ' + _sensor1[2].toFixed()+')';
-    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLightR(_sensor2)).toFixed(2) + '|' + (self.getReflectedLight(_sensor2)).toFixed(2) + ' ('+ _sensor2[0].toFixed() +', ' + _sensor2[1].toFixed() + ', ' + _sensor2[2].toFixed()+')';
-  
+    document.getElementById('sensor1_value').innerHTML = (self.getReflectedLightR(_sensor1)).toFixed(2) + '|' + (self.getReflectedLight(_sensor1)).toFixed(2) + ' (' + _sensor1[0].toFixed() + ', ' + _sensor1[1].toFixed() + ', ' + _sensor1[2].toFixed() + ')';
+    document.getElementById('sensor2_value').innerHTML = (self.getReflectedLightR(_sensor2)).toFixed(2) + '|' + (self.getReflectedLight(_sensor2)).toFixed(2) + ' (' + _sensor2[0].toFixed() + ', ' + _sensor2[1].toFixed() + ', ' + _sensor2[2].toFixed() + ')';
+
     document.getElementById('ultrasonic_value').innerHTML = self.robotStates.ultrasonic.toFixed(2);
-    document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) +", "+self.robotStates.gyro[1].toFixed(2) ;
-  
+    document.getElementById('gyro_value').innerHTML = self.robotStates.gyro[0].toFixed(2) + ", " + self.robotStates.gyro[1].toFixed(2);
+
     if (!self.dragok) {
       document.getElementById('sensor1_color').style.backgroundColor = self.getRGB(_sensor1);
       document.getElementById('sensor2_color').style.backgroundColor = self.getRGB(_sensor2);
@@ -1096,7 +1191,7 @@ function EV3devSim(id) {
     var rW = self.robotSpecs.width / 2
     var rH = self.robotSpecs.height / 2
     if (mx > (self.robotStates.x - rW) && mx < (self.robotStates.x + rW) && my > (self.robotStates.y - rH) && my < (self.robotStates.y + rH)) {
-    //console.log('Drag enable...');
+      //console.log('Drag enable...');
       self.dragok = true;
       self.isDragging = true;
     }
@@ -1141,7 +1236,7 @@ function EV3devSim(id) {
 
   // handle mouse moves
   this.myMove = function (e) {
-    
+
     var cursorCoords = self.cursorCanvasCoords(e)
     var mx = cursorCoords.mx
     var my = cursorCoords.my
@@ -1177,8 +1272,12 @@ function EV3devSim(id) {
       self.robotStates.x = mx;
       self.robotStates.y = my;
 
-      document.getElementById('xPos').value = self.robotStates.x;
-      document.getElementById('yPos').value = self.robotStates.y;
+      //document.getElementById('xPos').value = self.robotStates.x;
+      //document.getElementById('yPos').value = self.robotStates.y;
+
+      // TO DO - do these events collide? Only one slider seems to get updated
+      setSliderVal("rs-display-xPos", self.robotStates.x);
+      setSliderVal("rs-display-yPos", self.robotStates.y);
 
       // redraw the scene with the new rect positions
       self.drawAll();
@@ -1201,4 +1300,6 @@ function EV3devSim(id) {
   self.loadRobot();
   self.drawRobot();
   self.drawObstacles();
+
+  console.debug("Ev3devsim.js loaded");
 }

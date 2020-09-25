@@ -1,5 +1,13 @@
+/* We want a responsive layout,
+   but a minimum width is sensible? */
+.roboSim {
+  min-width: 200px;
+}
+
 .roboSim button {
   background: AliceBlue;
+  border-radius: 12px;
+  border-color: lightblue;
 }
 
 .row {
@@ -8,6 +16,23 @@
   width: 1181;
   /* margin-top: 0.5em; */
   margin: 0.2em 0;
+}
+
+
+.rs-grouped-controls legend, .rs-world legend {
+  margin-bottom: 0px;
+  border-bottom: none;
+  width: auto;
+  font-size: inherit;
+  padding: 0.5rem;
+  color: cornflowerblue;
+}
+
+.rs-grouped-controlset {
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-basis: auto;
+  justify-content: space-between;
 }
 
 .menu {
@@ -63,7 +88,7 @@
 }
 
 #editor {
-  width: 50%;
+  width: 100%;
 }
 
 #pythonCode {
@@ -88,6 +113,7 @@
   justify-content: space-between;
   margin-top: 0.2em;
   width: 100%;
+  align-items: baseline;
 }
 
 .sensorReading {
@@ -114,6 +140,8 @@
   border: 2px solid green;
 }
 
+toggle-switch span, value-slider span {white-space: nowrap;}
+/*
 #robotConfigurator,
 #obstaclesConfigurator,
 #codeDisplay {
@@ -122,7 +150,6 @@
   flex-direction: column;
   justify-content: space-between;
   top: 50px;
-  /* left: 200px; */
   width: 80%;
   height: 80%;
   border: solid 2px black;
@@ -226,9 +253,11 @@
   top: -2000px !important;
 }
 
+
 #run {
   background-color: yellow;
 }
+*/
 
 #background {
   image-rendering: pixelated;
@@ -241,8 +270,24 @@ x-switch {
   zoom: 1;
 }
 
+toggle-switch {
+  display: inline-block;
+  padding: 0.7rem;
+}
+
+toggle-switch label {
+  color: navy;
+}
+
+toggle-switch.rs-toggle-button {
+  padding: 2px;
+}
+
 .rs-toggle-group {
-  border: 1px solid lightgrey;
+  border: 1px solid lightblue;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem;
 }
 
 /*
@@ -260,20 +305,64 @@ button.x-switch {
   font: .9rem sans-serif;
 }
 */
+
 button.x-switch span {
   padding: 1px 4px;
   pointer-events: none;
+  border-radius: 12px;
+
 }
 
-[role="switch"][aria-checked="false"] :first-child,
+button.x-switch-text[aria-checked="false"] :first-child,
 [role="switch"][aria-checked="true"] :last-child {
-  background: rgb(120, 120, 120);
-  color: #eef;
+  background: cornflowerblue;
+  color: white;
+  ;
 }
 
-[role="switch"][aria-checked="false"] :last-child,
+button.x-switch-text[role="switch"][aria-checked="false"] :last-child,
 [role="switch"][aria-checked="true"] :first-child {
-  color: #bbd;
+  color: cornflowerblue;
+}
+
+
+button.x-switch-button[role="switch"][aria-checked="true"] {
+  background-color: cornflowerblue;
+  color: white;
+}
+
+button.x-switch-button[role="switch"][aria-checked="false"] {
+  background-color: white;
+  color: cornflowerblue;
+}
+
+/*https://dev.to/erikkroes/accessible-html-toggle-button-switch-o9e*/
+button.x-switch-switch {  
+  padding: 0;
+  width: 3.7em;
+  height: 1.5em;
+  border: 0;
+  border-radius: 1rem;
+  background-color: lightgrey;
+}
+
+button.x-switch-switch[role="switch"][aria-checked="true"] {
+  background-color: #0a0;
+}
+
+button.x-switch-switch[role="switch"] span {
+  color: white;
+  padding: 0.1rem;  
+  pointer-events: none;
+  border-radius: 2rem;
+}
+
+button.x-switch-switch[role="switch"][aria-checked="false"] :last-child {
+  padding-left: .2em;
+}
+
+button.x-switch-switch[role="switch"][aria-checked="true"] :last-child, button.x-switch-switch[role="switch"][aria-checked="false"] :first-child {
+  background: white;
 }
 /*
 label.x-switch {
@@ -288,14 +377,14 @@ label.x-switch {
   -webkit-user-select: none;
   -o-user-select: none; */
 /*---*/
-.sim-running {
+.toggle-button-on {
   background: green;
   border-radius: 50%;
   display: inline-block;
   height: 1rem;
   width: 1rem;
 }
-.sim-stopped {
+.toggle-button-off {
   background: red;
   border-radius: 50%;
   display: inline-block;
@@ -304,9 +393,10 @@ label.x-switch {
 }
 
 .rs-grouped-controls {
-  border: 2px solid lightgrey;
+  border: 2px solid cornflowerblue;
   padding: 10px;
   border-radius: 12px;
+  width:100%;
 }
 
 /* LEDs: https://austinrobertson.com/blog/2013/01/30/css-led/ */
@@ -341,4 +431,43 @@ label.x-switch {
   background-color: rgb(18, 250, 18);
   border-radius: 50%;
   box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7d0 0 2px 12px;
+}
+
+
+/* ------- Handling issues --------- */
+
+/* input[number] doesn't let you limit width as a form control */
+input[type=number]{
+  width: 7rem;
+} 
+
+input[type=range]{
+  display: inline-block;
+  width: auto;
+}
+
+/* Input element overflows parent div - this still doesn't work */
+input {
+  padding: 0.2em; 
+  box-sizing: border-box;
+  width: 100% 
+} 
+
+/* select elements go large...*/
+select {max-height: 3rem;}
+
+toggle-switch input[disabled] {
+  color: lightgrey;
+}
+
+toggle-switch input[enabled] {
+  color: initial;
+}
+
+.rs-closed {
+  display: none;
+}
+
+.rs-open {
+  display: block;
 }

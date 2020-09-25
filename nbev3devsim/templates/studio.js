@@ -1,36 +1,73 @@
+
+
 /*---- Custom elements ---*/
+
+
+//improved by Nick Freear
+const VALUE_SLIDER_CHANGE_EVENT = 'value-slider:change';
 
 class ValueSlider extends HTMLElement {
   constructor() {
     // Always call super first in constructor
     super();
 
-    const sliderId = `${this.id}-slider`;
+    const ID = this.id || 'slider-00';
+    const sliderId = `${ID}-slider`;
+    const valId = `${ID}-val`;
+
     const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
-    const labelId = `${this.id}-label`;
-    const valId = `${this.id}-val`;
     const valmin = this.getAttribute('min');
     const valmax = this.getAttribute('max');
     const valinit = this.getAttribute('initial');
-    const maxlen = valmin.toString().length + 1
+
     this.innerHTML = `
-    <span class="rs-valueslider-group">
-        <label class="checkboxLabel"for="${sliderId}">${label}:</label>
-        <input type="range"
-        id="${sliderId}" value="${valinit}" min="${valmin}" max="${valmax}">
-        <!--<div role="slider" aria-labelledby="${this.id}-label"
-        id="${sliderId}" aria-valuenow="${valinit}" aria-valuemin="${valmin}" aria-valuemax="${valmax}">-->
-        <!--<input type="text" id="${valId}" maxlength="${valmin}" size="${valmin}" value="${valinit}">-->
-        <input type="number" id="${valId}" value="${valinit}">
-      </span>
+    <span>
+      <label class="checkboxLabel" for="${sliderId}">${label} </label>
+      <input type="range"
+        id="${sliderId}" min="${valmin}" max="${valmax}" value="${valinit}" />
+      <input type="number" aria-label="${label} - simple input"
+        id="${valId}" min="${valmin}" max="${valmax}" value="${valinit}">
+    </span>
     `;
+
+    this.sliderElem = document.querySelector(`#${sliderId}`);
+    this.valueElem = document.querySelector(`#${valId}`);
+
+    //console.debug('ValueSlider:', this);
+
+    this.setupSliderVal();
+  }
+
+  setupSliderVal() {
+    this.sliderElem.addEventListener('input', ev => {
+      const value = parseFloat(ev.target.value);
+      //console.debug("slider updating", value)
+      this.valueElem.value = value;
+
+      const childEvent = ev;
+      const event = new CustomEvent(VALUE_SLIDER_CHANGE_EVENT, { detail: { childEvent, value } });
+      this.dispatchEvent(event);
+    });
+
+    this.valueElem.addEventListener('input', ev => { // Was: 'change' event.
+      const value = parseFloat(ev.target.value);
+      //console.debug('value updating...', value)
+      this.sliderElem.value = value;
+
+      const childEvent = ev;
+      const event = new CustomEvent(VALUE_SLIDER_CHANGE_EVENT, { detail: { childEvent, value } });
+      this.dispatchEvent(event);
+    });
   }
 }
 
-if (!(customElements.get('value-slider'))) customElements.define('value-slider', ValueSlider, { extends: null });
+if (!(customElements.get('value-slider'))) {
+  customElements.define('value-slider', ValueSlider, { extends: null });
+}
 
-function setSlider(el, val) {
-  var magic_slider = document.getElementById(el + "-slider");
+//this function is duplciated in ev3devsim.js
+function setSliderVal(el, val) {
+  const magic_slider = document.getElementById(el + "-slider");
   val = parseInt(val);
   if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
     {
@@ -41,27 +78,23 @@ function setSlider(el, val) {
   }
 }
 
-function getSlider(el) {
-  var magic_slider = document.getElementById(el + "-slider");
+function getSliderVal(el) {
+  const magic_slider = document.getElementById(el + "-slider");
   return magic_slider.value;
 }
 
-function setupSliderVal(el, obj, ref) {
-  var sliderId = `#${el}-slider`;
-  var sliderSlider = document.querySelector(sliderId);
 
-  sliderSlider.oninput = function () {
-    const val = parseFloat(this.value);
-    //const val = parseFloat(this.getAttribute("aria-valuenow"));
-    obj[ref] = val;
-    document.querySelector(`#${el}-val`).value = val;
-  }
-  var sliderVal = document.querySelector(`#${el}-val`);
-  sliderVal.onchange = function () {
-    const val = parseFloat(this.value);
-    document.querySelector(sliderId).value = val;
-    //document.querySelector(sliderId).setAttribute("aria-valuenow", val);
-  };
+function initSliderVal(el, obj, ref, mover = false) {
+  const sliderId = `#${el}`;
+  const sliderSlider = document.querySelector(sliderId);
+  sliderSlider.addEventListener(VALUE_SLIDER_CHANGE_EVENT, ev => {
+    //console.debug(VALUE_SLIDER_CHANGE_EVENT, ':~', ev.detail.value, ev);
+    obj[ref] = ev.detail.value;
+    mover = mover || ev.detail.mover;
+    if (mover) {
+      document.getElementById('move').click();
+    }
+  });
 }
 
 /* Toggle switch - Nick Freear --*/
@@ -74,24 +107,95 @@ class ToggleSwitch extends HTMLElement {
     const intID = `int--${this.id || 'x-switch-01'}`;
     const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
     const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
+    const element_type = this.getAttribute("type") || 'text';
 
-    this.innerHTML = `
-      <span class="rs-toggle-group">
-        <label for="${intID}" class="x-switch">${label}: </label>
-        <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
-          <span>${this.getAttribute('off') || 'Off'}</span>
-          <span>${this.getAttribute('on') || 'On'}</span>
-        </button>
-      </span>
-    `;
+    var indicator = this.getAttribute('indicator') || false;
+    if (indicator)
+      indicator = `<span id="${indicator}" class="toggle-button-${this.getAttribute('initial')}"></span>`
+    else
+      indicator = '';
+    var select = this.getAttribute('select') || false;
+    var selection = '';
+    if (select) {
+      var options = this.getAttribute('options') || false;
+      if (options) {
+        options = options.split(",");
+        selection = `<select id="${select}">`
+        for (var i = 0; i < options.length; i++)
+          selection = `${selection}<option>${options[i]}</option>`
+        selection = `${selection}</select>`
+      } else select = false;
+    }
+
+    /*
+  this.innerHTML = `
+  <span class="rs-toggle-group">
+    ${indicator}
+    <label for="${intID}" class="x-switch">${label} </label>
+    <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-text">
+      <span>${this.getAttribute('off') || 'Off'}</span>
+      <span>${this.getAttribute('on') || 'On'}</span>
+    </button>
+    ${selection}
+  </span>
+`;
+ 
+*/
+    console.debug("Create toggle type", element_type, intID)
+    switch (element_type) {
+      case "text":
+        this.innerHTML = `
+          <span class="rs-toggle-group">
+            ${indicator}
+            <label for="${intID}" class="x-switch">${label} </label>
+            <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-text">
+              <span>${this.getAttribute('off') || 'Off'}</span>
+              <span>${this.getAttribute('on') || 'On'}</span>
+            </button>
+            ${selection}
+          </span>
+        `;
+        this.classList.add("rs-toggle-text");
+        break;
+      case "button":
+        this.innerHTML = `
+          <span class="">
+            ${indicator}
+            <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-button">
+              ${label}
+            </button>
+            ${selection}
+          </span>
+        `;
+        this.classList.add("rs-toggle-button");
+        break;
+      case "switch":
+        this.innerHTML = `
+          <span class="rs-toggle-group">
+            ${indicator}
+            <label for="${intID}" class="x-switch">${label} </label>
+            <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-switch">
+              <span>${this.getAttribute('off') || 'off'}</span>
+              <span>${this.getAttribute('on') || 'on'}</span>
+            </button>
+            ${selection}
+          </span>
+        `;
+        this.classList.add("rs-toggle-switch");
+        break;
+    }
 
     const button = this.querySelector('button');
+
+    if (select)
+      document.getElementById(select).disabled = button.getAttribute('aria-checked') === 'false';
 
     button.addEventListener('click', childEvent => {
       const checked = button.getAttribute('aria-checked') === 'true'; // Old state.
       const on = !checked; // New state.
 
       button.setAttribute('aria-checked', checked ? 'false' : 'true');
+      if (select) document.getElementById(select).disabled = checked;
 
       const eventName = `x-switch:${checked ? 'off' : 'on'}`
       const event = new CustomEvent(eventName, { detail: { childEvent, on } });
@@ -118,9 +222,9 @@ function setPos(x, y, angle, init = false, reset = false) {
   if (isNaN(y)) { y = 0; }
   if (isNaN(angleRadian)) { angleRadian = 0; angle = 0; }
 
-  setSlider("rs-display-xPos", x);
-  setSlider("rs-display-yPos", y);
-  setSlider("rs-display-angle", angle);
+  setSliderVal("rs-display-xPos", x);
+  setSliderVal("rs-display-yPos", y);
+  setSliderVal("rs-display-angle", angle);
   //document.getElementById('rs-display-xPos').value = x;
   //document.getElementById('rs-display-yPos').value = y;
   //document.getElementById('rs-display-angle').value = angle;
@@ -148,12 +252,29 @@ function setPos(x, y, angle, init = false, reset = false) {
 
 var sim = new EV3devSim('field');
 
+var uiSettings = {};
+
+uiSettings['audio'] = { 'error': true };
+
+/* Audio */
+
+var ctx = new AudioContext()
+function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
+  var o = ctx.createOscillator(); var g = ctx.createGain()
+  o.frequency.value = frequency; o.type = type
+  o.connect(g); g.connect(ctx.destination)
+  o.start(0)
+  g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration)
+}
+
+//------
+
 // Initialise additional components
-setupSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
-setupSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise")
-setupSliderVal('rs-display-xPos', sim.robotSpecs, "sensorNoise")
-setupSliderVal('rs-display-yPos', sim.robotSpecs, "sensorNoise")
-setupSliderVal('rs-display-angle', sim.robotSpecs, "sensorNoise")
+initSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
+initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise")
+initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover = true)
+initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
+initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
 
 // Set the default position from something?!
 setPos(1181, 571, 0);
@@ -164,7 +285,7 @@ document.getElementById('codeFromClipboard').addEventListener('click', function 
   navigator.clipboard.readText().then(text => console.log(text));
 });
 
-/*
+/* to delete
 var lightSensorNoiseSlider = document.getElementById("rs-display-lightSensorNoiseSlider");
 lightSensorNoiseSlider.oninput = function () {
   var val = parseFloat(this.value);
@@ -185,7 +306,6 @@ wheelNoiseVal.onchange = function (){
   var val = parseFloat(this.value);
   document.getElementById('rs-display-wheelNoiseSlider').value = val;
 };
-*/
 
 document.getElementById('showCode').addEventListener('click', function () {
   console.log('showing code?')
@@ -202,18 +322,19 @@ document.getElementById('showCode').addEventListener('click', function () {
 document.getElementById('codeDisplayClose').addEventListener('click', function () {
   document.getElementById('codeDisplay').classList.add('closed');
 });
+*/
 
 document.getElementById('map').selectedIndex = "0";;
 document.getElementById('walls').checked = true;
 document.getElementById('obstacles').checked = true;
 
-
+/*
 document.getElementById('configureObstacles').addEventListener('click', function () {
   document.getElementById('obstaclesConfigurator').classList.remove('closed');
   var obstacles = JSON.stringify(sim.obstacles, null, 2);
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 });
-
+*/
 document.getElementById('obstaclesConfiguratorApply').addEventListener('click', function () {
   var json = document.getElementById('obstaclesConfiguratorEditor').value;
 
@@ -224,10 +345,11 @@ document.getElementById('obstaclesConfiguratorApply').addEventListener('click', 
   document.getElementById('obstaclesConfigurator').classList.add('closed');
 });
 
+/*
 document.getElementById('obstaclesConfiguratorClose').addEventListener('click', function () {
   document.getElementById('obstaclesConfigurator').classList.add('closed');
 });
-
+*/
 document.getElementById('obstaclesConfiguratordownload').addEventListener('click', function () {
   var obstaclesSpecs = document.getElementById('obstaclesConfiguratorEditor').value
 
@@ -298,9 +420,9 @@ document.getElementById('resetReset').addEventListener('click', function () {
   sim.robotStates._y = document.getElementById('rs-display-yPos').value;
   sim.robotStates._angle = document.getElementById('rs-display-angle').value;
   */
-  sim.robotStates._x = getSlider('rs-display-xPos');
-  sim.robotStates._x = getSlider('rs-display-yPos');
-  sim.robotStates._x = getSlider('rs-display-angle');
+  sim.robotStates._x = getSliderVal('rs-display-xPos');
+  sim.robotStates._y = getSliderVal('rs-display-yPos');
+  sim.robotStates._angle = getSliderVal('rs-display-angle');
 })
 
 document.getElementById('move').addEventListener('click', function () {
@@ -312,9 +434,9 @@ document.getElementById('move').addEventListener('click', function () {
   var y = document.getElementById('rs-display-yPos').value;
   var angle = document.getElementById('rs-display-angle').value;
   */
-  var x = getSlider('rs-display-xPos');
-  var y = getSlider('rs-display-yPos');
-  var angle = getSlider('rs-display-angle');
+  var x = getSliderVal('rs-display-xPos');
+  var y = getSliderVal('rs-display-yPos');
+  var angle = getSliderVal('rs-display-angle');
 
   setPos(x, y, angle, reset = true);
   sim.robotStates.penDown = tmp;
@@ -341,83 +463,190 @@ document.getElementById('reset').addEventListener('click', function () {
 
 /* ----------- START: define display toggles -----------*/
 
+console.debug("setup toggle buttons");
 
+// Adding to this then also requires a setupToggleHandler step
 var rs_display_lookup = {
-  "roboSim-display-world": "#field",
+  "roboSim-display-world": "#worldview",
   "roboSim-display-chart": "#charter",
   "roboSim-display-output": "#output",
-  "roboSim-display-sensor-values": "#readings",
-  "roboSim-display-sensor-array": "#sensorArray"
+  "roboSim-display-sensor-values": "#robosim-fieldset-instrumentation",
+  "roboSim-display-sensor-array": "#sensorArray",
+  "roboSim-display-noise-controls": "#noise_controls",
+  "roboSim-display-config-controls": "#config_controls",
+  "roboSim-pen-updown": null,
+  "roboSim-display-code": "#codeDisplay",
+  "roboSim-display-robot-configurator": "#robotConfigurator",
+  "roboSim-display-obstacles-configurator": "#obstaclesConfigurator",
+  "roboSim-display-positioning": "#position_controls",
+  "roboSim-display-sim-controls": "#simulator_controls"
+  //"roboSim-display-display-controls": "#roboSim-display-show-controls"
 };
 
-function _setupToggleUpdate(toggleElement) {
+function _setupToggleUpdate(toggleElement, obj = null, attr = null) {
+  // Event handler to update a toggle element
   toggleElement.addEventListener('x-switch:update', function (e) {
     var target = rs_display_lookup[e.target.id];
     var button = "#int--" + e.target.id;
     if (target) {
       var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
-      if (flag) document.querySelector(target).style.display = 'block';
-      else document.querySelector(target).style.display = 'none';
+      if (flag) {
+        document.querySelector(target).style.display = 'block';
+        if ((obj) && (attr)) obj[attr] = true;
+      }
+      else {
+        document.querySelector(target).style.display = 'none';
+        if ((obj) && (attr)) obj[attr] = false;
+      }
     }
   });
 }
 
-function _setUpToggleOff(toggleElement) {
+function _setUpToggleOff(toggleElement, obj = null, attr = null) {
   toggleElement.addEventListener('x-switch:off', function (e) {
     var target = rs_display_lookup[e.target.id];
-    flag = false;
+    if ((obj) && (attr)) obj[attr] = false;
     if (target) document.querySelector(target).style.display = 'none';
   });
 }
 
-function setupToggleHandler(el, flag, target) {
-  var toggleElement = document.querySelector(el);
+// TO DO - the toggle handlers can perhaps be reconciled?
+function setupToggleHandler(el, obj = null, attr = null) {
+  var toggleElement = document.getElementById(el);
+  var target;
+  if (rs_display_lookup.hasOwnProperty(el))
+    target = rs_display_lookup[el];
+  else target = null;
   toggleElement.addEventListener('x-switch:on', function (e) {
-    flag = true;
+    if ((obj) && (attr)) obj[attr] = true;
     if (target) document.querySelector(target).style.display = 'block';
   });
-  _setupToggleUpdate(toggleElement);
-  _setUpToggleOff(toggleElement);
+  _setupToggleUpdate(toggleElement, obj, attr);
+  _setUpToggleOff(toggleElement, obj, attr);
 }
 
-function setupChartToggleHandler(el, flag, target) {
-  var toggleElement = document.querySelector(el);
+/* to delete
+function setupChartToggleHandler(el, obj = null, attr = null) {
+  var toggleElement = document.getElementById(el);
+  var target;
+  if (rs_display_lookup.hasOwnProperty(el))
+    target = rs_display_lookup[el];
+  else target = null;
   toggleElement.addEventListener('x-switch:on', function (e) {
-    flag = true;
+    if ((obj) && (attr)) obj[attr] = true;
     if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
     if (target) document.querySelector(target).style.display = 'block';
   });
-  _setupToggleUpdate(toggleElement);
-  _setUpToggleOff(toggleElement);
+  _setupToggleUpdate(toggleElement, obj, attr);
+  _setUpToggleOff(toggleElement, obj, attr);
+}
+*/
+/* -- --*/
+
+console.debug("setup viewer buttons");
+function setupObstaclesConfigView() {
+  const obstacles = JSON.stringify(sim.obstacles, null, 2);
+  document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
-setupToggleHandler('#roboSim-display-output', sim.showOutput, "#output")
-setupToggleHandler('#roboSim-display-sensor-values', sim.showSensorValues, "#readings")
-setupToggleHandler('#roboSim-display-sensor-array', sim.showSensorArray, "#sensorArray")
-setupChartToggleHandler('#roboSim-display-chart', sim.showChart, "#charter")
-setupToggleHandler('#roboSim-display-world', sim.showWorld, "#field")
-setupToggleHandler('#roboSim-pen-updown', sim.robotStates.penDown, null)
-setupToggleHandler('#roboSim-state-collaborative', sim.collaborative, null)
+// TO DO - this should update whwnever we download a program 
+// to the simulator
+function setupCodeView() {
+  var _code = element.prog;
+  // Strip out any prefix magic line
+  _code = _code.split('\n').filter(function (line) {
+    return line.indexOf("%") != 0;
+  }).join('\n')
+  //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
+  document.getElementById('codeDisplayCode').textContent = _code;
+}
+
+function setupRobotConfigView() {
+  console.debug("Trying robot config")
+  const code = JSON.stringify(sim.robotSpecs, null, 2);
+  document.getElementById('robotConfiguratorEditor').value = code;
+}
+
+function setupChartView() {
+  if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
+}
+
+function setupPendownView(){
+  sim.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
+}
+
+function setupFunctionToggleHandler(el, fn, obj = null, attr = null) {
+  var toggleElement = document.getElementById(el);
+  var target;
+  if (rs_display_lookup.hasOwnProperty(el))
+    target = rs_display_lookup[el];
+  else target = null;
+  toggleElement.addEventListener('x-switch:on', function (e) {
+    if ((obj) && (attr)) obj[attr] = true;
+    console.debug("try generic fn")
+    fn();
+    console.debug("done generic fn")
+    if (target) document.querySelector(target).style.display = 'block';
+  });
+  _setupToggleUpdate(toggleElement, obj, attr);
+  _setUpToggleOff(toggleElement, obj, attr);
+}
+/* to delete
+function setupObstaclesToggleHandler(el, obj = null, attr = null) {
+  var toggleElement = document.getElementById(el);
+  var target;
+  if (rs_display_lookup.hasOwnProperty(el))
+    target = rs_display_lookup[el];
+  else target = null;
+  toggleElement.addEventListener('x-switch:on', function (e) {
+    if ((obj) && (attr)) obj[attr] = true;
+    setupObstaclesConfigView();
+    if (target) document.querySelector(target).style.display = 'block';
+  });
+  _setupToggleUpdate(toggleElement, obj, attr);
+  _setUpToggleOff(toggleElement, obj, attr);
+}
+*/
+
+// TO DO iterate through these; add and and el to rs_display_lookup
+// TO DO one line to register things with rs_display_lookup
+// If we take the above approach, everything will be configured just from setup array
+setupToggleHandler("roboSim-display-output");
+setupToggleHandler("roboSim-display-sensor-values");
+setupToggleHandler("roboSim-display-sensor-array");
+setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
+setupToggleHandler("roboSim-display-world");
+setupToggleHandler("roboSim-display-positioning");
+setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
+setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView);
+setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView);
+setupToggleHandler("roboSim-display-noise-controls");
+setupToggleHandler("roboSim-display-config-controls");
+setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView);
+setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
+setupToggleHandler("roboSim-display-sim-controls");
+//setupToggleHandler('roboSim-display-display-controls');
 
 
+console.debug("Done: toggle buttons");
 /*----------- END: define display toggles -----------*/
 
 
 
-document.getElementById('download').addEventListener('click', function () {
-  var hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:text/x-python;base64,' + btoa(element.prog);
-  hiddenElement.target = '_blank';
-  hiddenElement.download = 'robot.py';
-  hiddenElement.dispatchEvent(new MouseEvent('click'));
+document.getElementById("download").addEventListener("click", function () {
+  var hiddenElement = document.createElement("a");
+  hiddenElement.href = "data:text/x-python;base64," + btoa(element.prog);
+  hiddenElement.target = "_blank";
+  hiddenElement.download = "robot.py";
+  hiddenElement.dispatchEvent(new MouseEvent("click"));
 });
 
-document.getElementById('upload').addEventListener('click', function () {
+document.getElementById("upload").addEventListener("click", function () {
   var hiddenElement = document.createElement('input');
-  hiddenElement.type = 'file';
-  hiddenElement.accept = 'text/x-python,.py';
-  hiddenElement.dispatchEvent(new MouseEvent('click'));
-  hiddenElement.addEventListener('change', function (e) {
+  hiddenElement.type = "file";
+  hiddenElement.accept = "text/x-python,.py";
+  hiddenElement.dispatchEvent(new MouseEvent("click"));
+  hiddenElement.addEventListener("change", function (e) {
     var reader = new FileReader();
     reader.onload = function () {
       element.prog = this.result;
@@ -426,13 +655,13 @@ document.getElementById('upload').addEventListener('click', function () {
   });
 });
 
-document.getElementById('robotPreconfig').addEventListener('change', function () {
+document.getElementById("robotPreconfig").addEventListener("change", function () {
   var robotSpec = sim.default_robot_spec;
   var preconfig = document.getElementById('robotPreconfig').value;
   //TO DO - need to capture current robot location then reset to that
-  if (preconfig == 'Default_Robot') {
+  if (preconfig == "Default_Robot") {
     robotSpecs = sim.default_robot_spec;
-  } else if ((preconfig == 'Small_Robot') || (preconfig == 'Small_Robot_Wide_Eyes')) {
+  } else if ((preconfig == "Small_Robot") || (preconfig == "Small_Robot_Wide_Eyes")) {
     robotSpecs = {
       "wheeldiameter": 28,
       "wheelSpacing": 90,
@@ -516,6 +745,7 @@ function init_background(background, pos, clearObstacles = true, clearObstaclesL
   setPos(pos[0], pos[1], pos[2], pos[3]);
 }
 
+console.debug("Initialise background loader.")
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
 document.getElementById('map').addEventListener('change', function () {
   var map = document.getElementById('map').value;
@@ -613,6 +843,7 @@ document.getElementById('map').addEventListener('change', function () {
   }
 });
 
+/* to delete
 document.getElementById('robotConfiguratorOpen').addEventListener('click', function () {
   document.getElementById('robotConfiguratorEditor').value = JSON.stringify(sim.robotSpecs, null, 2);
   document.getElementById('robotConfigurator').classList.remove('closed');
@@ -633,6 +864,7 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   sim.bigDraw();
   document.getElementById('robotConfigurator').classList.add('closed');
 });
+*/
 
 document.getElementById('robotConfiguratordownload').addEventListener('click', function () {
   var robotSpecs = document.getElementById('robotConfiguratorEditor').value
@@ -661,6 +893,7 @@ document.getElementById('robotConfiguratorupload').addEventListener('click', fun
   });
 });
 
+// TO DO - what is this for?
 function openWindow(url) {
   var win = document.getElementById('window');
   var content = win.getElementsByClassName('content')[0];
@@ -807,8 +1040,8 @@ var interruptHandler = function (susp) {
 };
 
 function stopit(hard = true) {
-  document.getElementById("sim_runStatus").classList.remove("sim-running")
-  document.getElementById("sim_runStatus").classList.add("sim-stopped")
+  document.getElementById("sim_runStatus").classList.remove("toggle-button-on")
+  document.getElementById("sim_runStatus").classList.add("toggle-button-off")
   sim.stopAnimation();
   Sk.running = false;
 
@@ -820,8 +1053,8 @@ function stopit(hard = true) {
 }
 
 function runit() {
-  document.getElementById('sim_runStatus').classList.remove('sim-stopped')
-  document.getElementById('sim_runStatus').classList.add('sim-running')
+  document.getElementById('sim_runStatus').classList.remove('toggle-button-off')
+  document.getElementById('sim_runStatus').classList.add('toggle-button-on')
   // This function runs when the simulator Run button is clicked 
   if (typeof Sk.hardInterrupt != 'undefined') {
     delete Sk.hardInterrupt;
@@ -881,6 +1114,8 @@ function runit() {
       var mypre = document.getElementById("output");
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+
+      if (uiSettings['audio']['error']) rs_tone(0.4, 50, type = 'sawtooth');
     }
   );
 }
@@ -920,8 +1155,12 @@ document.getElementById('clearChart').addEventListener('click', function () {
 })
 
 
-/* Initialise display */
+/* Initialise simulator user interface
+Check the simulator UI settings and render areas accordingly.
+*/
 // Can we use the same event over and over?
+
+/* to delete
 var toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-display-world").dispatchEvent(toggleCheckEvent);
 toggleCheckEvent = new CustomEvent("x-switch:update");
@@ -933,7 +1172,22 @@ document.getElementById("roboSim-display-sensor-values").dispatchEvent(toggleChe
 toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-display-sensor-array").dispatchEvent(toggleCheckEvent);
 toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-noise-controls").dispatchEvent(toggleCheckEvent);
+toggleCheckEvent = new CustomEvent("x-switch:update");
+document.getElementById("roboSim-display-world-controls").dispatchEvent(toggleCheckEvent);
+
+toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-pen-updown").dispatchEvent(toggleCheckEvent);
+*/
+
+function initialise_display_element(el) {
+  var toggleCheckEvent = new CustomEvent("x-switch:update");
+  document.getElementById(el).dispatchEvent(toggleCheckEvent);
+}
+
+for (const el in rs_display_lookup)
+  initialise_display_element(el);
+
 
 // For some reason, we need this to let py retrieve vals from js sim
 // What it seems to do in bring a sim var into scope?
@@ -941,3 +1195,71 @@ var _prog = element.prog;
 element.prog = 'import ev3dev2_glue as glue';
 runit();
 element.prog = _prog;
+
+
+// Events on whole simulator
+
+const rs_root = document.getElementById("roboSim_root");
+
+// Make labels click hide/reveal the fieldset contents
+var legends = rs_root.getElementsByTagName("legend");
+
+for (var i = 0; i < legends.length; i++)
+  legends[i].addEventListener('click', function (e) {
+    var nextsibling = e.target.nextElementSibling;
+    if (nextsibling.classList.contains('rs-closed')) {
+      nextsibling.classList.remove('rs-closed');
+      nextsibling.classList.add('rs-open');
+    } else {
+      nextsibling.classList.remove('rs-open');
+      nextsibling.classList.add('rs-closed');
+    }
+  });
+
+
+// Keyboard shortcuts
+
+function rs_click_togglebutton(elID, state = "true", toggler = "false") {
+  var clicker = document.querySelector("#int--" + elID);
+  // I have no idea... toggler is always false whatever I pass?!
+  // What am I missing?!
+  console.debug(toggler, toggler=="true" )
+  if (toggler=="true") {
+    console.debug("toggling...")
+    var checked = clicker.getAttribute("aria-checked") === "true";
+    clicker.setAttribute("aria-checked", checked ? "false" : "true");
+  } else {
+    clicker.setAttribute("aria-checked", state==="true" ? "true" : "false");
+  }
+  var toggleClickEvent = new CustomEvent("x-switch:update");
+  document.getElementById(elID).dispatchEvent(toggleClickEvent);
+}
+
+uiSettings["enableKeyboardShortcuts"] = false;
+
+rs_root.addEventListener("mouseenter", function (e) {
+  Jupyter.keyboard_manager.disable();
+  uiSettings["enableKeyboardShortcuts"] = true;
+});
+
+document.addEventListener("keydown", function (e) {
+  var key = e.key;
+  if (uiSettings["enableKeyboardShortcuts"]) {
+    switch (key) {
+      case 'R': rs_click_togglebutton("roboSim-display-runstop"); break;
+      case 'S': rs_click_togglebutton("roboSim-display-runstop", state = "false"); break;
+      case 'p': rs_click_togglebutton("roboSim-pen-updown", toggler = "true"); break;
+      case 'X': rs_click_togglebutton("roboSim-display-positioning", toggler = "true"); break;
+    }
+  }
+})
+
+rs_root.addEventListener("mouseleave", function (e) {
+  uiSettings["enableKeyboardShortcuts"] = false;
+  Jupyter.keyboard_manager.enable();
+});
+
+
+// All done...
+
+console.debug("studio.js loaded");

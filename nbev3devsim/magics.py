@@ -259,9 +259,10 @@ Parameters requiring an argument:
         self.check_element(args.sim, args.sensorvals, "roboSim-display-sensor-values")
         self.check_element(args.sim, args.world, "roboSim-display-world")
         self.check_element(args.sim, args.noisecontrols, "roboSim-display-noise-controls")
-        self.check_element(args.sim, args.worldcontrols, "roboSim-display-config-controls")
-
-        #self.showHide(args.sim, args.hide, "roboSim-display-show-controls")
+        self.check_element(args.sim, args.configcontrols, "roboSim-display-config-controls")
+        self.check_element(args.sim, args.hide, "roboSim-display-sim-controls")
+        self.check_element(args.sim, args.positioning, "roboSim-display-positioning")
+        
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -298,8 +299,10 @@ Parameters requiring an argument:
         "--array", "-A", action="store_true", help="Show sensor array"
     )
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--worldcontrols", "-Z", action="store_true", help="Show world controls")
+    @magic_arguments.argument("--configcontrols", "-Z", action="store_true", help="Show config controls")
+    @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
+    @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
         "--sensorvals", "-V", action="store_true", help="Show sensor values"
     )
@@ -381,8 +384,10 @@ Parameters requiring an argument:
         "--array", "-A", action="store_true", help="Show sensor array"
     )
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--worldcontrols", "-Z", action="store_true", help="Show world controls")
+    @magic_arguments.argument("--configcontrols", "-Z", action="store_true", help="Show config controls")
+    @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
+    @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
         "--sensorvals", "-V", action="store_true", help="Show sensor values"
     )
@@ -462,8 +467,10 @@ from ev3dev2.sound import Sound
         "--array", "-A", action="store_true", help="Show sensor array"
     )
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--worldcontrols", "-Z", action="store_true", help="Show world controls")
+    @magic_arguments.argument("--configcontrols", "-Z", action="store_true", help="Show config controls")
+    @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
+    @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
         "--sensorvals", "-V", action="store_true", help="Show sensor values"
     )

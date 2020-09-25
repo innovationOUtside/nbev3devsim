@@ -13,7 +13,7 @@ setup(
         'pandas',
         'seaborn',
         'tqdm',
-        'empinken'
+        'nb-extension-empinken'
     ],
     data_files=[
         # like `jupyter nbextension install --sys-prefix`

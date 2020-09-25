@@ -549,6 +549,8 @@ function setupObstaclesConfigView() {
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
+// TO DO - this should update whwnever we download a program 
+// to the simulator
 function setupCodeView() {
   var _code = element.prog;
   // Strip out any prefix magic line
@@ -567,6 +569,10 @@ function setupRobotConfigView() {
 
 function setupChartView() {
   if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
+}
+
+function setupPendownView(){
+  sim.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
 }
 
 function setupFunctionToggleHandler(el, fn, obj = null, attr = null) {
@@ -616,7 +622,7 @@ setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfi
 setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView);
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
-setupToggleHandler("roboSim-pen-updown", sim.robotStates, "penDown");
+setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView);
 setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
 setupToggleHandler("roboSim-display-sim-controls");
 //setupToggleHandler('roboSim-display-display-controls');
@@ -1213,32 +1219,44 @@ for (var i = 0; i < legends.length; i++)
 
 // Keyboard shortcuts
 
-function rs_click_togglebutton(elID, state="true") {
-  const clicker = document.querySelector("#int--" + elID);
-  clicker.setAttribute('aria-checked', state);
+function rs_click_togglebutton(elID, state = "true", toggler = "false") {
+  var clicker = document.querySelector("#int--" + elID);
+  // I have no idea... toggler is always false whatever I pass?!
+  // What am I missing?!
+  console.debug(toggler, toggler=="true" )
+  if (toggler=="true") {
+    console.debug("toggling...")
+    var checked = clicker.getAttribute("aria-checked") === "true";
+    clicker.setAttribute("aria-checked", checked ? "false" : "true");
+  } else {
+    clicker.setAttribute("aria-checked", state==="true" ? "true" : "false");
+  }
   const toggleClickEvent = new CustomEvent("x-switch:update");
   document.getElementById(elID).dispatchEvent(toggleClickEvent);
 }
 
-uiSettings['enableKeyboardShortcuts'] = false;
+uiSettings["enableKeyboardShortcuts"] = false;
 
-rs_root.addEventListener('mouseenter', function (e) {
+rs_root.addEventListener("mouseenter", function (e) {
   Jupyter.keyboard_manager.disable();
-  uiSettings['enableKeyboardShortcuts'] = true;
+  uiSettings["enableKeyboardShortcuts"] = true;
 });
 
-document.addEventListener('keydown', function (e) {
+document.addEventListener("keydown", function (e) {
   const key = e.key;
-  if (uiSettings['enableKeyboardShortcuts']) {
-    if (key === 'R') {
-      rs_click_togglebutton('roboSim-display-runstop');
+  if (uiSettings["enableKeyboardShortcuts"]) {
+    switch (key) {
+      case 'R': rs_click_togglebutton("roboSim-display-runstop"); break;
+      case 'S': rs_click_togglebutton("roboSim-display-runstop", state = "false"); break;
+      case 'p': rs_click_togglebutton("roboSim-pen-updown", toggler = "true"); break;
+      case 'X': rs_click_togglebutton("roboSim-display-positioning", toggler = "true"); break;
     }
   }
 })
 
-rs_root.addEventListener('mouseleave', function (e) {
+rs_root.addEventListener("mouseleave", function (e) {
+  uiSettings["enableKeyboardShortcuts"] = false;
   Jupyter.keyboard_manager.enable();
-  uiSettings['enableKeyboardShortcuts'] = true;
 });
 
 

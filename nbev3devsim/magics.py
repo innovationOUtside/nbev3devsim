@@ -216,9 +216,9 @@ bright_sound('square', 1.5);"""
         self.check_element(args.sim, args.sensorvals, "roboSim-display-sensor-values")
         self.check_element(args.sim, args.world, "roboSim-display-world")
         self.check_element(args.sim, args.noisecontrols, "roboSim-display-noise-controls")
-        self.check_element(args.sim, args.worldcontrols, "roboSim-display-world-controls")
+        self.check_element(args.sim, args.worldcontrols, "roboSim-display-config-controls")
 
-        self.showHide(args.sim, args.hide, "roboSim-display-show-controls")
+        #self.showHide(args.sim, args.hide, "roboSim-display-show-controls")
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -248,7 +248,6 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
-    @magic_arguments.argument("--hide", "-H", action="store_true", help="Show controls")
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument(
@@ -331,7 +330,6 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
-    @magic_arguments.argument("--hide", "-H", action="store_true", help="Show controls")
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument(
@@ -363,6 +361,9 @@ from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 from ev3dev2.sound import Sound
+
+#----- YOUR CODE BELOW HERE -----
+
 """
         if args.preview  or cell is None:
             print(preload)
@@ -409,7 +410,6 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument(
         "--quiet", "-q", action="store_true", help="No audio confirmation"
     )
-    @magic_arguments.argument("--hide", "-H", action="store_true", help="Show controls")
     @magic_arguments.argument("--chart", "-c", action="store_true", help="Show chart")
     @magic_arguments.argument("--output", "-O", action="store_true", help="Show output")
     @magic_arguments.argument(
@@ -454,6 +454,9 @@ ultrasonic = UltrasonicSensor(INPUT_1)
 colorLeft = ColorSensor(INPUT_2)
 colorRight = ColorSensor(INPUT_3)
 gyro = GyroSensor(INPUT_4)
+
+# ----- YOUR CODE BELOW HERE -----
+
 '''
         if args.preview or cell is None:
             print(preload)

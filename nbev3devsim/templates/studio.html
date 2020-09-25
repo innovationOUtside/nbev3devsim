@@ -1,20 +1,51 @@
-<div id="roboSim_root" class="roboSim" onmouseover="Jupyter.keyboard_manager.disable()"
-  onmouseout="Jupyter.keyboard_manager.enable()">
+<div id="roboSim_root" class="roboSim">
+
+  <div>
+    <toggle-switch id="roboSim-display-sim-controls" type="button" initial="off">Simulator
+    </toggle-switch>
+    <toggle-switch id="roboSim-display-config-controls" type="button" initial="off">Settings
+    </toggle-switch>
+    <toggle-switch id="roboSim-display-output" type="button" initial="off">Output</toggle-switch>
+    <toggle-switch id="roboSim-display-noise-controls" type="button" initial="off">Noise controls
+    </toggle-switch>
+    <toggle-switch id="roboSim-display-sensor-values" type="button" initial="off">Instrumentation
+    </toggle-switch>
+    <toggle-switch id="roboSim-display-sensor-array" type="button" initial="off">Sensor arrays</toggle-switch>
+    <toggle-switch id="roboSim-display-chart" type="button" initial="off">Chart</toggle-switch>
+  </div>
+  <!--
+  <toggle-switch id="rs-test1" on="Show" off="Hide" initial="off">test1</toggle-switch>
+
+  <toggle-switch id="rs-test2" type="switch" initial="off">test2</toggle-switch>
+
+  <toggle-switch id="rs-test3" type="button" initial="off">test3</toggle-switch>
+
+
+  <fieldset class="rs-grouped-controls" id="roboSim-display-ui-controls">
+    <legend>UI controls</legend>
+    <div class="">
+      <toggle-switch id="roboSim-display-display-controls" on="Show" off="Hide" initial="off">Display
+      </toggle-switch>
+      <toggle-switch id="roboSim-display-sim-controls" on="Show" off="Hide" initial="off">Simulator
+      </toggle-switch>
+    </div>
+  </fieldset>
 
   <fieldset class="rs-grouped-controls" id="roboSim-display-show-controls">
     <legend>Display controls</legend>
     <div class="rs-grouped-controlset">
+      <toggle-switch id="roboSim-display-config-controls" on="Show" off="Hide" initial="off">Settings
+      </toggle-switch>
       <toggle-switch id="roboSim-display-output" on="Show" off="Hide" initial="off">Output</toggle-switch>
-      <toggle-switch id="roboSim-display-noise-controls" on="Show" off="Hide" initial="off">Noise Controls
+      <toggle-switch id="roboSim-display-noise-controls" on="Show" off="Hide" initial="off">Noise controls
       </toggle-switch>
-      <toggle-switch id="roboSim-display-world-controls" on="Show" off="Hide" initial="on">World Controls
+      <toggle-switch id="roboSim-display-sensor-values" on="Show" off="Hide" initial="off">Instrumentation
       </toggle-switch>
-      <toggle-switch id="roboSim-display-sensor-values" on="Show" off="Hide" initial="off">Sensor Values</toggle-switch>
-      <toggle-switch id="roboSim-display-sensor-array" on="Show" off="Hide" initial="off">Sensor Array</toggle-switch>
+      <toggle-switch id="roboSim-display-sensor-array" on="Show" off="Hide" initial="off">Sensor arrays</toggle-switch>
       <toggle-switch id="roboSim-display-chart" on="Show" off="Hide" initial="off">Chart</toggle-switch>
-      <toggle-switch id="roboSim-state-collaborative" on="On" off="Off" initial="off">Collaborative</toggle-switch>
     </div>
   </fieldset>
+-->
 
   <div class="row">
     <div id="editor">
@@ -24,29 +55,31 @@
 
   <fieldset class="rs-grouped-controls" id="charter">
     <legend>Chart</legend>
-
-    <button id="clearChart">Clear Chart</button>
-    <div id="chartTraces">
-      <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour" checked>Colour</label>
-      <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light" checked>Left
-        light</label>
-      <label class="checkboxLabel"><input type="checkbox" id="chart_right_light" name="chart_right_light" checked>Right
-        light</label>
-      <label class="checkboxLabel"><input type="checkbox" id="chart_ultrasound"
-          name="chart_ultrasound">Ultrasonic</label>
-      <label class="checkboxLabel"><input type="checkbox" id="chart_gyro" name="chart_gyro">Gyro</label>
-      <label class="checkboxLabel"><input type="checkbox" id="chart_left_wheel" name="chart_left_wheel">Left
-        wheel</label>
-      <label class="checkboxLabel"><input type="checkbox" id="chart_right_wheel" name="chart_right_wheel">Right
-        wheel</label>
+    <div class="">
+      <button id="clearChart">Clear Chart</button>
+      <div id="chartTraces">
+        <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour" checked>Colour</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light" checked>Left
+          light</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_right_light" name="chart_right_light"
+            checked>Right
+          light</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_ultrasound"
+            name="chart_ultrasound">Ultrasonic</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_gyro" name="chart_gyro">Gyro</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_left_wheel" name="chart_left_wheel">Left
+          wheel</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_right_wheel" name="chart_right_wheel">Right
+          wheel</label>
+      </div>
+      <div id="plotlyDiv"></div>
     </div>
-    <div id="plotlyDiv"></div>
   </fieldset>
 
   <fieldset class="rs-grouped-controls" id="robosim-fieldset-instrumentation">
     <legend>Instrumentation</legend>
 
-    <div id="readings">Port Values:
+    <div id="readings">Port values:
       <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
       </div>
       <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
@@ -65,8 +98,10 @@
   <fieldset id='sensorArray' class='rightFlex rs-grouped-controls'>
     <legend>Sensor arrays</legend>
 
-    <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
-    <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
+    <div class="">
+      <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
+      <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
+    </div>
   </fieldset>
 
   <fieldset class="rs-grouped-controls" id="noise_controls">
@@ -83,58 +118,40 @@
       noise</span></value-slider>
   </fieldset>
 
-  <fieldset class="rs-grouped-controls" id="robot_controls">
-    <legend>Noise controls</legend>
-
-    <div class="leftFlex">
-      <span id='sim_runStatus' class="sim-stopped"></span>
-      <toggle-switch id="roboSim-display-runstop" on="Run" off="Stop" initial="off">Sim</span></toggle-switch>
-      <!--<button id="showCode">Show Code</button>-->
-      <toggle-switch id="roboSim-display-code" on="Show" off="Hide" initial="off">Show Code</toggle-switch>
-
-      <toggle-switch id="roboSim-display-world" on="Show" off="Hide" initial="on">World</toggle-switch>
-      <toggle-switch id="roboSim-pen-updown" on="down" off="up" initial="off">Pen</toggle-switch>
-      <select id="rs-display-penColor">
-        <option>red</option>
-        <option>orange</option>
-        <option>green</option>
-      </select>
-      <button id="clearTrace">Clear Trace</button>
-    </div>
-  </fieldset>
-
   <fieldset class="rs-grouped-controls" id="codeDisplay">
     <legend>Code display</legend>
 
-    <!--<textarea id='codeDisplayCode'></textarea>-->
-    <pre><code id='codeDisplayCode' class='language-python'></code></pre>
-    <div class="buttons">
-      <div class="leftFlex">
-        <button id='codeFromClipboard'>Paste</button>
-        <button id="download">Save</button>
-        <!--<button id="codeDisplayClose">Close</button>-->
-      </div>
-      <!-- what's the window? Docs?-->
-      <div id="window">
-        <div class="content"></div>
-        <!--<div class="windowRow">
+    <div class="">
+      <!--<textarea id='codeDisplayCode'></textarea>-->
+      <pre><code id='codeDisplayCode' class='language-python'></code></pre>
+      <div class="buttons">
+        <div class="leftFlex">
+          <button id='codeFromClipboard'>Paste</button>
+          <button id="download">Save</button>
+          <!--<button id="codeDisplayClose">Close</button>-->
+        </div>
+        <!-- what's the window? Docs?-->
+        <div id="window">
+          <div class="content"></div>
+          <!--<div class="windowRow">
             <button id="closeWindow">Close</button>
           </div>-->
+        </div>
       </div>
     </div>
   </fieldset>
 
-  <fieldset class="rs-grouped-controls" id="world_controls">
-    <legend>World controls</legend>
+  <fieldset class="rs-grouped-controls" id="config_controls">
+    <legend>Settings</legend>
 
-    <div class="leftFlex">
+    <div class="">
       <select id="robotPreconfig">
         <option>Default_Robot</option>
         <option>Small_Robot</option>
         <option>Small_Robot_Wide_Eyes</option>
       </select>
       <!--<button id="robotConfiguratorOpen">Configure Robot</button>-->
-      <toggle-switch id="roboSim-display-robot-configurator" on="Show" off="Hide" initial="off">Robot Config
+      <toggle-switch id="roboSim-display-robot-configurator" type="button" initial="off">Robot config
       </toggle-switch>
 
       <select id="map">
@@ -169,53 +186,58 @@
       </select>
       <button id="upload">Load</button>
       <!--<button id="configureObstacles">Obstacles...</button>-->
-      <toggle-switch id="roboSim-display-obstacles-configurator" on="Show" off="Hide" initial="off">Obstacles Config
+      <toggle-switch id="roboSim-display-obstacles-configurator" type="button" initial="off">Obstacles config
       </toggle-switch>
+      <toggle-switch id="roboSim-state-collaborative" on="On" off="Off" initial="off">Collaborative</toggle-switch>
     </div>
   </fieldset>
 
   <fieldset class="rs-grouped-controls" id="robotConfigurator">
     <legend>Robot configurator</legend>
 
-    <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>
-    <div><i>* Dimensions are in mm and degrees.</i></div>
-    <div class="buttons">
-      <div class="leftFlex">
-        <button id="robotConfiguratorApply">Apply</button>
-        <!--<button id="robotConfiguratorCancel">Cancel</button>-->
-      </div>
+    <div class="">
+      <textarea id="robotConfiguratorEditor" spellcheck="false"></textarea>
+      <div><i>* Dimensions are in mm and degrees.</i></div>
+      <div class="buttons">
+        <div class="leftFlex">
+          <button id="robotConfiguratorApply">Apply</button>
+          <!--<button id="robotConfiguratorCancel">Cancel</button>-->
+        </div>
 
-      <div class="rightFlex">
-        <button id="robotConfiguratorupload">Load</button>
-        <button id="robotConfiguratordownload">Save</button>
-      </div>
+        <div class="">
+          <button id="robotConfiguratorupload">Load</button>
+          <button id="robotConfiguratordownload">Save</button>
+        </div>
 
+      </div>
     </div>
   </fieldset>
 
   <fieldset class="rs-grouped-controls" id="obstaclesConfigurator">
     <legend>Obstacles configurator</legend>
 
-    <div class="content">
-      <div><input type="checkbox" id="showRays">Show ultrasonic rays</div>
-      <div><input type="checkbox" id="walls" checked>Walls around map</div>
-      <div><input type="checkbox" id="obstacles" checked>Obstacles (format [x, y, w, h]</div>
-      <textarea id="obstaclesConfiguratorEditor" spellcheck="false"></textarea>
-    </div>
-    <div class="buttons">
-      <div class="leftFlex">
-        <button id="obstaclesConfiguratorApply">Apply</button>
-        <!--<button id="obstaclesConfiguratorClose">Close</button>-->
+    <div class="">
+      <div class="content">
+        <div><input type="checkbox" id="showRays">Show ultrasonic rays</div>
+        <div><input type="checkbox" id="walls" checked>Walls around map</div>
+        <div><input type="checkbox" id="obstacles" checked>Obstacles (format [x, y, w, h]</div>
+        <textarea id="obstaclesConfiguratorEditor" spellcheck="false"></textarea>
       </div>
-      <div class="rightFlex">
-        <select id="obstaclesPreset">
-          <option selected="selected">None</option>
-          <option>Central_post</option>
-          <option>Square_posts</option>
-          <option>Wall</option>
-        </select>
-        <button id="obstaclesConfiguratorupload">Upload File</button>
-        <button id="obstaclesConfiguratordownload">Download to File</button>
+      <div class="buttons">
+        <div class="leftFlex">
+          <button id="obstaclesConfiguratorApply">Apply</button>
+          <!--<button id="obstaclesConfiguratorClose">Close</button>-->
+        </div>
+        <div class="rightFlex">
+          <select id="obstaclesPreset">
+            <option selected="selected">None</option>
+            <option>Central_post</option>
+            <option>Square_posts</option>
+            <option>Wall</option>
+          </select>
+          <button id="obstaclesConfiguratorupload">Upload File</button>
+          <button id="obstaclesConfiguratordownload">Download to File</button>
+        </div>
       </div>
     </div>
   </fieldset>
@@ -223,25 +245,50 @@
   <fieldset class="rs-grouped-controls" id="simulator_controls">
     <legend>Simulator controls</legend>
 
-    <div class="leftFlex">
-      <button id="move">Move</button>
-      <button id="reset">Reset</button>
-      <button id="resetReset" style="display: none;">ResetReset</button>
-      <button id="randomLocation" style="display: none;">Random Location</button>
-      <value-slider class="rs-valueslider-group" id="rs-display-xPos" min="0" max="2362" initial="0">X</span>
-      </value-slider>
-      <value-slider class="rs-valueslider-group" id="rs-display-yPos" min="0" max="1143" initial="0">Y</span>
-      </value-slider>
-      <value-slider class="rs-valueslider-group" id="rs-display-angle" min="0" max="360" initial="0">Angle</span>
-      </value-slider>
+    <div class="">
+      <!--<button id="showCode">Show Code</button>-->
+      <toggle-switch id="roboSim-display-code" type="switch" initial="off">Code display</toggle-switch>
+      <toggle-switch id="roboSim-display-world" type="switch" initial="on">World</toggle-switch>
+      <toggle-switch id="roboSim-display-positioning" type="switch" initial="off">Positioning</toggle-switch>
+      <toggle-switch id="roboSim-pen-updown" on="down" off="up" initial="off" select="rs-display-penColor"
+        options="red,orange,green">Pen</toggle-switch>
+      <!--<select id="rs-display-penColor">
+        <option>red</option>
+        <option>orange</option>
+        <option>green</option>
+      </select>-->
+      <toggle-switch id="roboSim-display-runstop" on="Run" off="Stop" indicator="sim_runStatus" initial="off">Sim</span>
+      </toggle-switch>
+      <button id="clearTrace">Clear trace</button>
+    </div>
+  </fieldset>
+
+  <fieldset class="rs-grouped-controls" id="position_controls">
+    <legend>Position controls</legend>
+
+    <div class="">
+      <div>
+        <button id="move">Move</button>
+        <button id="reset">Reset</button>
+        <button id="resetReset" style="display: none;">ResetReset</button>
+        <button id="randomLocation" style="display: none;">Random location</button>
+      </div>
+      <div class="">
+        <value-slider class="rs-valueslider-group" id="rs-display-xPos" min="0" max="2362" initial="0">X</span>
+        </value-slider>
+        <value-slider class="rs-valueslider-group" id="rs-display-yPos" min="0" max="1143" initial="0">Y</span>
+        </value-slider>
+        <value-slider class="rs-valueslider-group" id="rs-display-angle" min="0" max="360" initial="0">Angle</span>
+        </value-slider>
+      </div>
       <!--<label for="rs-display-xPos">X</label><input type="number" id="rs-display-xPos" maxlength="4" size="5">
     <label for="rs-display-yPos">Y</label><input type="number" id="rs-display-yPos" maxlength="4" size="5">
     <label for="rs-display-angle">Angle</label><input type="number" id="rs-display-angle" maxlength="3" size="5">-->
     </div>
   </fieldset>
 
-  <fieldset class="rs-world" id="worldview">
-    <legend>Simulator World</legend>
+  <fieldset class="rs-grouped-controls rs-world" id="worldview">
+    <legend>Simulator world</legend>
 
     <div id="field"></div>
   </fieldset>

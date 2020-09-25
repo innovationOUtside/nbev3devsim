@@ -211,7 +211,7 @@ function EV3devSim(id) {
     }
 
     function initSensorArrayCtx(el) {
-      var ctx = self.sensorArrayLeft.getContext('2d');
+      var ctx = el.getContext('2d');
       ctx.webkitImageSmoothingEnabled = false;
       ctx.mozImageSmoothingEnabled = false;
       ctx.msImageSmoothingEnabled = false;
@@ -923,6 +923,13 @@ function EV3devSim(id) {
     self.timer = null;
   };
 
+  this.updateUIControls = function () {
+    document.getElementById('rs-display-xPos-slider').value = self.robotStates.x;
+    document.getElementById('rs-display-xPos-val').value = self.robotStates.x;
+    document.getElementById('rs-display-yPos-slider').value = self.robotStates.y;
+    document.getElementById('rs-display-yPos-val').value = self.robotStates.y;
+  }
+
   this.drawRobot = function () {
     self.foregroundCtx.save();
     self.foregroundCtx.translate(self.robotStates.x, self.robotStates.y);
@@ -933,6 +940,7 @@ function EV3devSim(id) {
       -self.ROBOT_Y_CENTER
     );
     self.foregroundCtx.restore();
+    self.updateUIControls()
   };
 
   this.drawObstacles = function () {
@@ -1267,7 +1275,7 @@ function EV3devSim(id) {
       //document.getElementById('xPos').value = self.robotStates.x;
       //document.getElementById('yPos').value = self.robotStates.y;
       setSliderVal("rs-display-xPos", self.robotStates.x);
-      setSliderVal("rs-display-yPos", self.robotStates.x);
+      setSliderVal("rs-display-yPos", self.robotStates.y);
 
       // redraw the scene with the new rect positions
       self.drawAll();

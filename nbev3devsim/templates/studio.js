@@ -107,24 +107,95 @@ class ToggleSwitch extends HTMLElement {
     const intID = `int--${this.id || 'x-switch-01'}`;
     const label = this.getAttribute('label') || this.innerHTML || 'MY LABEL';
     const initial = this.getAttribute('initial') === 'on' ? 'true' : 'false';
+    const element_type = this.getAttribute("type") || 'text';
 
-    this.innerHTML = `
-      <span class="rs-toggle-group">
-        <label for="${intID}" class="x-switch">${label}: </label>
-        <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch">
-          <span>${this.getAttribute('off') || 'Off'}</span>
-          <span>${this.getAttribute('on') || 'On'}</span>
-        </button>
-      </span>
-    `;
+    var indicator = this.getAttribute('indicator') || false;
+    if (indicator)
+      indicator = `<span id="${indicator}" class="toggle-button-${this.getAttribute('initial')}"></span>`
+    else
+      indicator = '';
+    var select = this.getAttribute('select') || false;
+    var selection = '';
+    if (select) {
+      var options = this.getAttribute('options') || false;
+      if (options) {
+        options = options.split(",");
+        selection = `<select id="${select}">`
+        for (var i = 0; i < options.length; i++)
+          selection = `${selection}<option>${options[i]}</option>`
+        selection = `${selection}</select>`
+      } else select = false;
+    }
+
+    /*
+  this.innerHTML = `
+  <span class="rs-toggle-group">
+    ${indicator}
+    <label for="${intID}" class="x-switch">${label} </label>
+    <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-text">
+      <span>${this.getAttribute('off') || 'Off'}</span>
+      <span>${this.getAttribute('on') || 'On'}</span>
+    </button>
+    ${selection}
+  </span>
+`;
+ 
+*/
+    console.debug("Create toggle type", element_type, intID)
+    switch (element_type) {
+      case "text":
+        this.innerHTML = `
+          <span class="rs-toggle-group">
+            ${indicator}
+            <label for="${intID}" class="x-switch">${label} </label>
+            <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-text">
+              <span>${this.getAttribute('off') || 'Off'}</span>
+              <span>${this.getAttribute('on') || 'On'}</span>
+            </button>
+            ${selection}
+          </span>
+        `;
+        this.classList.add("rs-toggle-text");
+        break;
+      case "button":
+        this.innerHTML = `
+          <span class="">
+            ${indicator}
+            <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-button">
+              ${label}
+            </button>
+            ${selection}
+          </span>
+        `;
+        this.classList.add("rs-toggle-button");
+        break;
+      case "switch":
+        this.innerHTML = `
+          <span class="rs-toggle-group">
+            ${indicator}
+            <label for="${intID}" class="x-switch">${label} </label>
+            <button role="switch" aria-checked="${initial}" id="${intID}" class="x-switch x-switch-switch">
+              <span>${this.getAttribute('off') || 'off'}</span>
+              <span>${this.getAttribute('on') || 'on'}</span>
+            </button>
+            ${selection}
+          </span>
+        `;
+        this.classList.add("rs-toggle-switch");
+        break;
+    }
 
     const button = this.querySelector('button');
+
+    if (select)
+      document.getElementById(select).disabled = button.getAttribute('aria-checked') === 'false';
 
     button.addEventListener('click', childEvent => {
       const checked = button.getAttribute('aria-checked') === 'true'; // Old state.
       const on = !checked; // New state.
 
       button.setAttribute('aria-checked', checked ? 'false' : 'true');
+      if (select) document.getElementById(select).disabled = checked;
 
       const eventName = `x-switch:${checked ? 'off' : 'on'}`
       const event = new CustomEvent(eventName, { detail: { childEvent, on } });
@@ -181,12 +252,29 @@ function setPos(x, y, angle, init = false, reset = false) {
 
 var sim = new EV3devSim('field');
 
+var uiSettings = {};
+
+uiSettings['audio'] = { 'error': true };
+
+/* Audio */
+
+var ctx = new AudioContext()
+function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
+  var o = ctx.createOscillator(); var g = ctx.createGain()
+  o.frequency.value = frequency; o.type = type
+  o.connect(g); g.connect(ctx.destination)
+  o.start(0)
+  g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration)
+}
+
+//------
+
 // Initialise additional components
 initSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
 initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise")
-initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover=true)
-initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover=true)
-initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover=true)
+initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover = true)
+initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
+initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
 
 // Set the default position from something?!
 setPos(1181, 571, 0);
@@ -375,19 +463,24 @@ document.getElementById('reset').addEventListener('click', function () {
 
 /* ----------- START: define display toggles -----------*/
 
+console.debug("setup toggle buttons");
+
 // Adding to this then also requires a setupToggleHandler step
 var rs_display_lookup = {
-  "roboSim-display-world": "#field",
+  "roboSim-display-world": "#worldview",
   "roboSim-display-chart": "#charter",
   "roboSim-display-output": "#output",
   "roboSim-display-sensor-values": "#robosim-fieldset-instrumentation",
   "roboSim-display-sensor-array": "#sensorArray",
   "roboSim-display-noise-controls": "#noise_controls",
-  "roboSim-display-world-controls": "#world_controls",
+  "roboSim-display-config-controls": "#config_controls",
   "roboSim-pen-updown": null,
   "roboSim-display-code": "#codeDisplay",
   "roboSim-display-robot-configurator": "#robotConfigurator",
-  "roboSim-display-obstacles-configurator": "#obstaclesConfigurator"
+  "roboSim-display-obstacles-configurator": "#obstaclesConfigurator",
+  "roboSim-display-positioning": "#position_controls",
+  "roboSim-display-sim-controls": "#simulator_controls"
+  //"roboSim-display-display-controls": "#roboSim-display-show-controls"
 };
 
 function _setupToggleUpdate(toggleElement, obj = null, attr = null) {
@@ -447,6 +540,8 @@ function setupChartToggleHandler(el, obj = null, attr = null) {
   _setupToggleUpdate(toggleElement, obj, attr);
   _setUpToggleOff(toggleElement, obj, attr);
 }
+*/
+/* -- --*/
 
 console.debug("setup viewer buttons");
 function setupObstaclesConfigView() {
@@ -939,8 +1034,8 @@ var interruptHandler = function (susp) {
 };
 
 function stopit(hard = true) {
-  document.getElementById("sim_runStatus").classList.remove("sim-running")
-  document.getElementById("sim_runStatus").classList.add("sim-stopped")
+  document.getElementById("sim_runStatus").classList.remove("toggle-button-on")
+  document.getElementById("sim_runStatus").classList.add("toggle-button-off")
   sim.stopAnimation();
   Sk.running = false;
 
@@ -952,8 +1047,8 @@ function stopit(hard = true) {
 }
 
 function runit() {
-  document.getElementById('sim_runStatus').classList.remove('sim-stopped')
-  document.getElementById('sim_runStatus').classList.add('sim-running')
+  document.getElementById('sim_runStatus').classList.remove('toggle-button-off')
+  document.getElementById('sim_runStatus').classList.add('toggle-button-on')
   // This function runs when the simulator Run button is clicked 
   if (typeof Sk.hardInterrupt != 'undefined') {
     delete Sk.hardInterrupt;
@@ -1013,6 +1108,8 @@ function runit() {
       var mypre = document.getElementById("output");
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+
+      if (uiSettings['audio']['error']) rs_tone(0.4, 50, type = 'sawtooth');
     }
   );
 }
@@ -1077,7 +1174,7 @@ toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-pen-updown").dispatchEvent(toggleCheckEvent);
 */
 
-function initialise_display_element(el){
+function initialise_display_element(el) {
   var toggleCheckEvent = new CustomEvent("x-switch:update");
   document.getElementById(el).dispatchEvent(toggleCheckEvent);
 }
@@ -1092,3 +1189,59 @@ var _prog = element.prog;
 element.prog = 'import ev3dev2_glue as glue';
 runit();
 element.prog = _prog;
+
+
+// Events on whole simulator
+
+const rs_root = document.getElementById("roboSim_root");
+
+// Make labels click hide/reveal the fieldset contents
+var legends = rs_root.getElementsByTagName("legend");
+
+for (var i = 0; i < legends.length; i++)
+  legends[i].addEventListener('click', function (e) {
+    var nextsibling = e.target.nextElementSibling;
+    if (nextsibling.classList.contains('rs-closed')) {
+      nextsibling.classList.remove('rs-closed');
+      nextsibling.classList.add('rs-open');
+    } else {
+      nextsibling.classList.remove('rs-open');
+      nextsibling.classList.add('rs-closed');
+    }
+  });
+
+
+// Keyboard shortcuts
+
+function rs_click_togglebutton(elID, state="true") {
+  const clicker = document.querySelector("#int--" + elID);
+  clicker.setAttribute('aria-checked', state);
+  const toggleClickEvent = new CustomEvent("x-switch:update");
+  document.getElementById(elID).dispatchEvent(toggleClickEvent);
+}
+
+uiSettings['enableKeyboardShortcuts'] = false;
+
+rs_root.addEventListener('mouseenter', function (e) {
+  Jupyter.keyboard_manager.disable();
+  uiSettings['enableKeyboardShortcuts'] = true;
+});
+
+document.addEventListener('keydown', function (e) {
+  const key = e.key;
+  if (uiSettings['enableKeyboardShortcuts']) {
+    if (key === 'R') {
+      rs_click_togglebutton('roboSim-display-runstop');
+    }
+  }
+})
+
+rs_root.addEventListener('mouseleave', function (e) {
+  Jupyter.keyboard_manager.enable();
+  uiSettings['enableKeyboardShortcuts'] = true;
+});
+
+
+// All done...
+
+console.debug("studio.js loaded");

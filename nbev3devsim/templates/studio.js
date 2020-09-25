@@ -65,9 +65,9 @@ if (!(customElements.get('value-slider'))) {
   customElements.define('value-slider', ValueSlider, { extends: null });
 }
 
-//this function is duplciated in ev3devsim.js
+//this function is duplicated in ev3devsim.js
 function setSliderVal(el, val) {
-  const magic_slider = document.getElementById(el + "-slider");
+  var magic_slider = document.getElementById(el + "-slider");
   val = parseInt(val);
   if ((val >= parseInt(magic_slider.min)) && (val <= parseInt(magic_slider.max))) {
     {
@@ -79,7 +79,7 @@ function setSliderVal(el, val) {
 }
 
 function getSliderVal(el) {
-  const magic_slider = document.getElementById(el + "-slider");
+  var magic_slider = document.getElementById(el + "-slider");
   return magic_slider.value;
 }
 
@@ -91,7 +91,7 @@ function initSliderVal(el, obj, ref, mover = false) {
     //console.debug(VALUE_SLIDER_CHANGE_EVENT, ':~', ev.detail.value, ev);
     obj[ref] = ev.detail.value;
     mover = mover || ev.detail.mover;
-    if (mover) {
+    if ((mover) && (!obj._dragok)) {
       document.getElementById('move').click();
     }
   });
@@ -483,6 +483,8 @@ var rs_display_lookup = {
   //"roboSim-display-display-controls": "#roboSim-display-show-controls"
 };
 
+
+// TO DO refactor this - remember that js doesn't allow named params in fn signature...
 function _setupToggleUpdate(toggleElement, obj = null, attr = null) {
   // Event handler to update a toggle element
   toggleElement.addEventListener('x-switch:update', function (e) {
@@ -544,14 +546,14 @@ function setupChartToggleHandler(el, obj = null, attr = null) {
 /* -- --*/
 
 console.debug("setup viewer buttons");
-function setupObstaclesConfigView() {
-  const obstacles = JSON.stringify(sim.obstacles, null, 2);
+function setupObstaclesConfigView(obj) {
+  const obstacles = JSON.stringify(obj.obstacles, null, 2);
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
 // TO DO - this should update whwnever we download a program 
 // to the simulator
-function setupCodeView() {
+function setupCodeView(obj) {
   var _code = element.prog;
   // Strip out any prefix magic line
   _code = _code.split('\n').filter(function (line) {
@@ -561,21 +563,22 @@ function setupCodeView() {
   document.getElementById('codeDisplayCode').textContent = _code;
 }
 
-function setupRobotConfigView() {
+function setupRobotConfigView(obj) {
   console.debug("Trying robot config")
-  const code = JSON.stringify(sim.robotSpecs, null, 2);
+  const code = JSON.stringify(obj.robotSpecs, null, 2);
   document.getElementById('robotConfiguratorEditor').value = code;
 }
 
-function setupChartView() {
+function setupChartView(obj) {
   if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
 }
 
-function setupPendownView(){
-  sim.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
+function setupPendownView(obj) {
+  obj.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
 }
 
-function setupFunctionToggleHandler(el, fn, obj = null, attr = null) {
+function setupFunctionToggleHandler(el, fn, obj = null, attr = null, type="") {
+  console.debug("hello");
   var toggleElement = document.getElementById(el);
   var target;
   if (rs_display_lookup.hasOwnProperty(el))
@@ -583,13 +586,38 @@ function setupFunctionToggleHandler(el, fn, obj = null, attr = null) {
   else target = null;
   toggleElement.addEventListener('x-switch:on', function (e) {
     if ((obj) && (attr)) obj[attr] = true;
-    console.debug("try generic fn")
-    fn();
-    console.debug("done generic fn")
+    fn(obj);
     if (target) document.querySelector(target).style.display = 'block';
   });
-  _setupToggleUpdate(toggleElement, obj, attr);
-  _setUpToggleOff(toggleElement, obj, attr);
+  console.debug("hello2", type, el)
+  if (type=="toggle") {
+    console.debug("toggle", el, fn)
+    toggleElement.addEventListener('x-switch:off', function (e) {
+      if ((obj) && (attr)) obj[attr] = false;
+      fn(obj);
+      if (target) document.querySelector(target).style.display = 'none';
+    });
+    toggleElement.addEventListener('x-switch:update', function (e) {
+      var target = rs_display_lookup[e.target.id];
+      var button = "#int--" + e.target.id;
+      fn(obj);
+      if (target) {
+        var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
+        if (flag) {
+          document.querySelector(target).style.display = 'block';
+          if ((obj) && (attr)) obj[attr] = true;
+        }
+        else {
+          document.querySelector(target).style.display = 'none';
+          if ((obj) && (attr)) obj[attr] = false;
+        }
+      }
+    });
+  } else{
+    _setupToggleUpdate(toggleElement, obj, attr);
+    _setUpToggleOff(toggleElement, obj, attr);
+  }
+
 }
 /* to delete
 function setupObstaclesToggleHandler(el, obj = null, attr = null) {
@@ -618,11 +646,11 @@ setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
 setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
-setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView);
-setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView);
+setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView, obj = sim);
+setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView, obj = sim);
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
-setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView);
+setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView, sim, null, "toggle");
 setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
 setupToggleHandler("roboSim-display-sim-controls");
 //setupToggleHandler('roboSim-display-display-controls');
@@ -1223,13 +1251,13 @@ function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   var clicker = document.querySelector("#int--" + elID);
   // I have no idea... toggler is always false whatever I pass?!
   // What am I missing?!
-  console.debug(toggler, toggler=="true" )
-  if (toggler=="true") {
+  console.debug(toggler, toggler == "true")
+  if (toggler == "true") {
     console.debug("toggling...")
     var checked = clicker.getAttribute("aria-checked") === "true";
     clicker.setAttribute("aria-checked", checked ? "false" : "true");
   } else {
-    clicker.setAttribute("aria-checked", state==="true" ? "true" : "false");
+    clicker.setAttribute("aria-checked", state === "true" ? "true" : "false");
   }
   var toggleClickEvent = new CustomEvent("x-switch:update");
   document.getElementById(elID).dispatchEvent(toggleClickEvent);
@@ -1247,9 +1275,9 @@ document.addEventListener("keydown", function (e) {
   if (uiSettings["enableKeyboardShortcuts"]) {
     switch (key) {
       case 'R': rs_click_togglebutton("roboSim-display-runstop"); break;
-      case 'S': rs_click_togglebutton("roboSim-display-runstop", state = "false"); break;
-      case 'p': rs_click_togglebutton("roboSim-pen-updown", toggler = "true"); break;
-      case 'X': rs_click_togglebutton("roboSim-display-positioning", toggler = "true"); break;
+      case 'S': rs_click_togglebutton("roboSim-display-runstop", "false"); break;
+      case 'p': rs_click_togglebutton("roboSim-pen-updown", "true", "true"); break;
+      case 'X': rs_click_togglebutton("roboSim-display-positioning", "true", "true"); break;
     }
   }
 })

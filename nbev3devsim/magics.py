@@ -105,6 +105,49 @@ bright_sound('square', 1.5);"""
       """
             )
 
+        if args.help:
+            help = """
+--- nbev3devsim magic - available switches ---
+
+Boolean flags (no arguments):
+
+--help / -h : display help
+--autorun / -R : autorun simulator code
+--stop / -S : stop simulator code execution
+--move / -m : move robot back to start
+--pendown / -p : set pen down
+--clear / -C : clear trace
+--ultrasound / -u : show ultrasound rays
+--quiet / -q : no download audio confirmation
+
+--world / -W : hide world (default: displayed)
+--hide / -H : hide simulator controls (default: displayed)
+--output / -O : show output panel (default: hidden)
+--configcontrols / -Z : show config controls (default: hidden)
+--sensorvals / -V : show sensor value controls (default: hidden)
+--array / -A : show sensor array panel (default: hidden)
+--noisecontrols / -z : show noise controls (default: hidden)
+--positioning / -X : show positioning controls  (default: hidden)
+--chart / -c : show chart panel (default: hidden)
+
+Parameters requiring an argument:
+
+--xpos / -x : x co-ord 
+--ypos / -y : y co-ord
+--angle / -a : angle
+
+--background / -b : background selection
+--pencolor / -P : set pen color
+--sensornoise / -N sensor noise (0..128)
+--motornoise / -M : motor noise (0..500)
+--sim / -s : simulator object (default: roboSim)
+--robotSetup / -r : robot config selection
+--obstacles / -o : obstacles config
+
+
+            """
+            print(help)
+
         if args.background is not None:
             self.shell.user_ns[args.sim].js_init(
                 f"""
@@ -225,6 +268,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--sim", "-s", default="roboSim", help="Simulator object."
     )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--background", "-b", default=None, help="Background selection"
     )
@@ -307,6 +351,7 @@ bright_sound('square', 1.5);"""
     @magic_arguments.argument(
         "--sim", "-s", default="roboSim", help="Simulator object."
     )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--background", "-b", default=None, help="Background selection"
     )
@@ -387,6 +432,7 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument(
         "--sim", "-s", default="roboSim", help="Simulator object."
     )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--background", "-b", default=None, help="Background selection"
     )

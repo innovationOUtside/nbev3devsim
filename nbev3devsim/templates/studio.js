@@ -1296,4 +1296,7 @@ rs_root.parent.addEventListener("mouseleave", function (e) {
 
 // All done...
 
+document.getElementById("roboSim_loading").style.display = 'none';
+document.getElementById("roboSim_root").style.display = 'block';
 console.debug("studio.js loaded");
+

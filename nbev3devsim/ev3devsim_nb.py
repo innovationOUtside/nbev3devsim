@@ -123,7 +123,8 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         e.height("1000") # 551px 1143
         # self.require_js("ace", "ace-src-min/ace.js")
         self.load_js_files([get_file_path("js/skulpt.min.js"), get_file_path("js/skulpt-stdlib.js"),
-                            get_file_path("js/EV3devSim.js"), get_file_path("js/plotly.min.js")])
+                            get_file_path("js/EV3devSim.js"), get_file_path("js/plotly.min.js"),
+                            get_file_path("js/prism.js")])
         self.load_css(get_file_path("css/main.css"))
         e.html(html)
         #self.require_js("saveAs", "js/FileSaver.js")

@@ -8,6 +8,7 @@
   background: AliceBlue;
   border-radius: 12px;
   border-color: lightblue;
+  border-style: groove;
 }
 
 .row {

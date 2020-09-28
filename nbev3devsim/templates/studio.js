@@ -553,14 +553,20 @@ function setupObstaclesConfigView(obj) {
 
 // TO DO - this should update whwnever we download a program 
 // to the simulator
-function setupCodeView(obj) {
+function setupCodeView(obj = null) {
+  //console.debug("Enter setupcodeview")
   var _code = element.prog;
   // Strip out any prefix magic line
   _code = _code.split('\n').filter(function (line) {
     return line.indexOf("%") != 0;
   }).join('\n')
   //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
-  document.getElementById('codeDisplayCode').textContent = _code;
+  var highlighted_code = Prism.highlight(_code, Prism.languages.py, 'py')
+  document.getElementById('codeDisplayCode').innerHTML = highlighted_code;
+  // For some reason this doesn't update the displayed code?
+  // But it does seem to set thing thre prior <pre> was prettified?
+  //https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?lang=py
+  //PR.prettyPrint();
 }
 
 function setupRobotConfigView(obj) {

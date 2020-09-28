@@ -123,8 +123,8 @@ Boolean flags (no arguments):
 --world / -W : hide world (default: displayed)
 --hide / -H : hide simulator controls (default: displayed)
 --output / -O : show output panel (default: hidden)
---configcontrols / -Z : show config controls (default: hidden)
---sensorvals / -V : show sensor value controls (default: hidden)
+--settings / -Z : show settings/ config controls (default: hidden)
+--instrumentation / -i : show sensor value controls (default: hidden)
 --array / -A : show sensor array panel (default: hidden)
 --noisecontrols / -z : show noise controls (default: hidden)
 --positioning / -X : show positioning controls  (default: hidden)
@@ -173,7 +173,7 @@ Parameters requiring an argument:
         self.sliderUpdate(args.sim, args.ypos, "rs-display-yPos", mover=True)
         self.sliderUpdate(args.sim, args.angle, "rs-display-angle", mover=True)
         self.sliderUpdate(
-            args.sim, args.sensornoise, "rs-display-lightSensorNoiseSlider"
+            args.sim, args.sensornoise, "rs-display-lightSensorNoise"
         )
         self.sliderUpdate(args.sim, args.motornoise, "rs-display-wheelNoise")
         
@@ -256,10 +256,10 @@ Parameters requiring an argument:
         self.check_element(args.sim, args.output, "roboSim-display-output")
         self.check_element(args.sim, args.chart, "roboSim-display-chart")
         self.check_element(args.sim, args.array, "roboSim-display-sensor-array")
-        self.check_element(args.sim, args.sensorvals, "roboSim-display-sensor-values")
+        self.check_element(args.sim, args.instrumentation, "roboSim-display-instrumentation")
         self.check_element(args.sim, args.world, "roboSim-display-world")
         self.check_element(args.sim, args.noisecontrols, "roboSim-display-noise-controls")
-        self.check_element(args.sim, args.configcontrols, "roboSim-display-config-controls")
+        self.check_element(args.sim, args.settings, "roboSim-display-config-controls")
         self.check_element(args.sim, args.hide, "roboSim-display-sim-controls")
         self.check_element(args.sim, args.positioning, "roboSim-display-positioning")
         
@@ -299,12 +299,12 @@ Parameters requiring an argument:
         "--array", "-A", action="store_true", help="Show sensor array"
     )
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--configcontrols", "-Z", action="store_true", help="Show config controls")
+    @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
-        "--sensorvals", "-V", action="store_true", help="Show sensor values"
+        "--instrumentation", "-i", action="store_true", help="Show sensor values"
     )
     @magic_arguments.argument(
         "--autorun", "-R", action="store_true", help="Autorun simulator code"
@@ -384,12 +384,12 @@ Parameters requiring an argument:
         "--array", "-A", action="store_true", help="Show sensor array"
     )
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--configcontrols", "-Z", action="store_true", help="Show config controls")
+    @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
-        "--sensorvals", "-V", action="store_true", help="Show sensor values"
+        "--instrumentation", "-i", action="store_true", help="Show sensor values"
     )
     @magic_arguments.argument(
         "--autorun", "-R", action="store_true", help="Autorun simulator code"
@@ -406,7 +406,8 @@ Parameters requiring an argument:
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
-        preload = """
+        preload = """#---- BOILERPLATE CODE LOADED BY sim_magic_imports ----
+
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
@@ -467,12 +468,12 @@ from ev3dev2.sound import Sound
         "--array", "-A", action="store_true", help="Show sensor array"
     )
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--configcontrols", "-Z", action="store_true", help="Show config controls")
+    @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
-        "--sensorvals", "-V", action="store_true", help="Show sensor values"
+        "--instrumentation", "-i", action="store_true", help="Show sensor values"
     )
     @magic_arguments.argument(
         "--autorun", "-R", action="store_true", help="Autorun simulator code"
@@ -489,7 +490,8 @@ from ev3dev2.sound import Sound
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
-        preload = '''
+        preload = '''#---- BOILERPLATE CODE LOADED BY sim_magic_preloaded ----
+
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor

@@ -470,7 +470,7 @@ var rs_display_lookup = {
   "roboSim-display-world": "#worldview",
   "roboSim-display-chart": "#charter",
   "roboSim-display-output": "#output",
-  "roboSim-display-sensor-values": "#robosim-fieldset-instrumentation",
+  "roboSim-display-instrumentation": "#robosim-fieldset-instrumentation",
   "roboSim-display-sensor-array": "#sensorArray",
   "roboSim-display-noise-controls": "#noise_controls",
   "roboSim-display-config-controls": "#config_controls",
@@ -551,7 +551,7 @@ function setupObstaclesConfigView(obj) {
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
-// TO DO - this should update whwnever we download a program 
+// TO DO - this should update whenever we download a program 
 // to the simulator
 function setupCodeView(obj = null) {
   //console.debug("Enter setupcodeview")
@@ -583,8 +583,7 @@ function setupPendownView(obj) {
   obj.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
 }
 
-function setupFunctionToggleHandler(el, fn, obj = null, attr = null, type="") {
-  console.debug("hello");
+function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type = null) {
   var toggleElement = document.getElementById(el);
   var target;
   if (rs_display_lookup.hasOwnProperty(el))
@@ -595,9 +594,9 @@ function setupFunctionToggleHandler(el, fn, obj = null, attr = null, type="") {
     fn(obj);
     if (target) document.querySelector(target).style.display = 'block';
   });
-  console.debug("hello2", type, el)
-  if (type=="toggle") {
-    console.debug("toggle", el, fn)
+
+  if (type == "toggle") {
+    //console.debug("toggle", el, fn)
     toggleElement.addEventListener('x-switch:off', function (e) {
       if ((obj) && (attr)) obj[attr] = false;
       fn(obj);
@@ -619,7 +618,7 @@ function setupFunctionToggleHandler(el, fn, obj = null, attr = null, type="") {
         }
       }
     });
-  } else{
+  } else {
     _setupToggleUpdate(toggleElement, obj, attr);
     _setUpToggleOff(toggleElement, obj, attr);
   }
@@ -646,7 +645,7 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 // TO DO one line to register things with rs_display_lookup
 // If we take the above approach, everything will be configured just from setup array
 setupToggleHandler("roboSim-display-output");
-setupToggleHandler("roboSim-display-sensor-values");
+setupToggleHandler("roboSim-display-instrumentation");
 setupToggleHandler("roboSim-display-sensor-array");
 setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
@@ -1202,7 +1201,7 @@ document.getElementById("roboSim-display-chart").dispatchEvent(toggleCheckEvent)
 toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-display-output").dispatchEvent(toggleCheckEvent);
 toggleCheckEvent = new CustomEvent("x-switch:update");
-document.getElementById("roboSim-display-sensor-values").dispatchEvent(toggleCheckEvent);
+document.getElementById("roboSim-display-instrumentation").dispatchEvent(toggleCheckEvent);
 toggleCheckEvent = new CustomEvent("x-switch:update");
 document.getElementById("roboSim-display-sensor-array").dispatchEvent(toggleCheckEvent);
 toggleCheckEvent = new CustomEvent("x-switch:update");
@@ -1253,13 +1252,30 @@ for (var i = 0; i < legends.length; i++)
 
 // Keyboard shortcuts
 
+var rs_shortcuts = {
+  "R": { elID: "roboSim-display-runstop", state: "true", toggler: "false"},
+  "S": { elID: "roboSim-display-runstop", state: "false", toggler: "false"},
+  "p": { elID: "roboSim-pen-updown", state: "true", toggler: "true"},
+  "X": { elID: "roboSim-display-positioning", state: "true", toggler: "true"},
+  "A": { elID: "roboSim-display-sensor-array", state: "true", toggler: "true"},
+  "O": { elID: "roboSim-display-output", state: "true", toggler: "true"},
+  "c": { elID: "roboSim-display-chart", state: "true", toggler: "true"},
+  "i": { elID: "roboSim-display-instrumentation", state: "true", toggler: "true"},
+  "W": { elID: "roboSim-display-world", state: "true", toggler: "true"},
+  "z": { elID: "roboSim-display-noise-controls", state: "true", toggler: "true"},
+  "Z": { elID: "roboSim-display-config-controls", state: "true", toggler: "true"},
+  "D": { elID: "roboSim-display-code", state: "true", toggler: "true"},
+  "H": { elID: "roboSim-display-sim-controls", state: "true", toggler: "true"}
+}
+
+
 function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   var clicker = document.querySelector("#int--" + elID);
   // I have no idea... toggler is always false whatever I pass?!
   // What am I missing?!
-  console.debug(toggler, toggler == "true")
+  //console.debug(toggler, toggler == "true")
   if (toggler == "true") {
-    console.debug("toggling...")
+    //console.debug("toggling...")
     var checked = clicker.getAttribute("aria-checked") === "true";
     clicker.setAttribute("aria-checked", checked ? "false" : "true");
   } else {
@@ -1279,12 +1295,24 @@ rs_root.parent.addEventListener("mouseenter", function (e) {
 document.addEventListener("keydown", function (e) {
   var key = e.key;
   if (uiSettings["enableKeyboardShortcuts"]) {
-    switch (key) {
-      case 'R': rs_click_togglebutton("roboSim-display-runstop"); break;
-      case 'S': rs_click_togglebutton("roboSim-display-runstop", "false"); break;
-      case 'p': rs_click_togglebutton("roboSim-pen-updown", "true", "true"); break;
-      case 'X': rs_click_togglebutton("roboSim-display-positioning", "true", "true"); break;
-    }
+    if (rs_shortcuts[key])
+      rs_click_togglebutton(rs_shortcuts[key].elID, rs_shortcuts[key].state, rs_shortcuts[key].toggler)
+    /*switch (key) {
+      case "R": rs_click_togglebutton("roboSim-display-runstop", "true", "false"); break;
+      case "S": rs_click_togglebutton("roboSim-display-runstop", "false", "false"); break;
+      case "p": rs_click_togglebutton("roboSim-pen-updown", "true", "true"); break;
+      case "X": rs_click_togglebutton("roboSim-display-positioning", "true", "true"); break;
+      case "A": rs_click_togglebutton("roboSim-display-sensor-array", "true", "true"); break;
+      case "O": rs_click_togglebutton("roboSim-display-output", "true", "true"); break;
+      case "c": rs_click_togglebutton("roboSim-display-chart", "true", "true"); break;
+      case "i": rs_click_togglebutton("roboSim-display-instrumentation", "true", "true"); break;
+      case "W": rs_click_togglebutton("roboSim-display-world", "true", "true"); break;
+      case "z": rs_click_togglebutton("roboSim-display-noise-controls", "true", "true"); break;
+      case "Z": rs_click_togglebutton("roboSim-display-config-controls", "true", "true"); break;
+      case "D": rs_click_togglebutton("roboSim-display-code", "true", "true"); break;
+      case "H": rs_click_togglebutton("roboSim-display-sim-controls", "true", "true"); break;
+      //ArrowRight, ArrowLeft, ArrowUp, ArrowDown .shiftKey .altKey  .ctrlKey
+    }*/
   }
 })
 

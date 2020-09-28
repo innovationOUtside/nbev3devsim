@@ -10,7 +10,7 @@
     <toggle-switch id="roboSim-display-output" type="button" initial="off">Output</toggle-switch>
     <toggle-switch id="roboSim-display-noise-controls" type="button" initial="off">Noise controls
     </toggle-switch>
-    <toggle-switch id="roboSim-display-sensor-values" type="button" initial="off">Instrumentation
+    <toggle-switch id="roboSim-display-instrumentation" type="button" initial="off">Instrumentation
     </toggle-switch>
     <toggle-switch id="roboSim-display-sensor-array" type="button" initial="off">Sensor arrays</toggle-switch>
     <toggle-switch id="roboSim-display-chart" type="button" initial="off">Chart</toggle-switch>
@@ -128,7 +128,7 @@
       <pre class="line-numbers language-py"><code id="codeDisplayCode" class=".prismcode language-py"></code></pre>
       <div class="buttons">
         <div class="leftFlex">
-          <button id='codeFromClipboard'>Paste</button>
+          <button id="codeFromClipboard">Paste</button>
           <button id="download">Save</button>
           <!--<button id="codeDisplayClose">Close</button>-->
         </div>
@@ -191,6 +191,12 @@
       <toggle-switch id="roboSim-display-obstacles-configurator" type="button" initial="off">Obstacles config
       </toggle-switch>
       <toggle-switch id="roboSim-state-collaborative" on="On" off="Off" initial="off">Collaborative</toggle-switch>
+      
+      <!--
+      <div><input type="checkbox" id="roboSim-audio-program-download">Audio alert on program download</div>
+      <div><input type="checkbox" id="roboSim-audio-program-error">Audio alert on error</div>
+      <div><input type="checkbox" id="roboSim-audio-program-complete">Audio alert on program complete</div>
+      -->
     </div>
   </fieldset>
 
@@ -249,9 +255,9 @@
 
     <div class="">
       <!--<button id="showCode">Show Code</button>-->
-      <toggle-switch id="roboSim-display-world" type="switch" initial="on">World</toggle-switch>
-      <toggle-switch id="roboSim-display-positioning" type="switch" initial="off">Positioning</toggle-switch>
-      <toggle-switch id="roboSim-display-code" type="switch" initial="off">Code display</toggle-switch>
+      <toggle-switch id="roboSim-display-world" type="button" initial="on">World</toggle-switch>
+      <toggle-switch id="roboSim-display-positioning" type="button" initial="off">Positioning</toggle-switch>
+      <toggle-switch id="roboSim-display-code" type="button" initial="off">Code display</toggle-switch>
       <toggle-switch id="roboSim-pen-updown" on="down" off="up" initial="off" select="rs-display-penColor"
         options="red,orange,green">Pen</toggle-switch>
       <!--<select id="rs-display-penColor">

@@ -1287,7 +1287,7 @@ function rs_click_togglebutton(elID, state = "true", toggler = "false") {
 
 uiSettings["enableKeyboardShortcuts"] = false;
 
-rs_root.parent.addEventListener("mouseenter", function (e) {
+rs_root.addEventListener("mouseenter", function (e) {
   Jupyter.keyboard_manager.disable();
   uiSettings["enableKeyboardShortcuts"] = true;
 });
@@ -1316,7 +1316,7 @@ document.addEventListener("keydown", function (e) {
   }
 })
 
-rs_root.parent.addEventListener("mouseleave", function (e) {
+rs_root.addEventListener("mouseleave", function (e) {
   uiSettings["enableKeyboardShortcuts"] = false;
   Jupyter.keyboard_manager.enable();
 });

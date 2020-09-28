@@ -31,7 +31,7 @@ Running the follow cell should:
     
 The widget should be draggable and resizable, with widget sizing controls available in its top bar.
 
-The notebook column should be resiabale: draggable left and rigth to change the width.
+The notebook column should be resizable: draggable left and rigth to change the width.
 
 Known issues:
 
@@ -335,7 +335,7 @@ At the moment, the following keyboard shortcuts are supported:
 For example, in the magic, by default the pen is up but we can set the pen down mode:
 
 ```python
-%sim_magic --p
+%sim_magic --pendown
 ```
 
 If you move the mouse cursor over the simulator widget, you should also be able to toggle the pen up / pen down mode by pressing the *p* key.

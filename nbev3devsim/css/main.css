@@ -79,7 +79,7 @@
   color: white;
   overflow-y: scroll;
   overflow-x: hidden;
-  height: 24em;
+  height: 15em;
   white-space: pre-wrap;
   font-size: 13px;
 }

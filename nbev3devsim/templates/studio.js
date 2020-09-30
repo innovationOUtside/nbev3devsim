@@ -1263,21 +1263,20 @@ for (var i = 0; i < legends.length; i++)
 // Keyboard shortcuts
 
 var rs_shortcuts = {
-  "R": { elID: "roboSim-display-runstop", state: "true", toggler: "false"},
-  "S": { elID: "roboSim-display-runstop", state: "false", toggler: "false"},
-  "p": { elID: "roboSim-pen-updown", state: "true", toggler: "true"},
-  "X": { elID: "roboSim-display-positioning", state: "true", toggler: "true"},
-  "A": { elID: "roboSim-display-sensor-array", state: "true", toggler: "true"},
-  "O": { elID: "roboSim-display-output", state: "true", toggler: "true"},
-  "c": { elID: "roboSim-display-chart", state: "true", toggler: "true"},
-  "i": { elID: "roboSim-display-instrumentation", state: "true", toggler: "true"},
-  "W": { elID: "roboSim-display-world", state: "true", toggler: "true"},
-  "z": { elID: "roboSim-display-noise-controls", state: "true", toggler: "true"},
-  "Z": { elID: "roboSim-display-config-controls", state: "true", toggler: "true"},
-  "D": { elID: "roboSim-display-code", state: "true", toggler: "true"},
-  "H": { elID: "roboSim-display-sim-controls", state: "true", toggler: "true"}
+  "R": { elID: "roboSim-display-runstop", state: "true", toggler: "false" },
+  "S": { elID: "roboSim-display-runstop", state: "false", toggler: "false" },
+  "p": { elID: "roboSim-pen-updown", state: "true", toggler: "true" },
+  "X": { elID: "roboSim-display-positioning", state: "true", toggler: "true" },
+  "A": { elID: "roboSim-display-sensor-array", state: "true", toggler: "true" },
+  "O": { elID: "roboSim-display-output", state: "true", toggler: "true" },
+  "c": { elID: "roboSim-display-chart", state: "true", toggler: "true" },
+  "i": { elID: "roboSim-display-instrumentation", state: "true", toggler: "true" },
+  "W": { elID: "roboSim-display-world", state: "true", toggler: "true" },
+  "z": { elID: "roboSim-display-noise-controls", state: "true", toggler: "true" },
+  "Z": { elID: "roboSim-display-config-controls", state: "true", toggler: "true" },
+  "D": { elID: "roboSim-display-code", state: "true", toggler: "true" },
+  "H": { elID: "roboSim-display-sim-controls", state: "true", toggler: "true" }
 }
-
 
 function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   var clicker = document.querySelector("#int--" + elID);
@@ -1305,8 +1304,11 @@ rs_root.addEventListener("mouseenter", function (e) {
 document.addEventListener("keydown", function (e) {
   var key = e.key;
   if (uiSettings["enableKeyboardShortcuts"]) {
-    if (rs_shortcuts[key])
-      rs_click_togglebutton(rs_shortcuts[key].elID, rs_shortcuts[key].state, rs_shortcuts[key].toggler)
+    if (key=="C")
+      document.getElementById("clearTrace").click();
+    else if (rs_shortcuts[key])
+      rs_click_togglebutton(rs_shortcuts[key].elID, rs_shortcuts[key].state,
+         rs_shortcuts[key].toggler)
     /*switch (key) {
       case "R": rs_click_togglebutton("roboSim-display-runstop", "true", "false"); break;
       case "S": rs_click_togglebutton("roboSim-display-runstop", "false", "false"); break;

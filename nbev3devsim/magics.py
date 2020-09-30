@@ -76,6 +76,11 @@ bright_sound('square', 1.5);"""
       """
         self.shell.user_ns[sim].js_init(_js)
     
+    def updateCode(self, sim):
+        # fire an event
+        _js = 'document.getElementById("rs_code_updater").click()'
+        self.shell.user_ns[sim].js_init(_js)
+
     def sliderUpdate(self, sim, arg, item, mover=False):
         """Update sliderVal component."""
         _slider = f"{item.replace('-', '')}Slider"
@@ -301,6 +306,7 @@ Parameters requiring an argument:
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
     @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
@@ -308,6 +314,9 @@ Parameters requiring an argument:
     )
     @magic_arguments.argument(
         "--autorun", "-R", action="store_true", help="Autorun simulator code"
+    )
+    @magic_arguments.argument(
+        "--preview", "-v", action="store_true", help="Preview preloaded code"
     )
     @magic_arguments.argument(
         "--stop", "-S", action="store_true", help="Stop simulator code execution"
@@ -386,6 +395,7 @@ Parameters requiring an argument:
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
     @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
@@ -416,12 +426,17 @@ from ev3dev2.sound import Sound
 #----- YOUR CODE BELOW HERE -----
 
 """
-        if args.preview  or cell is None:
+        if not cell:
+            return
+        elif args.preview and cell is None:
             print(preload)
             return
         try:
             cell = preload + cell
+            if args.preview:
+                print(cell)
             self.shell.user_ns[args.sim].set_element("prog", cell)
+            self.updateCode(args.sim)
             self.handle_args(args)
         except:
             print(f"Is {args.sim} defined?")
@@ -470,6 +485,7 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
     @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
@@ -513,20 +529,24 @@ gyro = GyroSensor(INPUT_4)
 # ----- YOUR CODE BELOW HERE -----
 
 '''
-        if args.preview or cell is None:
+        if not cell:
+            return
+        elif args.preview and cell is None:
             print(preload)
             return
 
         try:
             cell = preload + cell
             # self.linter(cell)
-
+            if args.preview:
+                print(cell)
             self.handle_args(args)
 
             # TO DO - support robot config; need to dispatch event and redraw;
             # Also need to respect bg image default co-ords;
 
             self.shell.user_ns[args.sim].set_element("prog", cell)
+            self.updateCode(args.sim)
 
             # The following fragment is an example of how to
             # get a confirmatory beep after downloading code to the simulator

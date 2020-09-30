@@ -341,7 +341,7 @@ Parameters requiring an argument:
                 self.updateCode(args.sim)
             self.handle_args(args)
         except:
-            print(f"Is {args.sim} defined?")
+            print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet and cell is not None:
             self.download_ping()
@@ -442,7 +442,7 @@ from ev3dev2.sound import Sound
             self.updateCode(args.sim)
             self.handle_args(args)
         except:
-            print(f"Is {args.sim} defined?")
+            print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet:
             self.download_ping()
@@ -565,6 +565,6 @@ gyro = GyroSensor(INPUT_4)
 
         except:
 
-            print(f"Is {args.sim} defined?")
+            print(f"There seems to be a problem... Is {args.sim} defined?")
             return
 

@@ -267,7 +267,8 @@ Parameters requiring an argument:
         self.check_element(args.sim, args.settings, "roboSim-display-config-controls")
         self.check_element(args.sim, args.hide, "roboSim-display-sim-controls")
         self.check_element(args.sim, args.positioning, "roboSim-display-positioning")
-        
+        self.check_element(args.sim, args.code, "roboSim-display-code")
+
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -337,6 +338,7 @@ Parameters requiring an argument:
         try:
             if cell is not None:
                 self.shell.user_ns[args.sim].set_element("prog", cell)
+                self.updateCode(args.sim)
             self.handle_args(args)
         except:
             print(f"Is {args.sim} defined?")
@@ -357,6 +359,7 @@ Parameters requiring an argument:
         if args.stop:
             _js = "document.getElementById('stop').click();"
             self.shell.user_ns[args.sim].js_init(_js)
+
 
     @line_cell_magic
     @magic_arguments.magic_arguments()

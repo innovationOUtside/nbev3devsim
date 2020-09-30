@@ -882,7 +882,7 @@ document.getElementById('map').addEventListener('change', function () {
     sim.clearBackground();
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(2362 / 2, 1143 / 2, 0, true);
+    setPos(100, 800, 0, true);
   }
 });
 

@@ -284,7 +284,7 @@ initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
 initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
 
 // Set the default position from something?!
-setPos(1181, 571, 0);
+setPos(200, 800, 0);
 
 document.getElementById('codeFromClipboard').addEventListener('click', function () {
   navigator.clipboard.readText().then(text => element.prog = text);

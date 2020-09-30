@@ -1,5 +1,12 @@
+//https://stackoverflow.com/a/29373891/454773
+//var AudioContext = window.AudioContext // Default
+//  || window.webkitAudioContext // Safari and old versions of Chrome
+//  || false;
 
-
+// Safari seems to limit how many audio context objects are allowed (?)
+// so we need to find a way to create one and then use it more widely.
+// Would it make sense to give the simulator access to one, perhaps?
+//var ctx = new AudioContext();
 /*---- Custom elements ---*/
 
 

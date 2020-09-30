@@ -32,7 +32,12 @@ class NbEv3DevSimMagic(Magics):
     def download_ping(self):
         display(
             Javascript(
-                """var context = new AudioContext();
+                """
+      //https://stackoverflow.com/a/29373891/454773
+      //var AudioContext = window.AudioContext // Default
+      //  || window.webkitAudioContext // Safari and old versions of Chrome
+      //  || false;
+      var context = new AudioContext();
       var o = null;
       var g = null;
       function bright_sound(type="square", x=1.5) {

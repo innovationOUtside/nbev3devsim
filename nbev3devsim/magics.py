@@ -1,6 +1,11 @@
 from IPython.core.magic import magics_class, line_cell_magic, Magics
 from IPython.core import magic_arguments
-from IPython.display import Javascript, clear_output, display
+from IPython.display import Javascript, clear_output, display, HTML
+
+
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
 
 import time
 
@@ -32,7 +37,12 @@ class NbEv3DevSimMagic(Magics):
     def download_ping(self):
         display(
             Javascript(
-                """var context = new AudioContext();
+                """
+      //https://stackoverflow.com/a/29373891/454773
+      //var AudioContext = window.AudioContext // Default
+      //  || window.webkitAudioContext // Safari and old versions of Chrome
+      //  || false;
+      var context = new AudioContext();
       var o = null;
       var g = null;
       function bright_sound(type="square", x=1.5) {
@@ -76,6 +86,11 @@ bright_sound('square', 1.5);"""
       """
         self.shell.user_ns[sim].js_init(_js)
     
+    def updateCode(self, sim):
+        # fire an event
+        _js = 'document.getElementById("rs_code_updater").click()'
+        self.shell.user_ns[sim].js_init(_js)
+
     def sliderUpdate(self, sim, arg, item, mover=False):
         """Update sliderVal component."""
         _slider = f"{item.replace('-', '')}Slider"
@@ -109,26 +124,29 @@ bright_sound('square', 1.5);"""
             help = """
 --- nbev3devsim magic - available switches ---
 
+[Simulator keyboard shortcuts are identified in square brackets]
+
 Boolean flags (no arguments):
 
 --help / -h : display help
---autorun / -R : autorun simulator code
---stop / -S : stop simulator code execution
+--autorun / -R  [R] : autorun simulator code
+--stop / -S [S] : stop simulator code execution
 --move / -m : move robot back to start
---pendown / -p : set pen down
---clear / -C : clear trace
---ultrasound / -u : show ultrasound rays
+--pendown / -p [p] : set pen down
+--clear / -C [C] : clear trace
+--ultrasound / -u [U]: show ultrasound rays
 --quiet / -q : no download audio confirmation
 
---world / -W : hide world (default: displayed)
---hide / -H : hide simulator controls (default: displayed)
---output / -O : show output panel (default: hidden)
---settings / -Z : show settings/ config controls (default: hidden)
---instrumentation / -i : show sensor value controls (default: hidden)
---array / -A : show sensor array panel (default: hidden)
---noisecontrols / -z : show noise controls (default: hidden)
---positioning / -X : show positioning controls  (default: hidden)
---chart / -c : show chart panel (default: hidden)
+--world / -W [W] : hide world (default: displayed)
+--hide / -H [H] : hide simulator controls (default: displayed)
+--output / -O [O] : show output panel (default: hidden)
+--settings / -Z [Z] : show settings/ config controls (default: hidden)
+--instrumentation / -i [i] : show sensor value controls (default: hidden)
+--array / -A [A] : show sensor array panel (default: hidden)
+--noisecontrols / -z [z] : show noise controls (default: hidden)
+--positioning / -X [X] : show positioning controls  (default: hidden)
+--chart / -c [c] : show chart panel (default: hidden)
+--code / -D [D] : show code panel (default: hidden)
 
 Parameters requiring an argument:
 
@@ -262,7 +280,8 @@ Parameters requiring an argument:
         self.check_element(args.sim, args.settings, "roboSim-display-config-controls")
         self.check_element(args.sim, args.hide, "roboSim-display-sim-controls")
         self.check_element(args.sim, args.positioning, "roboSim-display-positioning")
-        
+        self.check_element(args.sim, args.code, "roboSim-display-code")
+
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -301,6 +320,7 @@ Parameters requiring an argument:
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
     @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
@@ -308,6 +328,9 @@ Parameters requiring an argument:
     )
     @magic_arguments.argument(
         "--autorun", "-R", action="store_true", help="Autorun simulator code"
+    )
+    @magic_arguments.argument(
+        "--preview", "-v", action="store_true", help="Preview preloaded code"
     )
     @magic_arguments.argument(
         "--stop", "-S", action="store_true", help="Stop simulator code execution"
@@ -328,9 +351,10 @@ Parameters requiring an argument:
         try:
             if cell is not None:
                 self.shell.user_ns[args.sim].set_element("prog", cell)
+                self.updateCode(args.sim)
             self.handle_args(args)
         except:
-            print(f"Is {args.sim} defined?")
+            print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet and cell is not None:
             self.download_ping()
@@ -349,6 +373,11 @@ Parameters requiring an argument:
             _js = "document.getElementById('stop').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
+        if args.preview:
+            #print(cell)
+            display(HTML(highlight(cell, PythonLexer(),
+               HtmlFormatter())))
+
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
@@ -386,6 +415,7 @@ Parameters requiring an argument:
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
     @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
@@ -403,10 +433,13 @@ Parameters requiring an argument:
     @magic_arguments.argument(
         "--motornoise", "-M", default=None, help="Motor noise, 0..500"
     )
+    @magic_arguments.argument(
+        "--previewcode", action="store_true", help="Return preloaded code"
+    )
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
-        preload = """#---- BOILERPLATE CODE LOADED BY sim_magic_imports ----
+        preload = """#---- sim_magic_imports BOILERPLATE ----
 
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
@@ -416,15 +449,22 @@ from ev3dev2.sound import Sound
 #----- YOUR CODE BELOW HERE -----
 
 """
-        if args.preview  or cell is None:
-            print(preload)
+        if args.previewcode:
+            return preload
+        elif not cell and not args.preview:
+            return
+        elif args.preview and cell is None:
+            #print(preload)
+            display(HTML(highlight(preload, PythonLexer(),
+               HtmlFormatter())))
             return
         try:
             cell = preload + cell
             self.shell.user_ns[args.sim].set_element("prog", cell)
+            self.updateCode(args.sim)
             self.handle_args(args)
         except:
-            print(f"Is {args.sim} defined?")
+            print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet:
             self.download_ping()
@@ -432,6 +472,11 @@ from ev3dev2.sound import Sound
         # self.give_focus_to_run()
         if args.autorun:
             self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
+
+        if args.preview:
+            #print(cell)
+            display(HTML(highlight(cell, PythonLexer(),
+               HtmlFormatter())))
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -470,6 +515,7 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
     @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
     @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
     @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
     @magic_arguments.argument(
@@ -487,10 +533,13 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument(
         "--motornoise", "-M", default=None, help="Motor noise, 0..500"
     )
+    @magic_arguments.argument(
+        "--previewcode", action="store_true", help="Return preloaded code"
+    )
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
-        preload = '''#---- BOILERPLATE CODE LOADED BY sim_magic_preloaded ----
+        preload = '''#---- sim_magic_preloaded BOILERPLATE ----
 
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
@@ -513,20 +562,26 @@ gyro = GyroSensor(INPUT_4)
 # ----- YOUR CODE BELOW HERE -----
 
 '''
-        if args.preview or cell is None:
-            print(preload)
+        if args.previewcode:
+            return preload
+        elif not cell and not args.preview:
+            return
+        elif args.preview and cell is None:
+            #print(preload)
+            display(HTML(highlight(preload, PythonLexer(),
+               HtmlFormatter())))
             return
 
         try:
             cell = preload + cell
             # self.linter(cell)
-
             self.handle_args(args)
 
             # TO DO - support robot config; need to dispatch event and redraw;
             # Also need to respect bg image default co-ords;
 
             self.shell.user_ns[args.sim].set_element("prog", cell)
+            self.updateCode(args.sim)
 
             # The following fragment is an example of how to
             # get a confirmatory beep after downloading code to the simulator
@@ -539,9 +594,14 @@ gyro = GyroSensor(INPUT_4)
             # self.give_focus_to_run()
             if args.autorun:
                 self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
+            
+            if args.preview:
+                #print(cell)
+                display(HTML(highlight(cell, PythonLexer(),
+               HtmlFormatter())))
 
         except:
 
-            print(f"Is {args.sim} defined?")
+            print(f"There seems to be a problem... Is {args.sim} defined?")
             return
 

@@ -1,5 +1,12 @@
+//https://stackoverflow.com/a/29373891/454773
+//var AudioContext = window.AudioContext // Default
+//  || window.webkitAudioContext // Safari and old versions of Chrome
+//  || false;
 
-
+// Safari seems to limit how many audio context objects are allowed (?)
+// so we need to find a way to create one and then use it more widely.
+// Would it make sense to give the simulator access to one, perhaps?
+//var ctx = new AudioContext();
 /*---- Custom elements ---*/
 
 
@@ -277,7 +284,7 @@ initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
 initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
 
 // Set the default position from something?!
-setPos(1181, 571, 0);
+setPos(200, 800, 0);
 
 document.getElementById('codeFromClipboard').addEventListener('click', function () {
   navigator.clipboard.readText().then(text => element.prog = text);
@@ -551,23 +558,29 @@ function setupObstaclesConfigView(obj) {
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
-// TO DO - this should update whenever we download a program 
-// to the simulator
+
+function getHighlightedCode(_code) {
+  // Strip out any prefix magic line
+  if (_code) {
+    _code = _code.split('\n').filter(function (line) {
+      return line.indexOf("%") != 0;
+    }).join('\n');
+    _code = Prism.highlight(_code, Prism.languages.py, 'py');
+    return _code
+  }
+}
+
 function setupCodeView(obj = null) {
   //console.debug("Enter setupcodeview")
-  var _code = element.prog;
-  // Strip out any prefix magic line
-  _code = _code.split('\n').filter(function (line) {
-    return line.indexOf("%") != 0;
-  }).join('\n')
+  var _code = getHighlightedCode(element.prog);
   //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
-  var highlighted_code = Prism.highlight(_code, Prism.languages.py, 'py')
-  document.getElementById('codeDisplayCode').innerHTML = highlighted_code;
-  // For some reason this doesn't update the displayed code?
-  // But it does seem to set thing thre prior <pre> was prettified?
-  //https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?lang=py
-  //PR.prettyPrint();
+  document.getElementById('codeDisplayCode').innerHTML = _code;
 }
+
+// Hack to give us something to update code by
+document.getElementById("rs_code_updater").addEventListener('click', function (e) {
+  setupCodeView();
+})
 
 function setupRobotConfigView(obj) {
   console.debug("Trying robot config")
@@ -733,12 +746,12 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
     };
   } else robotSpecs = sim.default_robot_spec;
 
-  if (preconfig == 'Small_Robot_Wide_Eyes') {
+  if (preconfig == "Small_Robot_Wide_Eyes") {
     robotSpecs.sensor1.x = -30;
     robotSpecs.sensor2.x = 30;
   }
 
-  if (preconfig == 'Sensor_Diameter_Config') {
+  if (preconfig == "Sensor_Diameter_Config") {
     robotSpecs.sensor1.diameter = 30;
     robotSpecs.sensor2.diameter = 10;
   }
@@ -747,29 +760,32 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
   sim.drawAll();
 });
 
-document.getElementById('obstaclesPreset').addEventListener('change', function () {
-  var preset = document.getElementById('obstaclesPreset').value;
-  var obstacles = ''
-  if (preset == 'Central_post') {
-    obstacles = '[[900, 500, 200, 200]]'
-  } else if (preset == 'Square_posts') {
-    obstacles = '[[500, 200, 100, 100], [500, 700, 100, 100], [1500, 200, 100, 100], [1500, 700, 100, 100]]'
-  } else if (preset == 'Wall') {
-    obstacles = '[[1500, 200, 200, 800]]'
-  } else if (preset == 'Square') {
+document.getElementById("obstaclesPreset").addEventListener("change", function () {
+  var preset = document.getElementById("obstaclesPreset").value;
+  var obstacles = "";
+  if (preset == "Central_post") {
+    obstacles = "[[900, 500, 200, 200]]";
+  } else if (preset == "Square_posts") {
+    obstacles = "[[500, 200, 100, 100], [500, 700, 100, 100], [1500, 200, 100, 100], [1500, 700, 100, 100]]";
+  } else if (preset == "Wall") {
+    obstacles = "[[1500, 200, 200, 800]]";
+  } else if (preset == "Square") {
 
-  } else if (preset == 'U') {
+  } else if (preset == "U") {
 
-  } else if (preset == 'L') {
+  } else if (preset == "L") {
 
-  } else if (preset == 'maze') {
+  } else if (preset == "maze") {
     // TO DO
   }
-  document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
+  document.getElementById("obstaclesConfiguratorEditor").value = obstacles;
 });
 
+// TO DO - if the notebook with the widget is in jupyter notebook server root dir
+// then this will break because .. is out of server path?
 //var imagepath = '/notebooks/backgrounds/'
-var imagepath = '/' + window.location.pathname.split('/')[1] + '/backgrounds/'
+var imagepath = "/" + window.location.pathname.split("/")[1] + "/backgrounds/";
+
 
 function init_background(background, pos, clearObstacles = true, clearObstaclesLayer = true) {
   sim.loadBackground(imagepath + background);
@@ -780,21 +796,21 @@ function init_background(background, pos, clearObstacles = true, clearObstaclesL
 
 console.debug("Initialise background loader.")
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
-document.getElementById('map').addEventListener('change', function () {
-  var map = document.getElementById('map').value;
+document.getElementById("map").addEventListener("change", function () {
+  var map = document.getElementById("map").value;
 
-  if (map == 'WRO_2019_Regular_Junior') {
-    init_background('WRO-2019-Regular-Junior.jpg', [2215, 150, 90, true]);
-  } else if (map == 'Loop') {
-    init_background('_loop.png', [1000, 500, 90, true]);
-  } else if (map == 'Two_shapes') {
-    init_background('_two_shapes.png', [1000, 500, 90, true]);
-  } else if (map == 'Grey_bands') {
-    init_background('_greys.png', [400, 500, 0, true]);
-  } else if (map == 'Linear_grey') {
-    init_background('_linear_grey.png', [1000, 50, 90, true]);
-  } else if (map == 'Radial_grey') {
-    init_background('_radial_grey.png', [100, 400, 0, true]);
+  if (map == "WRO_2019_Regular_Junior") {
+    init_background("WRO-2019-Regular-Junior.jpg", [2215, 150, 90, true]);
+  } else if (map == "Loop") {
+    init_background("_loop.png", [1000, 500, 90, true]);
+  } else if (map == "Two_shapes") {
+    init_background("_two_shapes.png", [1000, 500, 90, true]);
+  } else if (map == "Grey_bands") {
+    init_background("_greys.png", [400, 500, 0, true]);
+  } else if (map == "Linear_grey") {
+    init_background("_linear_grey.png", [1000, 50, 90, true]);
+  } else if (map == "Radial_grey") {
+    init_background("_radial_grey.png", [100, 400, 0, true]);
     //Update robot config
     sim.robotSpecs.sensor1.x = -60;
     sim.robotSpecs.sensor2.x = 60;
@@ -802,42 +818,42 @@ document.getElementById('map').addEventListener('change', function () {
     sim.drawAll();
     //Set initial location
     setPos(100, 400, 0, true);
-  } else if (map == 'Radial_red') {
-    init_background('_radial_red.png', [100, 400, 0, true]);
-  } else if (map == 'Coloured_bands') {
-    init_background('_coloured_bands.png', [500, 500, 0, true]);
-  } else if (map == 'Rainbow_bands') {
-    init_background('_rainbow_bands.png', [150, 500, 0, true]);
-  } else if (map == 'Grey_and_black') {
-    init_background('_grey_and_black.png', [500, 250, 90, true]);
-  } else if (map == 'Lollipop') {
-    init_background('_line_follower_track.png', [750, 375, -180, true]);
-  } else if (map == 'Noisy_Lollipop') {
-    init_background('_noisy_line_follower_track.png', [750, 375, -180, true]);
-  } else if (map == 'Testcard') {
-    init_background('FuBK_testcard_vectorized.png', [500, 250, 90, true]);
-  } else if (map == 'Square') {
-    init_background('_square.png', [775, 500, -90, true]);
-  } else if (map == 'WRO_2018_Regular_Junior') {
-    init_background('WRO-2018-Regular-Junior.png', [1181, 150, 90, true]);
-  } else if (map == 'FLL_2019_City_Shaper') {
-    init_background('FLL2019.jpg', [500, 150, 90, true]);
-  } else if (map == 'FLL_2018_Into_Orbit') {
-    init_background('FLL2018.jpg', [150, 150, 90, true]);
-  } else if (map == 'Line_Following_Test') {
-    init_background('Line_Following_Test.png', [141, 125, 90, true]);
-  } else if (map == 'Junction_Handling_Test') {
-    init_background('Junction_Handling_Test.png', [698, 130, 90, true]);
-  } else if (map == 'Sensor_Diameter_Test') {
-    init_background('_sensor_diameter_test.png', [550, 450, 90, true]);
-  } else if (map == 'Simple_Shapes') {
-    init_background('_simple_shapes.png', [800, 400, 0, true]);
-  } else if (map == 'Thruxton_Circuit') {
-    init_background('thruxton_track.png', [457, 242, 120, true]);
-  } else if (map == 'MNIST_Digits') {
-    init_background('_number_sheet.png', [400, 50, 90, true]);
-  } else if (map == 'Obstacles_Test') {
-    init_background('Obstacles_Test.png', [121, 125, 90, true]);
+  } else if (map == "Radial_red") {
+    init_background("_radial_red.png", [100, 400, 0, true]);
+  } else if (map == "Coloured_bands") {
+    init_background("_coloured_bands.png", [500, 500, 0, true]);
+  } else if (map == "Rainbow_bands") {
+    init_background("_rainbow_bands.png", [150, 500, 0, true]);
+  } else if (map == "Grey_and_black") {
+    init_background("_grey_and_black.png", [500, 250, 90, true]);
+  } else if (map == "Lollipop") {
+    init_background("_line_follower_track.png", [750, 375, -180, true]);
+  } else if (map == "Noisy_Lollipop") {
+    init_background("_noisy_line_follower_track.png", [750, 375, -180, true]);
+  } else if (map == "Testcard") {
+    init_background("FuBK_testcard_vectorized.png", [500, 250, 90, true]);
+  } else if (map == "Square") {
+    init_background("_square.png", [775, 500, -90, true]);
+  } else if (map == "WRO_2018_Regular_Junior") {
+    init_background("WRO-2018-Regular-Junior.png", [1181, 150, 90, true]);
+  } else if (map == "FLL_2019_City_Shaper") {
+    init_background("FLL2019.jpg", [500, 150, 90, true]);
+  } else if (map == "FLL_2018_Into_Orbit") {
+    init_background("FLL2018.jpg", [150, 150, 90, true]);
+  } else if (map == "Line_Following_Test") {
+    init_background("Line_Following_Test.png", [141, 125, 90, true]);
+  } else if (map == "Junction_Handling_Test") {
+    init_background("Junction_Handling_Test.png", [698, 130, 90, true]);
+  } else if (map == "Sensor_Diameter_Test") {
+    init_background("_sensor_diameter_test.png", [550, 450, 90, true]);
+  } else if (map == "Simple_Shapes") {
+    init_background("_simple_shapes.png", [800, 400, 0, true]);
+  } else if (map == "Thruxton_Circuit") {
+    init_background("thruxton_track.png", [457, 242, 120, true]);
+  } else if (map == "MNIST_Digits") {
+    init_background("_number_sheet.png", [400, 50, 90, true]);
+  } else if (map == "Obstacles_Test") {
+    init_background("Obstacles_Test.png", [121, 125, 90, true]);
     sim.loadObstacles([
       [46, 388, 150, 150],
       [479, 704, 150, 150],
@@ -847,16 +863,16 @@ document.getElementById('map').addEventListener('change', function () {
       [2126, 388, 150, 150]
     ]);
   }
-  else if (map == 'Topo_map') {
-    init_background('Topo_map.png', [698, 130, 90, true]);
-  } else if (map == 'Upload Image (2362x1143px)...') {
-    console.log('upload');
-    var hiddenElement = document.createElement('input');
-    hiddenElement.type = 'file';
-    hiddenElement.accept = 'image/*';
+  else if (map == "Topo_map") {
+    init_background("Topo_map.png", [698, 130, 90, true]);
+  } else if (map == "Upload Image (2362x1143px)...") {
+    console.log("upload");
+    var hiddenElement = document.createElement("input");
+    hiddenElement.type = "file";
+    hiddenElement.accept = "image/*";
     console.log(hiddenElement);
-    hiddenElement.dispatchEvent(new MouseEvent('click'));
-    hiddenElement.addEventListener('change', function (e) {
+    hiddenElement.dispatchEvent(new MouseEvent("click"));
+    hiddenElement.addEventListener("change", function (e) {
       var reader = new FileReader();
       reader.onload = function () {
         sim.loadBackground(this.result);
@@ -865,14 +881,14 @@ document.getElementById('map').addEventListener('change', function () {
       };
       reader.readAsDataURL(e.target.files[0]);
     });
-    var select = document.getElementById('map');
+    var select = document.getElementById("map");
     select.selectedIndex = select.options.length - 1;
 
   } else {
     sim.clearBackground();
     sim.clearObstacles();
     sim.clearObstaclesLayer();
-    setPos(2362 / 2, 1143 / 2, 0, true);
+    setPos(100, 800, 0, true);
   }
 });
 
@@ -1253,21 +1269,20 @@ for (var i = 0; i < legends.length; i++)
 // Keyboard shortcuts
 
 var rs_shortcuts = {
-  "R": { elID: "roboSim-display-runstop", state: "true", toggler: "false"},
-  "S": { elID: "roboSim-display-runstop", state: "false", toggler: "false"},
-  "p": { elID: "roboSim-pen-updown", state: "true", toggler: "true"},
-  "X": { elID: "roboSim-display-positioning", state: "true", toggler: "true"},
-  "A": { elID: "roboSim-display-sensor-array", state: "true", toggler: "true"},
-  "O": { elID: "roboSim-display-output", state: "true", toggler: "true"},
-  "c": { elID: "roboSim-display-chart", state: "true", toggler: "true"},
-  "i": { elID: "roboSim-display-instrumentation", state: "true", toggler: "true"},
-  "W": { elID: "roboSim-display-world", state: "true", toggler: "true"},
-  "z": { elID: "roboSim-display-noise-controls", state: "true", toggler: "true"},
-  "Z": { elID: "roboSim-display-config-controls", state: "true", toggler: "true"},
-  "D": { elID: "roboSim-display-code", state: "true", toggler: "true"},
-  "H": { elID: "roboSim-display-sim-controls", state: "true", toggler: "true"}
+  "R": { elID: "roboSim-display-runstop", state: "true", toggler: "false" },
+  "S": { elID: "roboSim-display-runstop", state: "false", toggler: "false" },
+  "p": { elID: "roboSim-pen-updown", state: "true", toggler: "true" },
+  "X": { elID: "roboSim-display-positioning", state: "true", toggler: "true" },
+  "A": { elID: "roboSim-display-sensor-array", state: "true", toggler: "true" },
+  "O": { elID: "roboSim-display-output", state: "true", toggler: "true" },
+  "c": { elID: "roboSim-display-chart", state: "true", toggler: "true" },
+  "i": { elID: "roboSim-display-instrumentation", state: "true", toggler: "true" },
+  "W": { elID: "roboSim-display-world", state: "true", toggler: "true" },
+  "z": { elID: "roboSim-display-noise-controls", state: "true", toggler: "true" },
+  "Z": { elID: "roboSim-display-config-controls", state: "true", toggler: "true" },
+  "D": { elID: "roboSim-display-code", state: "true", toggler: "true" },
+  "H": { elID: "roboSim-display-sim-controls", state: "true", toggler: "true" }
 }
-
 
 function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   var clicker = document.querySelector("#int--" + elID);
@@ -1285,6 +1300,11 @@ function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   document.getElementById(elID).dispatchEvent(toggleClickEvent);
 }
 
+//Button in code display to hide it
+document.getElementById("rs_code_display_close").addEventListener('click', function (e) {
+  rs_click_togglebutton("roboSim-display-code", "false", "false");
+})
+
 uiSettings["enableKeyboardShortcuts"] = false;
 
 rs_root.addEventListener("mouseenter", function (e) {
@@ -1295,8 +1315,11 @@ rs_root.addEventListener("mouseenter", function (e) {
 document.addEventListener("keydown", function (e) {
   var key = e.key;
   if (uiSettings["enableKeyboardShortcuts"]) {
-    if (rs_shortcuts[key])
-      rs_click_togglebutton(rs_shortcuts[key].elID, rs_shortcuts[key].state, rs_shortcuts[key].toggler)
+    if (key == "C")
+      document.getElementById("clearTrace").click();
+    else if (rs_shortcuts[key])
+      rs_click_togglebutton(rs_shortcuts[key].elID, rs_shortcuts[key].state,
+        rs_shortcuts[key].toggler)
     /*switch (key) {
       case "R": rs_click_togglebutton("roboSim-display-runstop", "true", "false"); break;
       case "S": rs_click_togglebutton("roboSim-display-runstop", "false", "false"); break;

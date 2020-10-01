@@ -1,4 +1,5 @@
-<div id="roboSim_loading">Loading nbev3devsim...</h2></div>
+<div id="roboSim_loading">Loading nbev3devsim...</h2>
+</div>
 
 <div id="roboSim_root" class="roboSim" style="display:none">
 
@@ -48,100 +49,6 @@
     </div>
   </fieldset>
 -->
-
-  <div class="row">
-    <div id="editor">
-      <pre id="output"></pre>
-    </div>
-  </div>
-
-  <fieldset class="rs-grouped-controls" id="charter">
-    <legend>Chart</legend>
-    <div class="">
-      <button id="clearChart">Clear Chart</button>
-      <div id="chartTraces">
-        <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour" checked>Colour</label>
-        <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light" checked>Left
-          light</label>
-        <label class="checkboxLabel"><input type="checkbox" id="chart_right_light" name="chart_right_light"
-            checked>Right
-          light</label>
-        <label class="checkboxLabel"><input type="checkbox" id="chart_ultrasound"
-            name="chart_ultrasound">Ultrasonic</label>
-        <label class="checkboxLabel"><input type="checkbox" id="chart_gyro" name="chart_gyro">Gyro</label>
-        <label class="checkboxLabel"><input type="checkbox" id="chart_left_wheel" name="chart_left_wheel">Left
-          wheel</label>
-        <label class="checkboxLabel"><input type="checkbox" id="chart_right_wheel" name="chart_right_wheel">Right
-          wheel</label>
-      </div>
-      <div id="plotlyDiv"></div>
-    </div>
-  </fieldset>
-
-  <fieldset class="rs-grouped-controls" id="robosim-fieldset-instrumentation">
-    <legend>Instrumentation</legend>
-
-    <div id="readings">Port values:
-      <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
-      </div>
-      <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
-      </div>
-      <div class='sensorReading'>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span
-          id="sensor1_value"></span>
-      </div>
-      <div class='sensorReading'>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span
-          id="sensor2_value"></span>
-      </div>
-      <div class='sensorReading'>Ultrasonic: <span id="ultrasonic_value"></span></div>
-      <div class='sensorReading'>Gyro: <span id="gyro_value"></span></div>
-    </div>
-  </fieldset>
-
-  <fieldset id='sensorArray' class='rightFlex rs-grouped-controls'>
-    <legend>Sensor arrays</legend>
-
-    <div class="">
-      <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
-      <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
-    </div>
-  </fieldset>
-
-  <fieldset class="rs-grouped-controls" id="noise_controls">
-    <legend>Noise controls</legend>
-
-    <!--<label class="checkboxLabel" for="rs-display-lightSensorNoiseSlider">Light sensor noise</label><input type="range"
-        id="rs-display-lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="128"><input type="number" id="rs-display-sensorNoiseVal" maxlength="3" size="4">
-      <label class="checkboxLabel" for="rs-display-wheelNoiseSlider">Wheel noise</label><input type="range"
-        id="rs-display-wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500"><input type="number" id="rs-display-wheelNoiseVal" maxlength="3" size="4">
-      -->
-    <value-slider class="rs-valueslider-group" id="rs-display-lightSensorNoise" min="0" max="128" initial="0">Light
-      sensor noise</span></value-slider>
-    <value-slider class="rs-valueslider-group" id="rs-display-wheelNoise" min="0" max="500" initial="0">Wheel
-      noise</span></value-slider>
-  </fieldset>
-
-  <fieldset class="rs-grouped-controls" id="codeDisplay">
-    <legend>Code display</legend>
-
-    <div class="">
-      <!--<textarea id='codeDisplayCode'></textarea>-->
-      <pre class="line-numbers language-py"><code id="codeDisplayCode" class=".prismcode language-py"></code></pre>
-      <div class="buttons">
-        <div class="leftFlex">
-          <button id="codeFromClipboard">Paste</button>
-          <button id="download">Save</button>
-          <!--<button id="codeDisplayClose">Close</button>-->
-        </div>
-        <!-- what's the window? Docs?-->
-        <div id="window">
-          <div class="content"></div>
-          <!--<div class="windowRow">
-            <button id="closeWindow">Close</button>
-          </div>-->
-        </div>
-      </div>
-    </div>
-  </fieldset>
 
   <fieldset class="rs-grouped-controls" id="config_controls">
     <legend>Settings</legend>
@@ -245,6 +152,103 @@
           </select>
           <button id="obstaclesConfiguratorupload">Upload File</button>
           <button id="obstaclesConfiguratordownload">Download to File</button>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="row">
+    <div id="editor">
+      <pre id="output"></pre>
+    </div>
+  </div>
+
+  <fieldset class="rs-grouped-controls" id="charter">
+    <legend>Chart</legend>
+    <div class="">
+      <button id="clearChart">Clear Chart</button>
+      <div id="chartTraces">
+        <label class="checkboxLabel"><input type="checkbox" id="chart_colour" name="chart_colour" checked>Colour</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_left_light" name="chart_left_light" checked>Left
+          light</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_right_light" name="chart_right_light"
+            checked>Right
+          light</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_ultrasound"
+            name="chart_ultrasound">Ultrasonic</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_gyro" name="chart_gyro">Gyro</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_left_wheel" name="chart_left_wheel">Left
+          wheel</label>
+        <label class="checkboxLabel"><input type="checkbox" id="chart_right_wheel" name="chart_right_wheel">Right
+          wheel</label>
+      </div>
+      <div id="plotlyDiv"></div>
+    </div>
+  </fieldset>
+
+  <fieldset class="rs-grouped-controls" id="robosim-fieldset-instrumentation">
+    <legend>Instrumentation</legend>
+
+    <div id="readings">Port values:
+      <div class='motorReading'>LeftMotor: <span id="leftWheel_value"></span>
+      </div>
+      <div class='motorReading'>RightMotor: <span id="rightWheel_value"></span>
+      </div>
+      <div class='sensorReading'>Sensor1: <div id="sensor1_color" style="width: 10px; height:10px"></div> <span
+          id="sensor1_value"></span>
+      </div>
+      <div class='sensorReading'>Sensor2: <div id="sensor2_color" style="width: 10px; height:10px"></div> <span
+          id="sensor2_value"></span>
+      </div>
+      <div class='sensorReading'>Ultrasonic: <span id="ultrasonic_value"></span></div>
+      <div class='sensorReading'>Gyro: <span id="gyro_value"></span></div>
+    </div>
+  </fieldset>
+
+  <fieldset id='sensorArray' class='rightFlex rs-grouped-controls'>
+    <legend>Sensor arrays</legend>
+
+    <div class="">
+      <canvas id='sensorArrayLeft' class='sensorGrid'></canvas>
+      <canvas id='sensorArrayRight' class='sensorGrid'></canvas>
+    </div>
+  </fieldset>
+
+  <fieldset class="rs-grouped-controls" id="noise_controls">
+    <legend>Noise controls</legend>
+
+    <!--<label class="checkboxLabel" for="rs-display-lightSensorNoiseSlider">Light sensor noise</label><input type="range"
+        id="rs-display-lightSensorNoiseSlider" name="lightSensorNoiseSlider" value="0" min="0" max="128"><input type="number" id="rs-display-sensorNoiseVal" maxlength="3" size="4">
+      <label class="checkboxLabel" for="rs-display-wheelNoiseSlider">Wheel noise</label><input type="range"
+        id="rs-display-wheelNoiseSlider" name="wheelNoiseSlider" value="0" min="0" max="500"><input type="number" id="rs-display-wheelNoiseVal" maxlength="3" size="4">
+      -->
+    <value-slider class="rs-valueslider-group" id="rs-display-lightSensorNoise" min="0" max="128" initial="0">Light
+      sensor noise</span></value-slider>
+    <value-slider class="rs-valueslider-group" id="rs-display-wheelNoise" min="0" max="500" initial="0">Wheel
+      noise</span></value-slider>
+  </fieldset>
+
+  <fieldset class="rs-grouped-controls" id="codeDisplay">
+    <legend>Code display</legend>
+    <div>
+      <button style="display:none;" id="rs_code_updater"></button>
+      <div class="">
+        <!--<textarea id='codeDisplayCode'></textarea>-->
+        <pre class="line-numbers language-py"><code id="codeDisplayCode" class=".prismcode language-py"></code></pre>
+        <div class="buttons">
+          <div class="leftFlex">
+            <button id="codeFromClipboard">Paste</button>
+            <button id="download">Save</button>
+            <button id="rs_code_display_close">Close</button>
+            <!--<button id="codeDisplayClose">Close</button>-->
+          </div>
+          <!-- what's the window? Docs?-->
+          <div id="window">
+            <div class="content"></div>
+            <!--<div class="windowRow">
+            <button id="closeWindow">Close</button>
+          </div>-->
+          </div>
         </div>
       </div>
     </div>

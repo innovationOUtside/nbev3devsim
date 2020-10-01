@@ -1,3 +1,5 @@
+console.debug("Loading ev3devsim...");
+
 //this is actually from studio.js
 // to do while dragging we need to suppress move
 function setSliderVal(el, val) {
@@ -12,10 +14,13 @@ function setSliderVal(el, val) {
 
 
 /* exported EV3devSim */
-console.debug("Loading ev3devsim...");
+
 
 // +
 function EV3devSim(id) {
+
+  console.log("Setting up EV3devSim");
+
   var self = this;
 
   const WIDTH = 2362;
@@ -104,6 +109,8 @@ function EV3devSim(id) {
   self.previousChartTraces = [];
 
   self.measurePts = [null, null];
+
+  console.debug("Creating canvas");
 
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
@@ -327,6 +334,8 @@ function EV3devSim(id) {
     self.measurementLayer.addEventListener('mousemove', self.myMove);
 
   };
+
+  console.debug("Canvas created");
 
   this.resetSensorDiameter = function () {
     self.sensorArrayLeft.height = self.robotSpecs.sensor1.diameter;
@@ -1175,6 +1184,7 @@ function EV3devSim(id) {
     }
   }
 
+  console.debug("Handle mouse events..."); 
   // handle mousedown events
   this.myDown = function (e) {
     //console.log('Mousedown')
@@ -1297,6 +1307,8 @@ function EV3devSim(id) {
 
   /// TH TEST END  
 
+  console.debug("Final setup");
+  
   self.loadCanvas(id);
   self.setWallsPresent(true);
   self.clearBackground();

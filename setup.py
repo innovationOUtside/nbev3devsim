@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="nbev3devsim",
     packages=['nbev3devsim', 'nb_cell_tools', 'nn_tools'],
-    version='0.0.3',
+    version='0.0.4',
     include_package_data=True,
     package_data = {
         'nbev3devsim' : ['progs/*.py', 'js/*.js', 'css/*.css', 'backgrounds/*', 'templates/*']},

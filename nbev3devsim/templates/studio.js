@@ -558,22 +558,23 @@ function setupObstaclesConfigView(obj) {
   document.getElementById('obstaclesConfiguratorEditor').value = obstacles;
 }
 
-// TO DO - this should update whenever we download a program 
-// to the simulator
 
-
-function setupCodeView(obj = null) {
-  //console.debug("Enter setupcodeview")
-  var _code = element.prog;
+function getHighlightedCode(_code) {
   // Strip out any prefix magic line
   if (_code) {
     _code = _code.split('\n').filter(function (line) {
       return line.indexOf("%") != 0;
     }).join('\n');
     _code = Prism.highlight(_code, Prism.languages.py, 'py');
-    //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
-    document.getElementById('codeDisplayCode').innerHTML = _code;
+    return _code
   }
+}
+
+function setupCodeView(obj = null) {
+  //console.debug("Enter setupcodeview")
+  var _code = getHighlightedCode(element.prog);
+  //document.getElementById('codeDisplayCode').value = _code; //for HTML textarea tag
+  document.getElementById('codeDisplayCode').innerHTML = _code;
 }
 
 // Hack to give us something to update code by
@@ -1299,6 +1300,11 @@ function rs_click_togglebutton(elID, state = "true", toggler = "false") {
   document.getElementById(elID).dispatchEvent(toggleClickEvent);
 }
 
+//Button in code display to hide it
+document.getElementById("rs_code_display_close").addEventListener('click', function (e) {
+  rs_click_togglebutton("roboSim-display-code", "false", "false");
+})
+
 uiSettings["enableKeyboardShortcuts"] = false;
 
 rs_root.addEventListener("mouseenter", function (e) {
@@ -1309,11 +1315,11 @@ rs_root.addEventListener("mouseenter", function (e) {
 document.addEventListener("keydown", function (e) {
   var key = e.key;
   if (uiSettings["enableKeyboardShortcuts"]) {
-    if (key=="C")
+    if (key == "C")
       document.getElementById("clearTrace").click();
     else if (rs_shortcuts[key])
       rs_click_togglebutton(rs_shortcuts[key].elID, rs_shortcuts[key].state,
-         rs_shortcuts[key].toggler)
+        rs_shortcuts[key].toggler)
     /*switch (key) {
       case "R": rs_click_togglebutton("roboSim-display-runstop", "true", "false"); break;
       case "S": rs_click_togglebutton("roboSim-display-runstop", "false", "false"); break;

@@ -1,6 +1,11 @@
 from IPython.core.magic import magics_class, line_cell_magic, Magics
 from IPython.core import magic_arguments
-from IPython.display import Javascript, clear_output, display
+from IPython.display import Javascript, clear_output, display, HTML
+
+
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
 
 import time
 
@@ -368,6 +373,10 @@ Parameters requiring an argument:
             _js = "document.getElementById('stop').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
+        if args.preview:
+            #print(cell)
+            display(HTML(highlight(cell, PythonLexer(),
+               HtmlFormatter())))
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -424,10 +433,13 @@ Parameters requiring an argument:
     @magic_arguments.argument(
         "--motornoise", "-M", default=None, help="Motor noise, 0..500"
     )
+    @magic_arguments.argument(
+        "--previewcode", action="store_true", help="Return preloaded code"
+    )
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
-        preload = """#---- BOILERPLATE CODE LOADED BY sim_magic_imports ----
+        preload = """#---- sim_magic_imports BOILERPLATE ----
 
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
@@ -437,15 +449,17 @@ from ev3dev2.sound import Sound
 #----- YOUR CODE BELOW HERE -----
 
 """
-        if not cell:
+        if args.previewcode:
+            return preload
+        elif not cell and not args.preview:
             return
         elif args.preview and cell is None:
-            print(preload)
+            #print(preload)
+            display(HTML(highlight(preload, PythonLexer(),
+               HtmlFormatter())))
             return
         try:
             cell = preload + cell
-            if args.preview:
-                print(cell)
             self.shell.user_ns[args.sim].set_element("prog", cell)
             self.updateCode(args.sim)
             self.handle_args(args)
@@ -459,6 +473,11 @@ from ev3dev2.sound import Sound
         if args.autorun:
             self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
 
+        if args.preview:
+            #print(cell)
+            display(HTML(highlight(cell, PythonLexer(),
+               HtmlFormatter())))
+
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
@@ -514,10 +533,13 @@ from ev3dev2.sound import Sound
     @magic_arguments.argument(
         "--motornoise", "-M", default=None, help="Motor noise, 0..500"
     )
+    @magic_arguments.argument(
+        "--previewcode", action="store_true", help="Return preloaded code"
+    )
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
-        preload = '''#---- BOILERPLATE CODE LOADED BY sim_magic_preloaded ----
+        preload = '''#---- sim_magic_preloaded BOILERPLATE ----
 
 from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT_C
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
@@ -540,17 +562,19 @@ gyro = GyroSensor(INPUT_4)
 # ----- YOUR CODE BELOW HERE -----
 
 '''
-        if not cell:
+        if args.previewcode:
+            return preload
+        elif not cell and not args.preview:
             return
         elif args.preview and cell is None:
-            print(preload)
+            #print(preload)
+            display(HTML(highlight(preload, PythonLexer(),
+               HtmlFormatter())))
             return
 
         try:
             cell = preload + cell
             # self.linter(cell)
-            if args.preview:
-                print(cell)
             self.handle_args(args)
 
             # TO DO - support robot config; need to dispatch event and redraw;
@@ -570,6 +594,11 @@ gyro = GyroSensor(INPUT_4)
             # self.give_focus_to_run()
             if args.autorun:
                 self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
+            
+            if args.preview:
+                #print(cell)
+                display(HTML(highlight(cell, PythonLexer(),
+               HtmlFormatter())))
 
         except:
 

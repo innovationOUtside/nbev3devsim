@@ -230,22 +230,25 @@
 
   <fieldset class="rs-grouped-controls" id="codeDisplay">
     <legend>Code display</legend>
-    <button style="display:hidden;"  id="rs_code_updater"></button>
-    <div class="">
-      <!--<textarea id='codeDisplayCode'></textarea>-->
-      <pre class="line-numbers language-py"><code id="codeDisplayCode" class=".prismcode language-py"></code></pre>
-      <div class="buttons">
-        <div class="leftFlex">
-          <button id="codeFromClipboard">Paste</button>
-          <button id="download">Save</button>
-          <!--<button id="codeDisplayClose">Close</button>-->
-        </div>
-        <!-- what's the window? Docs?-->
-        <div id="window">
-          <div class="content"></div>
-          <!--<div class="windowRow">
+    <div>
+      <button style="display:none;" id="rs_code_updater"></button>
+      <div class="">
+        <!--<textarea id='codeDisplayCode'></textarea>-->
+        <pre class="line-numbers language-py"><code id="codeDisplayCode" class=".prismcode language-py"></code></pre>
+        <div class="buttons">
+          <div class="leftFlex">
+            <button id="codeFromClipboard">Paste</button>
+            <button id="download">Save</button>
+            <button id="rs_code_display_close">Close</button>
+            <!--<button id="codeDisplayClose">Close</button>-->
+          </div>
+          <!-- what's the window? Docs?-->
+          <div id="window">
+            <div class="content"></div>
+            <!--<div class="windowRow">
             <button id="closeWindow">Close</button>
           </div>-->
+          </div>
         </div>
       </div>
     </div>

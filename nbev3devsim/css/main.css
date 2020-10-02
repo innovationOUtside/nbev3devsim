@@ -25,6 +25,9 @@
   margin: 0.2em 0;
 }
 
+.rs-grouped-controls {
+  overflow: auto;
+}
 
 .rs-grouped-controls legend, .rs-world legend {
   margin-bottom: 0px;

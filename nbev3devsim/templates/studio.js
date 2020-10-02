@@ -12,6 +12,33 @@ var AudioContext = window.AudioContext // Default
 var ctx = new AudioContext();
 /*---- Custom elements ---*/
 
+// ---- CHART
+
+
+var chart_sensor_traces = [
+  { id: "chart_ultrasound", tag: "Ultrasonic:", color: "#FF0000" },
+  { id: "chart_left_light", tag: "Light_left:", color: "#CA80F6" },
+  { id: "chart_right_light", tag: "Light_right:", color: "#CAF680" },
+  { id: "chart_colour", tag: "Colour:", color: "#00FF00" },
+  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" },
+  { id: "chart_left_wheel", tag: "Wheel_left:", color: "#99FF00" },
+  { id: "chart_right_wheel", tag: "Wheel_right:", color: "#0099FF" }
+]
+
+var chart_lines = [];
+
+function set_chartlines() {
+  chart_lines = []
+  for (var j = 0; j < chart_sensor_traces.length; j++) {
+    _tmp = {
+      y: [],
+      mode: 'lines',
+      line: { color: chart_sensor_traces[j].color }
+    }
+    chart_lines.push(_tmp);
+  }
+}
+set_chartlines()
 
 //improved by Nick Freear
 const VALUE_SLIDER_CHANGE_EVENT = 'value-slider:change';
@@ -592,7 +619,9 @@ function setupRobotConfigView(obj) {
 }
 
 function setupChartView(obj) {
-  if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
+  sim.showChart = document.getElementById("int--roboSim-display-chart").getAttribute("aria-checked") === "true";
+  if (sim.showChart)
+    clearChart()
 }
 
 function setupPendownView(obj) {
@@ -977,32 +1006,6 @@ function rand() {
   return Math.random();
 }
 
-var chart_sensor_traces = [
-  { id: "chart_ultrasound", tag: "Ultrasonic:", color: "#FF0000" },
-  { id: "chart_left_light", tag: "Light_left:", color: "#CA80F6" },
-  { id: "chart_right_light", tag: "Light_right:", color: "#CAF680" },
-  { id: "chart_colour", tag: "Colour:", color: "#00FF00" },
-  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" },
-  { id: "chart_left_wheel", tag: "Wheel_left:", color: "#99FF00" },
-  { id: "chart_right_wheel", tag: "Wheel_right:", color: "#0099FF" }
-]
-
-
-
-var chart_lines = [];
-
-function set_chartlines() {
-  chart_lines = []
-  for (var j = 0; j < chart_sensor_traces.length; j++) {
-    _tmp = {
-      y: [],
-      mode: 'lines',
-      line: { color: chart_sensor_traces[j].color }
-    }
-    chart_lines.push(_tmp);
-  }
-}
-set_chartlines()
 
 //Plotly.newPlot('plotlyDiv', chart_lines);
 
@@ -1214,6 +1217,7 @@ function clearChart() {
   set_chartlines()
   Plotly.newPlot('plotlyDiv', chart_lines);
 }
+clearChart()
 
 document.getElementById('clearChart').addEventListener('click', function () {
   clearChart();

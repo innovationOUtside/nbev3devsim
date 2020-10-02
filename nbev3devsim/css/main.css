@@ -1,7 +1,8 @@
 /* We want a responsive layout,
    but a minimum width is sensible? */
-.roboSim {
+#roboSim_root {
   min-width: 200px;
+  max-width: 750px;
 }
 
 .roboSim button {
@@ -11,10 +12,15 @@
   border-style: groove;
 }
 
+#field {
+  overflow: hidden;
+  height: 350px;
+}
+
 .row {
   display: flex;
   justify-content: space-between;
-  width: 1181;
+  /* width: 1181; */
   /* margin-top: 0.5em; */
   margin: 0.2em 0;
 }

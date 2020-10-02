@@ -1179,7 +1179,8 @@ function runit() {
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
 
-      if (uiSettings['audio']['error']) rs_tone(0.4, 50, type = 'sawtooth');
+      if ((uiSettings.audio.enabled) && (uiSettings.audio.error_ping) )
+       rs_tone(0.4, 50, type = 'sawtooth');
     }
   );
 }

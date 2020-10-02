@@ -104,6 +104,13 @@ define(["require", "./jquery.dialogextend"], function (require, dialogextend) {
 		style.setAttribute("id", "hangLeft");
 		//style.innerHTML = "#notebook-container { width:50%; float:left !important;}; #playground { overflow: hidden;  position: relative; }; #playground iframe { border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%; resize: both;overflow: auto; };";
 		style.innerHTML = "#notebook-container { width:50%; float:left !important;}; #playground { overflow: hidden;  position: relative; }; #playground iframe { border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;  };";
+		$(function() {
+			$("#notebook-container").resizable({
+				handles: 'e',
+				//containment: '#container',
+		
+			});     
+		});  
 		document.getElementsByTagName("head")[0].appendChild(style);
 	}
 

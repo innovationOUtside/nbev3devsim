@@ -1325,6 +1325,14 @@ document.getElementById("rs_code_display_close").addEventListener('click', funct
   rs_click_togglebutton("roboSim-display-code", "false", "false");
 })
 
+document.getElementById("rs_obstacles_display_close").addEventListener('click', function (e) {
+  rs_click_togglebutton("roboSim-display-obstacles-configurator", "false", "false");
+})
+
+document.getElementById("rs_robotConfig_display_close").addEventListener('click', function (e) {
+  rs_click_togglebutton("roboSim-display-robot-configurator", "false", "false");
+})
+
 uiSettings["enableKeyboardShortcuts"] = false;
 
 rs_root.addEventListener("mouseenter", function (e) {

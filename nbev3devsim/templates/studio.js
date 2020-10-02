@@ -1,14 +1,44 @@
 //https://stackoverflow.com/a/29373891/454773
-//var AudioContext = window.AudioContext // Default
-//  || window.webkitAudioContext // Safari and old versions of Chrome
-//  || false;
+var AudioContext = window.AudioContext // Default
+  || window.webkitAudioContext // Safari and old versions of Chrome
+  || false;
+
+//https://www.geeksforgeeks.org/how-to-detect-the-user-browser-safari-chrome-ie-firefox-and-opera-using-javascript/
+//user agent / browser
 
 // Safari seems to limit how many audio context objects are allowed (?)
 // so we need to find a way to create one and then use it more widely.
 // Would it make sense to give the simulator access to one, perhaps?
-//var ctx = new AudioContext();
+var ctx = new AudioContext();
 /*---- Custom elements ---*/
 
+// ---- CHART
+
+
+var chart_sensor_traces = [
+  { id: "chart_ultrasound", tag: "Ultrasonic:", color: "#FF0000" },
+  { id: "chart_left_light", tag: "Light_left:", color: "#CA80F6" },
+  { id: "chart_right_light", tag: "Light_right:", color: "#CAF680" },
+  { id: "chart_colour", tag: "Colour:", color: "#00FF00" },
+  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" },
+  { id: "chart_left_wheel", tag: "Wheel_left:", color: "#99FF00" },
+  { id: "chart_right_wheel", tag: "Wheel_right:", color: "#0099FF" }
+]
+
+var chart_lines = [];
+
+function set_chartlines() {
+  chart_lines = []
+  for (var j = 0; j < chart_sensor_traces.length; j++) {
+    _tmp = {
+      y: [],
+      mode: 'lines',
+      line: { color: chart_sensor_traces[j].color }
+    }
+    chart_lines.push(_tmp);
+  }
+}
+set_chartlines()
 
 //improved by Nick Freear
 const VALUE_SLIDER_CHANGE_EVENT = 'value-slider:change';
@@ -259,13 +289,13 @@ function setPos(x, y, angle, init = false, reset = false) {
 
 var sim = new EV3devSim('field');
 
-var uiSettings = {};
+var uiSettings = sim.uiSettings;
 
-uiSettings['audio'] = { 'error': true };
+sim.audioCtx = ctx;
 
 /* Audio */
 
-var ctx = new AudioContext()
+//var ctx = new AudioContext()
 function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
   var o = ctx.createOscillator(); var g = ctx.createGain()
   o.frequency.value = frequency; o.type = type
@@ -486,7 +516,7 @@ var rs_display_lookup = {
   "roboSim-display-robot-configurator": "#robotConfigurator",
   "roboSim-display-obstacles-configurator": "#obstaclesConfigurator",
   "roboSim-display-positioning": "#position_controls",
-  "roboSim-display-sim-controls": "#simulator_controls"
+  "roboSim-display-sim-controls": "#simulator_controls",
   //"roboSim-display-display-controls": "#roboSim-display-show-controls"
 };
 
@@ -589,11 +619,24 @@ function setupRobotConfigView(obj) {
 }
 
 function setupChartView(obj) {
-  if (!($("#plotlyDiv").length)) Plotly.newPlot('plotlyDiv', chart_lines);
+  sim.showChart = document.getElementById("int--roboSim-display-chart").getAttribute("aria-checked") === "true";
+  if (sim.showChart)
+    clearChart()
 }
 
 function setupPendownView(obj) {
   obj.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
+}
+
+function setupArrayConfigView(obj) {
+  obj.uiSettings.display.sensorArray = document.getElementById("int--roboSim-display-sensor-array").getAttribute("aria-checked") === "true";
+}
+
+function setupAudioConfigView(obj) {
+  obj.uiSettings.audio.enabled = document.getElementById("int--roboSim-state-audio").getAttribute("aria-checked") === "true";
+  // set default to on in chrome, off in safari;
+  // make a beep on click on to enable audio in safari
+  // TO DO
 }
 
 function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type = null) {
@@ -659,18 +702,19 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 // If we take the above approach, everything will be configured just from setup array
 setupToggleHandler("roboSim-display-output");
 setupToggleHandler("roboSim-display-instrumentation");
-setupToggleHandler("roboSim-display-sensor-array");
+setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim);
 setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
 setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
-setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView, obj = sim);
-setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView, obj = sim);
+setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView, sim);
+setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView, sim);
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
 setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView, sim, null, "toggle");
 setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
 setupToggleHandler("roboSim-display-sim-controls");
+setupFunctionToggleHandler("roboSim-state-audio", setupAudioConfigView, sim, null, "toggle");
 //setupToggleHandler('roboSim-display-display-controls');
 
 
@@ -804,11 +848,11 @@ document.getElementById("map").addEventListener("change", function () {
   } else if (map == "Loop") {
     init_background("_loop.png", [1000, 500, 90, true]);
   } else if (map == "Two_shapes") {
-    init_background("_two_shapes.png", [1000, 500, 90, true]);
+    init_background("_two_shapes.png", [200, 500, 90, true]);
   } else if (map == "Grey_bands") {
-    init_background("_greys.png", [400, 500, 0, true]);
+    init_background("_greys.png", [150, 500, 0, true]);
   } else if (map == "Linear_grey") {
-    init_background("_linear_grey.png", [1000, 50, 90, true]);
+    init_background("_linear_grey.png", [200, 50, 90, true]);
   } else if (map == "Radial_grey") {
     init_background("_radial_grey.png", [100, 400, 0, true]);
     //Update robot config
@@ -821,19 +865,19 @@ document.getElementById("map").addEventListener("change", function () {
   } else if (map == "Radial_red") {
     init_background("_radial_red.png", [100, 400, 0, true]);
   } else if (map == "Coloured_bands") {
-    init_background("_coloured_bands.png", [500, 500, 0, true]);
+    init_background("_coloured_bands.png", [100, 800, 0, true]);
   } else if (map == "Rainbow_bands") {
-    init_background("_rainbow_bands.png", [150, 500, 0, true]);
+    init_background("_rainbow_bands.png", [100, 800, 0, true]);
   } else if (map == "Grey_and_black") {
-    init_background("_grey_and_black.png", [500, 250, 90, true]);
+    init_background("_grey_and_black.png", [200, 800, 90, true]);
   } else if (map == "Lollipop") {
     init_background("_line_follower_track.png", [750, 375, -180, true]);
   } else if (map == "Noisy_Lollipop") {
     init_background("_noisy_line_follower_track.png", [750, 375, -180, true]);
   } else if (map == "Testcard") {
-    init_background("FuBK_testcard_vectorized.png", [500, 250, 90, true]);
+    init_background("FuBK_testcard_vectorized.png", [400, 800, 90, true]);
   } else if (map == "Square") {
-    init_background("_square.png", [775, 500, -90, true]);
+    init_background("_square.png", [550, 300, -90, true]);
   } else if (map == "WRO_2018_Regular_Junior") {
     init_background("WRO-2018-Regular-Junior.png", [1181, 150, 90, true]);
   } else if (map == "FLL_2019_City_Shaper") {
@@ -962,32 +1006,6 @@ function rand() {
   return Math.random();
 }
 
-var chart_sensor_traces = [
-  { id: "chart_ultrasound", tag: "Ultrasonic:", color: "#FF0000" },
-  { id: "chart_left_light", tag: "Light_left:", color: "#CA80F6" },
-  { id: "chart_right_light", tag: "Light_right:", color: "#CAF680" },
-  { id: "chart_colour", tag: "Colour:", color: "#00FF00" },
-  { id: "chart_gyro", tag: "Gyro:", color: "#0000FF" },
-  { id: "chart_left_wheel", tag: "Wheel_left:", color: "#99FF00" },
-  { id: "chart_right_wheel", tag: "Wheel_right:", color: "#0099FF" }
-]
-
-
-
-var chart_lines = [];
-
-function set_chartlines() {
-  chart_lines = []
-  for (var j = 0; j < chart_sensor_traces.length; j++) {
-    _tmp = {
-      y: [],
-      mode: 'lines',
-      line: { color: chart_sensor_traces[j].color }
-    }
-    chart_lines.push(_tmp);
-  }
-}
-set_chartlines()
 
 //Plotly.newPlot('plotlyDiv', chart_lines);
 
@@ -1164,7 +1182,8 @@ function runit() {
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
 
-      if (uiSettings['audio']['error']) rs_tone(0.4, 50, type = 'sawtooth');
+      if ((uiSettings.audio.enabled) && (uiSettings.audio.error_ping) )
+       rs_tone(0.4, 50, type = 'sawtooth');
     }
   );
 }
@@ -1198,6 +1217,7 @@ function clearChart() {
   set_chartlines()
   Plotly.newPlot('plotlyDiv', chart_lines);
 }
+clearChart()
 
 document.getElementById('clearChart').addEventListener('click', function () {
   clearChart();
@@ -1303,6 +1323,14 @@ function rs_click_togglebutton(elID, state = "true", toggler = "false") {
 //Button in code display to hide it
 document.getElementById("rs_code_display_close").addEventListener('click', function (e) {
   rs_click_togglebutton("roboSim-display-code", "false", "false");
+})
+
+document.getElementById("rs_obstacles_display_close").addEventListener('click', function (e) {
+  rs_click_togglebutton("roboSim-display-obstacles-configurator", "false", "false");
+})
+
+document.getElementById("rs_robotConfig_display_close").addEventListener('click', function (e) {
+  rs_click_togglebutton("roboSim-display-robot-configurator", "false", "false");
 })
 
 uiSettings["enableKeyboardShortcuts"] = false;

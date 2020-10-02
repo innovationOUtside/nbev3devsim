@@ -2,6 +2,8 @@ from IPython.core.magic import magics_class, line_cell_magic, Magics
 from IPython.core import magic_arguments
 from IPython.display import Javascript, clear_output, display, HTML
 
+# Note that we can access state on the simulator as per: 
+# sim.js_init("alert(sim.uiSettings.audio.enabled)")
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -14,6 +16,8 @@ import sys
 import subprocess
 import tempfile
 from contextlib import redirect_stdout
+
+from nbev3devsim.load_nbev3devwidget import eds
 
 
 @magics_class
@@ -34,15 +38,17 @@ class NbEv3DevSimMagic(Magics):
             report = report.splitlines()
             display(report)
 
-    def download_ping(self):
-        display(
-            Javascript(
-                """
+    def download_ping(self, sim):
+        #display(
+        #    Javascript(
+        _js = """
       //https://stackoverflow.com/a/29373891/454773
       //var AudioContext = window.AudioContext // Default
       //  || window.webkitAudioContext // Safari and old versions of Chrome
       //  || false;
-      var context = new AudioContext();
+      //var context = new AudioContext();
+      if (sim.uiSettings.audio.enabled) {
+      var context = sim.audioCtx;
       var o = null;
       var g = null;
       function bright_sound(type="square", x=1.5) {
@@ -54,9 +60,10 @@ class NbEv3DevSimMagic(Magics):
     o.start(0)
     g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + x)
 };
-bright_sound('square', 1.5);"""
-            )
-        )
+bright_sound('square', 1.5);}"""
+        self.shell.user_ns[sim].js_init(_js)
+        #    )
+        #)
         clear_output()
 
     # The focus is grabbed back to the cell after the run cell in the notebook
@@ -357,7 +364,7 @@ Parameters requiring an argument:
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet and cell is not None:
-            self.download_ping()
+            self.download_ping(args.sim)
 
         # if cell is not None:
         #    self.give_focus_to_run()
@@ -467,7 +474,7 @@ from ev3dev2.sound import Sound
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet:
-            self.download_ping()
+            self.download_ping(args.sim)
 
         # self.give_focus_to_run()
         if args.autorun:
@@ -589,7 +596,7 @@ gyro = GyroSensor(INPUT_4)
             # the javascript ping will also be replayed unless we clear it?
             display(Javascript('console.log("here")'))
             if not args.quiet:
-                self.download_ping()
+                self.download_ping(args.sim)
 
             # self.give_focus_to_run()
             if args.autorun:
@@ -605,3 +612,60 @@ gyro = GyroSensor(INPUT_4)
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
 
+
+    @line_cell_magic
+    @magic_arguments.magic_arguments()
+    @magic_arguments.argument(
+            "--sim", "-s", default="roboSim", help="Simulator object."
+        )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument(
+        "--clear", "-c", action="store_true", help="Clear data log."
+    )
+    def sim_data(self, line, cell=None):
+        """Return data from simulator datalog as a pandas dataframe."""
+        args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
+        if args.help:
+
+            help = """
+            Return simulator datalog as a dataframe.
+
+            --clear / -c : clear data log
+            """
+            print(help)
+            return
+        
+        if args.clear:
+            self.shell.user_ns[args.sim].clear_datalog()
+            return
+
+        # Grab the logged data into a pandas dataframe
+        data = self.shell.user_ns[args.sim].results_log
+
+        # Create and return a tabular dataframe from the data
+        return eds.get_dataframe_from_datalog(data)
+
+    @line_cell_magic
+    @magic_arguments.magic_arguments()
+    @magic_arguments.argument(
+            "--sim", "-s", default="roboSim", help="Simulator object."
+        )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument(
+        "--clear", "-c", action="store_true", help="Clear data log."
+    )
+    def sim_robot_state(self, line, cell=None):
+        """Return robot state data."""
+        args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
+        if args.help:
+
+            help = """
+            Return robot state data from the simulator.
+
+            """
+            print(help)
+            return
+
+        robotState = eds.RobotState(self.shell.user_ns[args.sim])
+        robotState.update()
+        return robotState

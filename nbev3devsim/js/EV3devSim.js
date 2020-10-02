@@ -1,5 +1,6 @@
 console.debug("Loading ev3devsim...");
 
+
 //this is actually from studio.js
 // to do while dragging we need to suppress move
 function setSliderVal(el, val) {
@@ -25,6 +26,7 @@ function EV3devSim(id) {
 
   const WIDTH = 2362;
   const HEIGHT = 1143;
+  const OFFSET = 200;
 
   const BACK = -120;
 
@@ -34,6 +36,11 @@ function EV3devSim(id) {
   const LIGHT_SENSOR_DEFAULT_ABS = 20;
 
   const ULTRASONIC_RANGE = 2550;
+
+  self.uiSettings = {};
+  self.uiSettings.audio = { enabled: true, error_ping: true };
+  self.uiSettings.display = { sensorArray: false };
+  self.audioCtx = null;
 
   var ULTRASONIC_RAYS = [-21, -14, -7, 0, 7, 14, 21];
   for (let i = 0; i < ULTRASONIC_RAYS.length; i++) {
@@ -112,6 +119,10 @@ function EV3devSim(id) {
 
   console.debug("Creating canvas");
 
+
+  // TO DO - need to handle canvas better
+  // Possible: https://konvajs.org/docs/sandbox/Canvas_Scrolling.html
+
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
 
@@ -157,7 +168,10 @@ function EV3devSim(id) {
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
     */
-    self.scale = 0.4;
+    self.scale = 0.3;
+
+    // TO DO - can we perhaps associate this with a slider
+    // and reflow all canvas elements if we change the zoom level?
     scaler = 'scale(' + self.scale + ')';
 
     self.background = simpleLayerSetup('background');
@@ -426,10 +440,12 @@ function EV3devSim(id) {
 
   this.setWallsPresent = function (value) {
     if (value) {
-      self.parent.style.border = 'solid 4px black';
+      // TO DO - fix style
+      //self.parent.style.border = 'solid 4px black';
       self.wallsPresent = true;
     } else {
-      self.parent.style.border = 'solid 4px #fafafa';
+      // TO DO - fix style
+      // self.parent.style.border = 'solid 4px #fafafa';
       self.wallsPresent = false;
     }
   };
@@ -488,10 +504,10 @@ function EV3devSim(id) {
 
     // Initialize robot states
     self.robotStates = {
-      x: WIDTH / 2,
-      y: HEIGHT / 2,
-      _x: WIDTH / 2,
-      _y: HEIGHT / 2,
+      x: OFFSET, //WIDTH / 2,
+      y: HEIGHT - OFFSET, //HEIGHT / 2,
+      _x: OFFSET,
+      _y: HEIGHT - OFFSET,
       angle: 0,
       _angle: 0,
       penDown: false,
@@ -1127,7 +1143,8 @@ function EV3devSim(id) {
     else if (sensor == 'sensor2')
       self.robotStates.sensor2dataArray = sensorView.data.toString();
 
-    sensorViewCtx.putImageData(sensorView, 0, 0);
+    if (self.uiSettings.display.sensorArray)
+      sensorViewCtx.putImageData(sensorView, 0, 0);
 
     // TO DO - we could do a much simple noise estimate and just add noise here?
     return [redTotal / count, greenTotal / count, blueTotal / count];
@@ -1313,6 +1330,7 @@ function EV3devSim(id) {
   self.setWallsPresent(true);
   self.clearBackground();
   self.loadRobot();
+  self.reset();
   self.drawRobot();
   self.drawObstacles();
 

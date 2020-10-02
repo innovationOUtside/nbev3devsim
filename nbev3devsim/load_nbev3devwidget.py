@@ -4,9 +4,22 @@
 #%load_ext nbtutor
 
 #Reset the notebook style
-from IPython.core.display import display, HTML
+from IPython.core.display import display, HTML, Javascript
 
 display(HTML("<style>#notebook-container { width:50%; float:left !important;}</style>"))
+display(Javascript('''
+$(function() {
+    $("#notebook-container").resizable({
+        handles: 'e',
+        //containment: '#container',
+
+    });     
+});  
+'''))
+#https://stackoverflow.com/questions/4688162/jquery-resizable-dynamic-maxwidth-option
+#display(Javascript('document.getElementById("notebook-container").classList.add("ui-resizable");'))
+#display(HTML("<style>#notebook-container { width:50%; float:left !important; resize:horzontal; position: fixed; bottom: 0px; height: 100%;}</style>"))
+#<div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;">::after</div>
 
 
 #Launch the simulator

@@ -26,6 +26,7 @@ function EV3devSim(id) {
 
   const WIDTH = 2362;
   const HEIGHT = 1143;
+  const OFFSET = 200;
 
   const BACK = -120;
 
@@ -494,10 +495,10 @@ function EV3devSim(id) {
 
     // Initialize robot states
     self.robotStates = {
-      x: WIDTH / 2,
-      y: HEIGHT / 2,
-      _x: WIDTH / 2,
-      _y: HEIGHT / 2,
+      x: OFFSET, //WIDTH / 2,
+      y: HEIGHT - OFFSET, //HEIGHT / 2,
+      _x: OFFSET,
+      _y: HEIGHT - OFFSET,
       angle: 0,
       _angle: 0,
       penDown: false,

@@ -17,6 +17,8 @@ import subprocess
 import tempfile
 from contextlib import redirect_stdout
 
+from nbev3devsim.load_nbev3devwidget import eds
+
 
 @magics_class
 class NbEv3DevSimMagic(Magics):
@@ -610,3 +612,60 @@ gyro = GyroSensor(INPUT_4)
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
 
+
+    @line_cell_magic
+    @magic_arguments.magic_arguments()
+    @magic_arguments.argument(
+            "--sim", "-s", default="roboSim", help="Simulator object."
+        )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument(
+        "--clear", "-c", action="store_true", help="Clear data log."
+    )
+    def sim_data(self, line, cell=None):
+        """Return data from simulator datalog as a pandas dataframe."""
+        args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
+        if args.help:
+
+            help = """
+            Return simulator datalog as a dataframe.
+
+            --clear / -c : clear data log
+            """
+            print(help)
+            return
+        
+        if args.clear:
+            self.shell.user_ns[args.sim].clear_datalog()
+            return
+
+        # Grab the logged data into a pandas dataframe
+        data = self.shell.user_ns[args.sim].results_log
+
+        # Create and return a tabular dataframe from the data
+        return eds.get_dataframe_from_datalog(data)
+
+    @line_cell_magic
+    @magic_arguments.magic_arguments()
+    @magic_arguments.argument(
+            "--sim", "-s", default="roboSim", help="Simulator object."
+        )
+    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument(
+        "--clear", "-c", action="store_true", help="Clear data log."
+    )
+    def sim_robot_state(self, line, cell=None):
+        """Return robot state data."""
+        args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
+        if args.help:
+
+            help = """
+            Return robot state data from the simulator.
+
+            """
+            print(help)
+            return
+
+        robotState = eds.RobotState(self.shell.user_ns[args.sim])
+        robotState.update()
+        return robotState

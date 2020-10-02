@@ -848,11 +848,11 @@ document.getElementById("map").addEventListener("change", function () {
   } else if (map == "Loop") {
     init_background("_loop.png", [1000, 500, 90, true]);
   } else if (map == "Two_shapes") {
-    init_background("_two_shapes.png", [1000, 500, 90, true]);
+    init_background("_two_shapes.png", [200, 500, 90, true]);
   } else if (map == "Grey_bands") {
-    init_background("_greys.png", [400, 500, 0, true]);
+    init_background("_greys.png", [150, 500, 0, true]);
   } else if (map == "Linear_grey") {
-    init_background("_linear_grey.png", [1000, 50, 90, true]);
+    init_background("_linear_grey.png", [200, 50, 90, true]);
   } else if (map == "Radial_grey") {
     init_background("_radial_grey.png", [100, 400, 0, true]);
     //Update robot config
@@ -865,19 +865,19 @@ document.getElementById("map").addEventListener("change", function () {
   } else if (map == "Radial_red") {
     init_background("_radial_red.png", [100, 400, 0, true]);
   } else if (map == "Coloured_bands") {
-    init_background("_coloured_bands.png", [500, 500, 0, true]);
+    init_background("_coloured_bands.png", [100, 800, 0, true]);
   } else if (map == "Rainbow_bands") {
-    init_background("_rainbow_bands.png", [150, 500, 0, true]);
+    init_background("_rainbow_bands.png", [100, 800, 0, true]);
   } else if (map == "Grey_and_black") {
-    init_background("_grey_and_black.png", [500, 250, 90, true]);
+    init_background("_grey_and_black.png", [200, 800, 90, true]);
   } else if (map == "Lollipop") {
     init_background("_line_follower_track.png", [750, 375, -180, true]);
   } else if (map == "Noisy_Lollipop") {
     init_background("_noisy_line_follower_track.png", [750, 375, -180, true]);
   } else if (map == "Testcard") {
-    init_background("FuBK_testcard_vectorized.png", [500, 250, 90, true]);
+    init_background("FuBK_testcard_vectorized.png", [400, 800, 90, true]);
   } else if (map == "Square") {
-    init_background("_square.png", [775, 500, -90, true]);
+    init_background("_square.png", [550, 300, -90, true]);
   } else if (map == "WRO_2018_Regular_Junior") {
     init_background("WRO-2018-Regular-Junior.png", [1181, 150, 90, true]);
   } else if (map == "FLL_2019_City_Shaper") {

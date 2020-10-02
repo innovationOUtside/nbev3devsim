@@ -264,11 +264,11 @@ var sim = new EV3devSim('field');
 
 var uiSettings = sim.uiSettings;
 
-uiSettings['audio'] = { 'error': true };
+sim.audioCtx = ctx;
 
 /* Audio */
 
-var ctx = new AudioContext()
+//var ctx = new AudioContext()
 function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
   var o = ctx.createOscillator(); var g = ctx.createGain()
   o.frequency.value = frequency; o.type = type

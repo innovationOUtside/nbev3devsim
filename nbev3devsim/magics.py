@@ -45,7 +45,7 @@ class NbEv3DevSimMagic(Magics):
       //  || window.webkitAudioContext // Safari and old versions of Chrome
       //  || false;
       //var context = new AudioContext();
-      if (sim.uiSettings.audio.enabled222) {
+      if (sim.uiSettings.audio.enabled) {
       var context = sim.audioCtx;
       var o = null;
       var g = null;

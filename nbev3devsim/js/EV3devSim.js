@@ -119,6 +119,10 @@ function EV3devSim(id) {
 
   console.debug("Creating canvas");
 
+
+  // TO DO - need to handle canvas better
+  // Possible: https://konvajs.org/docs/sandbox/Canvas_Scrolling.html
+
   // Create the canvas and load into provided element
   this.loadCanvas = function (id) {
 
@@ -164,7 +168,10 @@ function EV3devSim(id) {
     self.penLayer.width = WIDTH;
     self.penLayer.height = HEIGHT;
     */
-    self.scale = 0.4;
+    self.scale = 0.3;
+
+    // TO DO - can we perhaps associate this with a slider
+    // and reflow all canvas elements if we change the zoom level?
     scaler = 'scale(' + self.scale + ')';
 
     self.background = simpleLayerSetup('background');
@@ -433,10 +440,12 @@ function EV3devSim(id) {
 
   this.setWallsPresent = function (value) {
     if (value) {
-      self.parent.style.border = 'solid 4px black';
+      // TO DO - fix style
+      //self.parent.style.border = 'solid 4px black';
       self.wallsPresent = true;
     } else {
-      self.parent.style.border = 'solid 4px #fafafa';
+      // TO DO - fix style
+      // self.parent.style.border = 'solid 4px #fafafa';
       self.wallsPresent = false;
     }
   };

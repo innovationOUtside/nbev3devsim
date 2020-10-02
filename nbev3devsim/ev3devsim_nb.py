@@ -47,6 +47,7 @@ import os
 import os.path
 import shutil
 
+
 # Copy over background files
 _dir = "backgrounds"
 _localdir = os.path.join(os.environ['HOME'], _dir)
@@ -57,6 +58,7 @@ if not os.path.isdir(_localdir):
 _path = get_file_path(_dir)
 for f in os.listdir(_path):
     shutil.copy(os.path.join(get_file_path(_dir), f), _localdir)
+
 
 with open(get_file_path('templates/studio.html'), 'r') as f:
     html = f.read()

@@ -1,5 +1,6 @@
 console.debug("Loading ev3devsim...");
 
+
 //this is actually from studio.js
 // to do while dragging we need to suppress move
 function setSliderVal(el, val) {
@@ -34,6 +35,11 @@ function EV3devSim(id) {
   const LIGHT_SENSOR_DEFAULT_ABS = 20;
 
   const ULTRASONIC_RANGE = 2550;
+
+  self.uiSettings = {};
+  self.uiSettings.audio = { enabled: true, error_ping: true };
+  self.uiSettings.display = { sensorArray: false };
+  self.audioCtx = null;
 
   var ULTRASONIC_RAYS = [-21, -14, -7, 0, 7, 14, 21];
   for (let i = 0; i < ULTRASONIC_RAYS.length; i++) {
@@ -1127,7 +1133,8 @@ function EV3devSim(id) {
     else if (sensor == 'sensor2')
       self.robotStates.sensor2dataArray = sensorView.data.toString();
 
-    sensorViewCtx.putImageData(sensorView, 0, 0);
+    if (self.uiSettings.display.sensorArray)
+      sensorViewCtx.putImageData(sensorView, 0, 0);
 
     // TO DO - we could do a much simple noise estimate and just add noise here?
     return [redTotal / count, greenTotal / count, blueTotal / count];
@@ -1313,6 +1320,7 @@ function EV3devSim(id) {
   self.setWallsPresent(true);
   self.clearBackground();
   self.loadRobot();
+  self.reset();
   self.drawRobot();
   self.drawObstacles();
 

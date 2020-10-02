@@ -2,6 +2,8 @@ from IPython.core.magic import magics_class, line_cell_magic, Magics
 from IPython.core import magic_arguments
 from IPython.display import Javascript, clear_output, display, HTML
 
+# Note that we can access state on the simulator as per: 
+# sim.js_init("alert(sim.uiSettings.audio.enabled)")
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -34,15 +36,17 @@ class NbEv3DevSimMagic(Magics):
             report = report.splitlines()
             display(report)
 
-    def download_ping(self):
-        display(
-            Javascript(
-                """
+    def download_ping(self, sim):
+        #display(
+        #    Javascript(
+        _js = """
       //https://stackoverflow.com/a/29373891/454773
       //var AudioContext = window.AudioContext // Default
       //  || window.webkitAudioContext // Safari and old versions of Chrome
       //  || false;
-      var context = new AudioContext();
+      //var context = new AudioContext();
+      if (sim.uiSettings.audio.enabled222) {
+      var context = sim.audioCtx;
       var o = null;
       var g = null;
       function bright_sound(type="square", x=1.5) {
@@ -54,9 +58,10 @@ class NbEv3DevSimMagic(Magics):
     o.start(0)
     g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + x)
 };
-bright_sound('square', 1.5);"""
-            )
-        )
+bright_sound('square', 1.5);}"""
+        self.shell.user_ns[sim].js_init(_js)
+        #    )
+        #)
         clear_output()
 
     # The focus is grabbed back to the cell after the run cell in the notebook
@@ -357,7 +362,7 @@ Parameters requiring an argument:
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet and cell is not None:
-            self.download_ping()
+            self.download_ping(args.sim)
 
         # if cell is not None:
         #    self.give_focus_to_run()
@@ -467,7 +472,7 @@ from ev3dev2.sound import Sound
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
         if not args.quiet:
-            self.download_ping()
+            self.download_ping(args.sim)
 
         # self.give_focus_to_run()
         if args.autorun:
@@ -589,7 +594,7 @@ gyro = GyroSensor(INPUT_4)
             # the javascript ping will also be replayed unless we clear it?
             display(Javascript('console.log("here")'))
             if not args.quiet:
-                self.download_ping()
+                self.download_ping(args.sim)
 
             # self.give_focus_to_run()
             if args.autorun:

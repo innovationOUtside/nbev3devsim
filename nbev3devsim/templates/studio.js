@@ -489,7 +489,7 @@ var rs_display_lookup = {
   "roboSim-display-robot-configurator": "#robotConfigurator",
   "roboSim-display-obstacles-configurator": "#obstaclesConfigurator",
   "roboSim-display-positioning": "#position_controls",
-  "roboSim-display-sim-controls": "#simulator_controls"
+  "roboSim-display-sim-controls": "#simulator_controls",
   //"roboSim-display-display-controls": "#roboSim-display-show-controls"
 };
 
@@ -599,6 +599,17 @@ function setupPendownView(obj) {
   obj.robotStates.penDown = document.getElementById("int--roboSim-pen-updown").getAttribute("aria-checked") === "true";
 }
 
+function setupArrayConfigView(obj) {
+  obj.uiSettings.display.sensorArray = document.getElementById("int--roboSim-display-sensor-array").getAttribute("aria-checked") === "true";
+}
+
+function setupAudioConfigView(obj) {
+  obj.uiSettings.audio.enabled = document.getElementById("int--roboSim-state-audio").getAttribute("aria-checked") === "true";
+  // set default to on in chrome, off in safari;
+  // make a beep on click on to enable audio in safari
+  // TO DO
+}
+
 function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type = null) {
   var toggleElement = document.getElementById(el);
   var target;
@@ -662,18 +673,19 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 // If we take the above approach, everything will be configured just from setup array
 setupToggleHandler("roboSim-display-output");
 setupToggleHandler("roboSim-display-instrumentation");
-setupToggleHandler("roboSim-display-sensor-array");
+setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim);
 setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
 setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
-setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView, obj = sim);
-setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView, obj = sim);
+setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView, sim);
+setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView, sim);
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
 setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView, sim, null, "toggle");
 setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
 setupToggleHandler("roboSim-display-sim-controls");
+setupFunctionToggleHandler("roboSim-state-audio", setupAudioConfigView, sim, null, "toggle");
 //setupToggleHandler('roboSim-display-display-controls');
 
 

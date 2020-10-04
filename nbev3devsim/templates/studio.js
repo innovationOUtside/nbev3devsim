@@ -129,7 +129,13 @@ function initSliderVal(el, obj, ref, mover = false, arrayView = false) {
     obj[ref] = ev.detail.value;
     mover = mover || ev.detail.mover;
     if ((mover) && (!obj._dragok)) {
+      // get pen state
+      const _penDown = sim.robotStates.penDown;
+      // pen up
+      sim.robotStates.penDown = false;
       document.getElementById('move').click();
+      //pen as was
+      sim.robotStates.penDown = _penDown;
     }
     if ((arrayView) && (sim.uiSettings.display.sensorArray)) {
       // Update sensor values
@@ -449,10 +455,10 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   var _angle = Math.floor(Math.random() * 360);
 
   // TO DO - make a "noPenMove" function to take coords/angle and move w/ no pen
-  var tmp = sim.robotStates.penDown;
+  const _penDown = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
   setPos(_x, _y, _angle, reset = true);
-  sim.robotStates.penDown = tmp;
+  sim.robotStates.penDown = _penDown;
 })
 
 

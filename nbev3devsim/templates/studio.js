@@ -718,7 +718,7 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 setupToggleHandler("roboSim-display-output");
 setupToggleHandler("roboSim-display-instrumentation");
 setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim, null, "toggle");
-setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
+setupFunctionToggleHandler('roboSim-display-chart', setupChartView, null, "toggle");
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
 setupFunctionToggleHandler("roboSim-display-code", setupCodeView);

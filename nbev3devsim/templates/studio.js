@@ -840,13 +840,14 @@ function init_background(background, pos, clearObstacles = true, clearObstaclesL
 
 console.debug("Initialise background loader.")
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
-document.getElementById("map").addEventListener("change", function () {
+
+function load_background() {
   var map = document.getElementById("map").value;
 
   if (map == "WRO_2019_Regular_Junior") {
     init_background("WRO-2019-Regular-Junior.jpg", [2215, 150, 90, true]);
   } else if (map == "Loop") {
-    init_background("_loop.png", [1000, 500, 90, true]);
+    init_background("_loop.png", [500, 500, 90, true]);
   } else if (map == "Two_shapes") {
     init_background("_two_shapes.png", [200, 500, 90, true]);
   } else if (map == "Grey_bands") {
@@ -869,7 +870,7 @@ document.getElementById("map").addEventListener("change", function () {
   } else if (map == "Rainbow_bands") {
     init_background("_rainbow_bands.png", [100, 800, 0, true]);
   } else if (map == "Grey_and_black") {
-    init_background("_grey_and_black.png", [200, 800, 90, true]);
+    init_background("_grey_and_black.png", [400, 700, 90, true]);
   } else if (map == "Lollipop") {
     init_background("_line_follower_track.png", [750, 375, -180, true]);
   } else if (map == "Noisy_Lollipop") {
@@ -934,6 +935,10 @@ document.getElementById("map").addEventListener("change", function () {
     sim.clearObstaclesLayer();
     setPos(100, 800, 0, true);
   }
+}
+
+document.getElementById("map").addEventListener("change", function () {
+  load_background();
 });
 
 /* to delete
@@ -958,6 +963,14 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   document.getElementById('robotConfigurator').classList.add('closed');
 });
 */
+
+function updateRobotConfig(setup) {
+  var bgSelector = document.getElementById("robotPreconfig");
+  // TO DO  - go defenseive and check it exists
+  bgSelector.value = setup;
+  const event = new Event('change');
+  bgSelector.dispatchEvent(event);
+}
 
 document.getElementById('robotConfiguratordownload').addEventListener('click', function () {
   var robotSpecs = document.getElementById('robotConfiguratorEditor').value

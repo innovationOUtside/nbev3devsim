@@ -47,18 +47,34 @@ import os
 import os.path
 import shutil
 
+def setup(_dir = "backgrounds"):
+    """Copy over background files"""
 
-# Copy over background files
-_dir = "backgrounds"
-_localdir = os.path.join(os.environ['HOME'], _dir)
-#Py 3.8?
-#shutil.copytree(get_file_path(_dir), _dir, dirs_exist_ok=True)
-if not os.path.isdir(_localdir):
-    os.makedirs(_localdir)
-_path = get_file_path(_dir)
-for f in os.listdir(_path):
-    shutil.copy(os.path.join(get_file_path(_dir), f), _localdir)
+    _localdir = os.path.join(os.environ['HOME'], _dir)
+    #Py 3.8?
+    #shutil.copytree(get_file_path(_dir), _dir, dirs_exist_ok=True)
+    if not os.path.isdir(_localdir):
+        os.makedirs(_localdir)
+    _path = get_file_path(_dir)
+    for f in os.listdir(_path):
+        shutil.copy(os.path.join(get_file_path(_dir), f), _localdir)
 
+from distutils.dir_util import copy_tree
+def setup2(_dir = "backgrounds"):
+    """Copy over background files"""
+
+    #_localdir = os.path.join(os.environ['HOME'], f'nb_{_dir}')
+    try:
+        #https://stackoverflow.com/a/58988310/454773
+        _base = os.readlink('/proc/%s/cwd' % os.environ['JPY_PARENT_PID'])
+    except:
+        _base = os.environ['JUPYTER_SERVER_ROOT'] if 'JUPYTER_SERVER_ROOT' in os.environ else os.environ['HOME']
+    _localdir = os.path.join(_base, f'nb_{_dir}')
+    if not os.path.isdir(_localdir):
+        os.makedirs(_localdir)
+        _path = get_file_path(_dir)
+        copy_tree(_path, _localdir)
+setup2()
 
 with open(get_file_path('templates/studio.html'), 'r') as f:
     html = f.read()

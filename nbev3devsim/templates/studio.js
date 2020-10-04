@@ -843,8 +843,10 @@ document.getElementById("obstaclesPreset").addEventListener("change", function (
 // TO DO - if the notebook with the widget is in jupyter notebook server root dir
 // then this will break because .. is out of server path?
 //var imagepath = '/notebooks/backgrounds/'
-var imagepath = "/" + window.location.pathname.split("/")[1] + "/backgrounds/";
-
+//var imagepath = "/" + window.location.pathname.split("/")[1] + "/nb_backgrounds/";
+var path_elements = window.location.pathname.split("/");
+var _basepath_ix = path_elements.findIndex(element=> element==="notebooks")+1;
+var imagepath = path_elements.slice(0, _basepath_ix).join("/") + "/nb_backgrounds/";
 
 function init_background(background, pos, clearObstacles = true, clearObstaclesLayer = true) {
   sim.loadBackground(imagepath + background);

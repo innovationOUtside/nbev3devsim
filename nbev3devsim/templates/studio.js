@@ -121,7 +121,7 @@ function getSliderVal(el) {
 }
 
 
-function initSliderVal(el, obj, ref, mover = false) {
+function initSliderVal(el, obj, ref, mover = false, arrayView = false) {
   const sliderId = `#${el}`;
   const sliderSlider = document.querySelector(sliderId);
   sliderSlider.addEventListener(VALUE_SLIDER_CHANGE_EVENT, ev => {
@@ -130,6 +130,11 @@ function initSliderVal(el, obj, ref, mover = false) {
     mover = mover || ev.detail.mover;
     if ((mover) && (!obj._dragok)) {
       document.getElementById('move').click();
+    }
+    if ((arrayView) && (sim.uiSettings.display.sensorArray)) {
+      // Update sensor values
+      sim.getColorSensorsValues();
+      sim.displaySensorValues();
     }
   });
 }
@@ -308,7 +313,7 @@ function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
 
 // Initialise additional components
 initSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
-initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise")
+initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise", arrayview = true)
 initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover = true)
 initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
 initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
@@ -630,6 +635,10 @@ function setupPendownView(obj) {
 
 function setupArrayConfigView(obj) {
   obj.uiSettings.display.sensorArray = document.getElementById("int--roboSim-display-sensor-array").getAttribute("aria-checked") === "true";
+  if (obj.uiSettings.display.sensorArray) {
+    sim.getColorSensorsValues();
+    sim.displaySensorValues();
+  }
 }
 
 function setupAudioConfigView(obj) {
@@ -702,7 +711,7 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 // If we take the above approach, everything will be configured just from setup array
 setupToggleHandler("roboSim-display-output");
 setupToggleHandler("roboSim-display-instrumentation");
-setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim);
+setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim, null, "toggle");
 setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
@@ -1390,5 +1399,11 @@ rs_root.addEventListener("mouseleave", function (e) {
 
 document.getElementById("roboSim_loading").style.display = 'none';
 document.getElementById("roboSim_root").style.display = 'block';
+
+// set up sensor views
+sim.getColorSensorsValues();
+sim.displaySensorValues();
+
+//load_background();
 console.debug("studio.js loaded");
 

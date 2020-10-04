@@ -121,7 +121,7 @@ function getSliderVal(el) {
 }
 
 
-function initSliderVal(el, obj, ref, mover = false) {
+function initSliderVal(el, obj, ref, mover = false, arrayView = false) {
   const sliderId = `#${el}`;
   const sliderSlider = document.querySelector(sliderId);
   sliderSlider.addEventListener(VALUE_SLIDER_CHANGE_EVENT, ev => {
@@ -129,7 +129,18 @@ function initSliderVal(el, obj, ref, mover = false) {
     obj[ref] = ev.detail.value;
     mover = mover || ev.detail.mover;
     if ((mover) && (!obj._dragok)) {
+      // get pen state
+      const _penDown = sim.robotStates.penDown;
+      // pen up
+      sim.robotStates.penDown = false;
       document.getElementById('move').click();
+      //pen as was
+      sim.robotStates.penDown = _penDown;
+    }
+    if ((arrayView) && (sim.uiSettings.display.sensorArray)) {
+      // Update sensor values
+      sim.getColorSensorsValues();
+      sim.displaySensorValues();
     }
   });
 }
@@ -308,7 +319,7 @@ function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
 
 // Initialise additional components
 initSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
-initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise")
+initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise", arrayview = true)
 initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover = true)
 initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
 initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
@@ -444,10 +455,10 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   var _angle = Math.floor(Math.random() * 360);
 
   // TO DO - make a "noPenMove" function to take coords/angle and move w/ no pen
-  var tmp = sim.robotStates.penDown;
+  const _penDown = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
   setPos(_x, _y, _angle, reset = true);
-  sim.robotStates.penDown = tmp;
+  sim.robotStates.penDown = _penDown;
 })
 
 
@@ -630,6 +641,10 @@ function setupPendownView(obj) {
 
 function setupArrayConfigView(obj) {
   obj.uiSettings.display.sensorArray = document.getElementById("int--roboSim-display-sensor-array").getAttribute("aria-checked") === "true";
+  if (obj.uiSettings.display.sensorArray) {
+    sim.getColorSensorsValues();
+    sim.displaySensorValues();
+  }
 }
 
 function setupAudioConfigView(obj) {
@@ -702,7 +717,7 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 // If we take the above approach, everything will be configured just from setup array
 setupToggleHandler("roboSim-display-output");
 setupToggleHandler("roboSim-display-instrumentation");
-setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim);
+setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim, null, "toggle");
 setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
@@ -840,13 +855,14 @@ function init_background(background, pos, clearObstacles = true, clearObstaclesL
 
 console.debug("Initialise background loader.")
 //sim.loadBackground(imagepath+'WRO-2019-Regular-Junior.jpg');
-document.getElementById("map").addEventListener("change", function () {
+
+function load_background() {
   var map = document.getElementById("map").value;
 
   if (map == "WRO_2019_Regular_Junior") {
     init_background("WRO-2019-Regular-Junior.jpg", [2215, 150, 90, true]);
   } else if (map == "Loop") {
-    init_background("_loop.png", [1000, 500, 90, true]);
+    init_background("_loop.png", [500, 500, 90, true]);
   } else if (map == "Two_shapes") {
     init_background("_two_shapes.png", [200, 500, 90, true]);
   } else if (map == "Grey_bands") {
@@ -869,7 +885,7 @@ document.getElementById("map").addEventListener("change", function () {
   } else if (map == "Rainbow_bands") {
     init_background("_rainbow_bands.png", [100, 800, 0, true]);
   } else if (map == "Grey_and_black") {
-    init_background("_grey_and_black.png", [200, 800, 90, true]);
+    init_background("_grey_and_black.png", [400, 700, 90, true]);
   } else if (map == "Lollipop") {
     init_background("_line_follower_track.png", [750, 375, -180, true]);
   } else if (map == "Noisy_Lollipop") {
@@ -934,6 +950,10 @@ document.getElementById("map").addEventListener("change", function () {
     sim.clearObstaclesLayer();
     setPos(100, 800, 0, true);
   }
+}
+
+document.getElementById("map").addEventListener("change", function () {
+  load_background();
 });
 
 /* to delete
@@ -958,6 +978,14 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   document.getElementById('robotConfigurator').classList.add('closed');
 });
 */
+
+function updateRobotConfig(setup) {
+  var bgSelector = document.getElementById("robotPreconfig");
+  // TO DO  - go defenseive and check it exists
+  bgSelector.value = setup;
+  const event = new Event('change');
+  bgSelector.dispatchEvent(event);
+}
 
 document.getElementById('robotConfiguratordownload').addEventListener('click', function () {
   var robotSpecs = document.getElementById('robotConfiguratorEditor').value
@@ -1182,8 +1210,8 @@ function runit() {
       mypre.innerHTML = mypre.innerHTML + '<span class="error">' + err.toString() + '</span>';
       mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
 
-      if ((uiSettings.audio.enabled) && (uiSettings.audio.error_ping) )
-       rs_tone(0.4, 50, type = 'sawtooth');
+      if ((uiSettings.audio.enabled) && (uiSettings.audio.error_ping))
+        rs_tone(0.4, 50, type = 'sawtooth');
     }
   );
 }
@@ -1377,5 +1405,11 @@ rs_root.addEventListener("mouseleave", function (e) {
 
 document.getElementById("roboSim_loading").style.display = 'none';
 document.getElementById("roboSim_root").style.display = 'block';
+
+// set up sensor views
+sim.getColorSensorsValues();
+sim.displaySensorValues();
+
+//load_background();
 console.debug("studio.js loaded");
 

@@ -51,16 +51,14 @@ class NbEv3DevSimMagic(Magics):
       var context = sim.audioCtx;
       var o = null;
       var g = null;
-      function bright_sound(type="square", x=1.5) {
-    o = context.createOscillator()
-    g = context.createGain()
-    o.connect(g)
-    o.type = type
-    g.connect(context.destination)
-    o.start(0)
-    g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + x)
-};
-bright_sound('square', 1.5);}"""
+      function download_tone(duration=1.5, frequency=400, type='sin'){
+          var o = context.createOscillator(); var g = context.createGain()
+          o.frequency.value = frequency; o.type = type
+          o.connect(g); g.connect(context.destination)
+          o.start(0)
+          g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + duration)
+        }
+        download_tone(1.5, 600);}"""
         self.shell.user_ns[sim].js_init(_js)
         #    )
         #)

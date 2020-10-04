@@ -552,9 +552,12 @@ from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 from ev3dev2.sound import Sound
 
 speaker = Sound()
-def say(txt):
-    """Say a phrase without blocking code execution."""
-    speaker.speak(txt, play_type=1)
+def say(txt, wait=False, show=True):
+    """Say and optionally show a phrase."""
+    if show:
+        print(txt)
+    # `wait` controls blocking behaviour
+    speaker.speak(txt, play_type=int(not wait))
 
 tank_turn = MoveSteering(OUTPUT_B, OUTPUT_C)
 tank_drive = MoveTank(OUTPUT_B, OUTPUT_C)

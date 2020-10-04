@@ -63,7 +63,13 @@ from distutils.dir_util import copy_tree
 def setup2(_dir = "backgrounds"):
     """Copy over background files"""
 
-    _localdir = os.path.join(os.environ['HOME'], f'nb_{_dir}')
+    #_localdir = os.path.join(os.environ['HOME'], f'nb_{_dir}')
+    try:
+        #https://stackoverflow.com/a/58988310/454773
+        _base = os.readlink('/proc/%s/cwd' % os.environ['JPY_PARENT_PID'])
+    except:
+        _base = os.environ['JUPYTER_SERVER_ROOT'] if 'JUPYTER_SERVER_ROOT' in os.environ else os.environ['HOME']
+    _localdir = os.path.join(_base, f'nb_{_dir}')
     if not os.path.isdir(_localdir):
         os.makedirs(_localdir)
         _path = get_file_path(_dir)

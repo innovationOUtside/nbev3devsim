@@ -461,13 +461,11 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   sim.robotStates.penDown = _penDown;
 })
 
-
 document.getElementById('resetReset').addEventListener('click', function () {
-  /*
-  sim.robotStates._x = document.getElementById('rs-display-xPos').value;
-  sim.robotStates._y = document.getElementById('rs-display-yPos').value;
-  sim.robotStates._angle = document.getElementById('rs-display-angle').value;
-  */
+  //sim.robotStates._x = document.getElementById('rs-display-xPos').value;
+  //sim.robotStates._y = document.getElementById('rs-display-yPos').value;
+  //sim.robotStates._angle = document.getElementById('rs-display-angle').value;
+  
   sim.robotStates._x = getSliderVal('rs-display-xPos');
   sim.robotStates._y = getSliderVal('rs-display-yPos');
   sim.robotStates._angle = getSliderVal('rs-display-angle');
@@ -477,11 +475,10 @@ document.getElementById('move').addEventListener('click', function () {
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
 
-  /*
-  var x = document.getElementById('rs-display-xPos').value;
-  var y = document.getElementById('rs-display-yPos').value;
-  var angle = document.getElementById('rs-display-angle').value;
-  */
+  //var x = document.getElementById('rs-display-xPos').value;
+  //var y = document.getElementById('rs-display-yPos').value;
+  //var angle = document.getElementById('rs-display-angle').value;
+  
   var x = getSliderVal('rs-display-xPos');
   var y = getSliderVal('rs-display-yPos');
   var angle = getSliderVal('rs-display-angle');
@@ -1232,7 +1229,7 @@ function setupRunToggleHandler(el) {
     var button = "#int--" + e.target.id;
     var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
     if (flag) runit();
-    //else stopit();
+    else stopit();
   });
 
 }
@@ -1240,7 +1237,7 @@ function setupRunToggleHandler(el) {
 //document.getElementById('stop').addEventListener('click', stopit );
 setupRunToggleHandler('#roboSim-display-runstop')
 
-document.getElementById("clearTrace").addEventListener("click", function () { sim.clearPenLayer() })
+document.getElementById('clearTrace').addEventListener('click', function () { sim.clearPenLayer() })
 
 function clearChart() {
   sim.previousChartTraces = [];

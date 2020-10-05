@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from IPython.display import display
+
 from PIL import Image
 
 from sklearn.preprocessing import normalize
@@ -44,7 +46,7 @@ def progress_tracked_training(data, labels, MLP=None, hidden_layer_sizes=(30), m
 def reshape_data(img, n_images=3000, size=(28, 28)):
     # Turn the image data into a multidimensional array
     # of 3000 separate 28 x 28 arrays
-    images_array = np.array(img).reshape(n_images, size[0], size[1])
+    images_array = np.array(img)
 
     flat_images = np.array(img).reshape(n_images, size[0]*size[1])
     
@@ -264,7 +266,7 @@ def image_class_predictor(MLP, img, label='', size=None,
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 
-def generate_N_random_samples(randfunc, num_samples=100):
+def generate_N_random_samples(randfunc, num_samples=100, jiggled=False, cropzoomed=False):
     """Generate a test collection on a specified number of samples."""
     test_list = []
     test_labels = [] 
@@ -349,7 +351,7 @@ def cnn_get_details(cnn):
 
 #input_details, output_details, floating_model, height, width = cnn_get_details(cnn_interpreter)
 
-def cnn_rank_results(results, rank=5):
+def cnn_rank_results(results, tf_labels=None, rank=5):
     """Display ordered list of top cnn classification results."""
     # Go defensive
     rank = 5 if not isinstance(rank, int) else rank
@@ -361,10 +363,12 @@ def cnn_rank_results(results, rank=5):
     floating_model = max(sum(top_k, [])) > 1
 
     for i in top_k:
+        label = tf_labels[i] if (tf_labels) else ''
+        
         if floating_model:
-            print('{:08.6f}: {}'.format(float(results[i]), tf_labels[i]))
+            print('{:08.6f}: {}'.format(float(results[i]), label))
         else:
-            print('{:08.6f}: {}'.format(float(results[i] / 255.0), tf_labels[i]))
+            print('{:08.6f}: {}'.format(float(results[i] / 255.0), label))
     
 
 def cnn_test_with_image(cnn, img, tf_labels='', retval=False, rank=None):
@@ -373,7 +377,7 @@ def cnn_test_with_image(cnn, img, tf_labels='', retval=False, rank=None):
     if not tf_labels:
         tf_labels = _tf_labels
     
-    display(img);
+    display(img)
 
     input_details, output_details, floating_model, height, width = cnn_get_details(cnn)
     
@@ -400,7 +404,7 @@ def cnn_test_with_image(cnn, img, tf_labels='', retval=False, rank=None):
                     title="Confidence score for each class")
 
     if rank:
-        cnn_rank_results(results, rank)
+        cnn_rank_results(results, tf_labels, rank)
 
     if retval:
         return results

@@ -2,7 +2,19 @@ from PIL import Image
 import numpy as np
 
 import pandas as pd
+from IPython.display import display
 
+def report_light_sensor(state, side='left'):
+    """Print a report of the sensor values."""
+    
+    print(f"""
+RGB: {state[side+'_light_raw']}
+Reflected light intensity: {state[side+'_light']}
+Reflected light intensity per cent: {state[side+'_light_pc']}
+Full reflected light intensity (%): {state[side+'_light_full']}
+""")
+#robotState = %sim_robot_state
+#report_light_sensor(robotState.state, 'left')
 
 # Specific to simulator 
 
@@ -118,7 +130,7 @@ def collected_image(df, index=0, size=(20, 20, 3)):
     """
     def _process_robot_image_data(data):
         """Process the robot image data and return a dataframe."""
-        print('You should really be passing a dataframe... Will ry to fix it.')
+        print('You should really be passing a dataframe... I will try to fix it.')
         df = pd.DataFrame(columns=['side', 'vals', 'clock'])
         for r in data:
             _r = r.split()
@@ -265,6 +277,24 @@ from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib.ticker import MaxNLocator
 
+
+def preview_state_image(data, size=(20, 20, 4), mode='RGB', zoom = True, retval = True):
+    """Preview the image from the robot state."""
+    _array = raw_image_data_to_array(data.split(','),
+                       size=size)
+    _img = image_from_array(_array, mode=mode)
+    if zoom:
+        zoom_img(_img)
+    
+    if retval:
+        return _img
+
+def get_image_from_state(data, size=(20, 20, 4), mode='RGB', zoom = True):
+    """Get image from robotstate."""
+    return  preview_state_image(data, size=size, mode=mode, zoom = zoom, retval = True)
+# robotState = %sim_robot_state
+# preview_state_image(robotState.state['sensor1dataArray'])
+
 def zoom_img(img, size=(5, 5), grid=True):
     """Zoom the display of the sensor captured image."""
     plt.figure(figsize = size)
@@ -283,7 +313,7 @@ def zoom_img(img, size=(5, 5), grid=True):
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
   
     plt.imshow(np.asarray(img.convert('RGB')),
-               extent=(0, img.size[0], img.size[1], 0));
+               extent=(0, img.size[0], img.size[1], 0))
     
     
     
@@ -390,11 +420,11 @@ def jiggle(img, background=0, quiet=True):
     return _shift_image
 
 
-    if img.size!=(_x, _y):
-        if not quiet:
-            print("Resizing")
-        img = img.resize((_x, _y), Image.LANCZOS)
-    
-    return img
+    #if _shift_image.size!=(_x, _y):
+    #    if not quiet:
+    #        print("Resizing")
+    #    _shift_image = _shift_image.resize((_x, _y), Image.LANCZOS)
+    #
+    #return _shift_image
 
 #jiggle(img, quiet=False)

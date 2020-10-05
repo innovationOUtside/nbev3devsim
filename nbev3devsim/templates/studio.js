@@ -1229,7 +1229,7 @@ function setupRunToggleHandler(el) {
     var button = "#int--" + e.target.id;
     var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
     if (flag) runit();
-    //else stopit();
+    else stopit();
   });
 
 }

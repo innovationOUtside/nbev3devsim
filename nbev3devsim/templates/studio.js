@@ -461,13 +461,11 @@ document.getElementById('randomLocation').addEventListener('click', function () 
   sim.robotStates.penDown = _penDown;
 })
 
-
 document.getElementById('resetReset').addEventListener('click', function () {
-  /*
-  sim.robotStates._x = document.getElementById('rs-display-xPos').value;
-  sim.robotStates._y = document.getElementById('rs-display-yPos').value;
-  sim.robotStates._angle = document.getElementById('rs-display-angle').value;
-  */
+  //sim.robotStates._x = document.getElementById('rs-display-xPos').value;
+  //sim.robotStates._y = document.getElementById('rs-display-yPos').value;
+  //sim.robotStates._angle = document.getElementById('rs-display-angle').value;
+  
   sim.robotStates._x = getSliderVal('rs-display-xPos');
   sim.robotStates._y = getSliderVal('rs-display-yPos');
   sim.robotStates._angle = getSliderVal('rs-display-angle');
@@ -477,11 +475,10 @@ document.getElementById('move').addEventListener('click', function () {
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;
 
-  /*
-  var x = document.getElementById('rs-display-xPos').value;
-  var y = document.getElementById('rs-display-yPos').value;
-  var angle = document.getElementById('rs-display-angle').value;
-  */
+  //var x = document.getElementById('rs-display-xPos').value;
+  //var y = document.getElementById('rs-display-yPos').value;
+  //var angle = document.getElementById('rs-display-angle').value;
+  
   var x = getSliderVal('rs-display-xPos');
   var y = getSliderVal('rs-display-yPos');
   var angle = getSliderVal('rs-display-angle');
@@ -493,7 +490,7 @@ document.getElementById('move').addEventListener('click', function () {
   sim.displaySensorValues();
 });
 
-document.getElementById('reset').addEventListener('click', function () {
+document.getElementById('rs-button-reset').addEventListener('click', function () {
   // Don't draw the trace when we reset the robot position
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;

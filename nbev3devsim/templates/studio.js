@@ -493,7 +493,7 @@ document.getElementById('move').addEventListener('click', function () {
   sim.displaySensorValues();
 });
 
-document.getElementById('reset').addEventListener('click', function () {
+document.getElementById('rs-button-reset').addEventListener('click', function () {
   // Don't draw the trace when we reset the robot position
   var tmp = sim.robotStates.penDown;
   sim.robotStates.penDown = false;

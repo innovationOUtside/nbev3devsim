@@ -718,7 +718,7 @@ function setupObstaclesToggleHandler(el, obj = null, attr = null) {
 setupToggleHandler("roboSim-display-output");
 setupToggleHandler("roboSim-display-instrumentation");
 setupFunctionToggleHandler("roboSim-display-sensor-array", setupArrayConfigView, sim, null, "toggle");
-setupFunctionToggleHandler('roboSim-display-chart', setupChartView, null, "toggle");
+setupFunctionToggleHandler('roboSim-display-chart', setupChartView);
 setupToggleHandler("roboSim-display-world");
 setupToggleHandler("roboSim-display-positioning");
 setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
@@ -1161,7 +1161,7 @@ function runit() {
   }
   Sk.running = true;
 
-  if (sim.showChart) Plotly.newPlot('plotlyDiv', chart_lines);
+  if (sim.showChart) Plotly.react('plotlyDiv', chart_lines);
 
   sim.reset();
   sim.startAnimation();
@@ -1245,11 +1245,12 @@ document.getElementById('clearTrace').addEventListener('click', function () { si
 function clearChart() {
   sim.previousChartTraces = [];
   set_chartlines()
-  Plotly.newPlot('plotlyDiv', chart_lines);
+  //Plotly.newChart deprecated
+  Plotly.react('plotlyDiv', chart_lines);
 }
 clearChart()
 
-document.getElementById('clearChart').addEventListener('click', function () {
+document.getElementById("rs-button-clearChart").addEventListener("click", function () {
   clearChart();
 })
 

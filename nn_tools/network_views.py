@@ -235,8 +235,8 @@ def image_class_predictor(MLP, img, label='', size=None,
     
     # TO DO - can we detect the network input and resize to that?
     if size and img.size!=size:
-        print("Resizing")
-        img = img.resize(resize, Image.LANCZOS)
+        print(f"Resizing to {size}")
+        img = img.resize(size, Image.LANCZOS)
     
     #resized_image_bw_list = list(img.getdata())
 

@@ -1240,7 +1240,7 @@ function setupRunToggleHandler(el) {
 //document.getElementById('stop').addEventListener('click', stopit );
 setupRunToggleHandler('#roboSim-display-runstop')
 
-document.getElementById('clearTrace').addEventListener('click', function () { sim.clearPenLayer() })
+document.getElementById("clearTrace").addEventListener("click", function () { sim.clearPenLayer() })
 
 function clearChart() {
   sim.previousChartTraces = [];

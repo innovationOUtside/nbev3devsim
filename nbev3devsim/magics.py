@@ -274,10 +274,9 @@ Parameters requiring an argument:
             _js = "document.getElementById('clearTrace').click();"
             self.shell.user_ns[args.sim].js_init(_js)
 
-        self.check_element(args.sim, args.pendown, "roboSim-pen-updown")
-
-        self.check_element(args.sim, args.output, "roboSim-display-output")
         self.check_element(args.sim, args.chart, "roboSim-display-chart")
+        self.check_element(args.sim, args.pendown, "roboSim-pen-updown")
+        self.check_element(args.sim, args.output, "roboSim-display-output")
         self.check_element(args.sim, args.array, "roboSim-display-sensor-array")
         self.check_element(args.sim, args.instrumentation, "roboSim-display-instrumentation")
         self.check_element(args.sim, args.world, "roboSim-display-world")

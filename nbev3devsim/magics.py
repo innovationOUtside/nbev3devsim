@@ -450,6 +450,8 @@ from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 from ev3dev2.sound import Sound
 
+from ev3dev2_glue import get_clock
+
 #----- YOUR CODE BELOW HERE -----
 
 """
@@ -549,6 +551,8 @@ from ev3dev2.motor import MoveTank, MoveSteering, SpeedPercent, OUTPUT_B, OUTPUT
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
 from ev3dev2.sensor.lego import ColorSensor, GyroSensor, UltrasonicSensor
 from ev3dev2.sound import Sound
+
+from ev3dev2_glue import get_clock
 
 speaker = Sound()
 def say(txt, wait=False, show=True):

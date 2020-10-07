@@ -4,6 +4,60 @@ import numpy as np
 import pandas as pd
 from IPython.display import display
 
+from sklearn.preprocessing import normalize
+
+# Provide a tqdm class with an audio response on completion
+#via https://github.com/tqdm/tqdm/issues/988
+from tqdm.notebook import tqdm as tqdm_notebook_orig
+
+class tqdm_notebook(tqdm_notebook_orig):
+    def close(self, *args, **kwargs):
+        if self.disable:
+            return
+        super(tqdm_notebook, self).close(*args, **kwargs)
+
+        from IPython.display import Javascript, display
+        display(Javascript('''
+        var ctx = new AudioContext()
+        function tone(duration=1.5, frequency=400, type='sin'){
+          var o = ctx.createOscillator(); var g = ctx.createGain()
+          o.frequency.value = frequency; o.type = type
+          o.connect(g); g.connect(ctx.destination)
+          o.start(0)
+          g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration)
+        }
+        tone(1.5, 600)'''))
+        
+tqdma = tqdm_notebook
+
+
+def load_MNIST_images_array(fn='mnist_batch_0.png'):
+    """Load data in from a MNIST images file."""
+    #Load in the image data file
+    img = Image.open(fn)
+    # Turn the image data into a multidimensional array
+    # of 3000 separate 28 x 28 arrays
+    images_array = np.array(img).reshape(3000, 28, 28)
+
+    return images_array
+
+import json
+
+def load_MNIST_labels(fn = 'labels.txt'):
+    """Load in MNIST labels data."""
+    # The labels.txt file contains 3000 digit labels in the same order as the image data file
+    with open(fn, 'r') as f:
+        labels = json.load(f)
+    return labels
+
+def load_MNIST_images_and_labels(images_file='mnist_batch_0.png', labels_file='labels.txt', images=True):
+    """Load in MNIST images and labels data"""
+    images_array = load_MNIST_images_array(images_file)
+    labels = load_MNIST_labels(labels_file)
+    if images:
+        return get_images_list_from_images_array(images_array), labels
+    return images_array, labels
+
 def report_light_sensor(state, side='left'):
     """Print a report of the sensor values."""
     
@@ -49,6 +103,49 @@ def get_sensor_image_pair(image_data, index=None, mode='L'):
 # Generic?
 
 
+def predict_from_image(MLP, _image_image):
+    """Test a trained MLP against a single image / class."""
+    # Linearise the raw image data
+    # as one dimensional list of values
+    flat_image = array_from_image(_image_image).reshape(1, _image_image.size[0]*_image_image.size[1])
+
+    # Normalise the values in the list
+    # to bring them into the range 0..1
+    normalised_flat_image = normalize(flat_image, norm='max')
+
+    # Display the image, along with prediction
+    display(_image_image, MLP.predict(normalised_flat_image))
+
+
+def get_random_image(images_array, labels, show=False, index=None):
+    """Return a random image and label."""
+    # images_array may also be images_list
+
+    # Check that the length of the labels list
+    # matches the length of the images array
+    assert len(labels) == len(images_array)
+    
+    # If no index  value is provided,
+    # generate a valid, random index value within the
+    # bounds of the dataset array / list size
+    if index is None:
+        index = random.randint(0, len(images_array)-1)
+
+    image = images_array[ index ] if isinstance(images_array[ index ], Image.Image) else Image.fromarray(images_array[ index ])
+ 
+    # Get the corresponding label
+    label = labels[index] 
+    
+    # If required, display the zoomed image
+    if show:
+        print(f"Image label: {label}")
+        zoom_img(image)
+        
+    # Return the image,
+    # along with the corresponding label
+    return image, label
+
+
 def style_df(df, bw=False, colorTheme='Blues', threshold=127):
     """Return a styled dataframe (not a dataframe...)."""
     vals = df.values.ravel()
@@ -70,6 +167,12 @@ def image_data_to_array(image_data, index=0, size=(20, 20, 3)):
     image_array = np.array(image_data).reshape(size[0], size[1], size[2]).astype(np.uint8)
     return image_array
 
+def get_resized_images_array(images_array, size=(20, 20)):
+    """Get resized images array."""
+    idfr=[]
+    for i in tqdm(images_array, "Get resized images"):
+        idfr.append(array_from_image(Image.fromarray(i).resize(size, Image.LANCZOS), size=size))
+    return idfr
 
 def array_from_image(img, size=(28, 28)):
     """Get array from image."""
@@ -78,6 +181,10 @@ def array_from_image(img, size=(28, 28)):
     image_array = _array.reshape(size[0], size[1])
     return image_array
 
+def get_images_list_from_images_array(images_array):
+    """Get images list from images_array."""
+    images_list = [image_from_array(image_array) for image_array in images_array]
+    return images_list
 
 def image_from_array(image_array, mode='L'):
     """Generate an image from an array."""
@@ -217,7 +324,7 @@ def generate_signature_from_series(s, fill=255, threshold=127, binarise=False):
     data['start'] = data['v'].ne(data['v'].shift(fill_value=fill))
     data['_id'] = data['start'].cumsum()
     data['counter'] = data.groupby('_id').cumcount() + 1
-    data['end'] = data['v'].ne(data['v'].shift(-1))
+    data['end'] = data['v'].ne(data['v'].shift(-1, fill_value=fill))
     
     transitions = data['end'].sum()
     longest_white = data[data['end'] & data['v']]['counter'].max()
@@ -227,6 +334,7 @@ def generate_signature_from_series(s, fill=255, threshold=127, binarise=False):
     longest_black = 0 if pd.isnull(longest_black) else longest_black
     
     initial_value = s.iloc[0]
+
     return transitions, initial_value, longest_white, longest_black
 
 
@@ -234,11 +342,13 @@ from sklearn import preprocessing
 
 def generate_signature(img, threshold=127, normalise=None,
                        linear=False,
-                       segment=None
+                       segment=None, fill=255, show=False
                        ):
     """Generate signature from image."""
     if isinstance(img, Image.Image):
-        bw_img = make_image_black_and_white(img, threshold=threshold)
+        bw_img = make_image_black_and_white(img, threshold=threshold) if threshold is not None else img
+        if show:
+            zoom_img(bw_img)
         _rows, _cols = bw_img.size
         _array = np.array(list(bw_img.getdata())).reshape(_rows, _cols)
         _df = pd.DataFrame(_array)
@@ -252,13 +362,14 @@ def generate_signature(img, threshold=127, normalise=None,
     if segment:
         _df.drop(_df.index[segment], inplace=True)
 
-    _signatures = _df.apply(generate_signature_from_series, axis=1)
+    _signatures = _df.apply(generate_signature_from_series, fill=fill, axis=1)
     _df = pd.DataFrame(list(_signatures))
-    #Normalise down columns
+    """
+    #Normalise down columns - the scales max val to 1 rther than normalise vector
     if normalise is not None:
         # if normalise=0 normalise down cols (features) rows
         # if 1, normalise across rows
-        # We would expect to pass 0 here to nornalise features
+        # We would expect to pass 0 here to normalise features
         if normalise:
             _df = _df.T
         _array = _df.values # Returns an array
@@ -267,7 +378,10 @@ def generate_signature(img, threshold=127, normalise=None,
         _df = pd.DataFrame(scaled)
         if normalise:
             _df = _df.T
+    """
     if linear:
+        if normalise:
+            return normalize([_df.values.ravel()])
         return _df.values.ravel()
     return _df
 
@@ -355,7 +469,7 @@ def clear_columns(df, reverse=False, transpose=False, background=255):
     
 #bw_df = pd.DataFrame(np.reshape(list(bw.getdata()), (20,20)))
 def trim_image(bw_df, background=255, reindex=False,
-               show=True, colorTheme='Blues'):
+               show=True, colorTheme='Blues', image=False):
     """Take an image dataframe and trim its edges."""
     if isinstance(bw_df, Image.Image):
         bw_df = df_from_image(bw_df, show=show)
@@ -373,6 +487,9 @@ def trim_image(bw_df, background=255, reindex=False,
     if show:
         display(style_df(bw_dfx, colorTheme=colorTheme))
     
+    if image:
+        return image_from_df(bw_dfx)
+
     return bw_dfx
 
 #trim_image( df_from_image (img))
@@ -409,6 +526,10 @@ def jiggle(img, background=0, quiet=True):
     _image_mode = 'L' #greyscale image mode
     _shift_image = Image.new(_image_mode, _image_size, background)
 
+    # What causes this to fail?
+    if _image_size[0]<_xt or _image_size[1]<_yt:
+        return img
+
     # Set an offset for where to paste the image
     # The limit of the jiggling depends on the size of the cropped image
     _x = random.randint(0, _image_size[0]-_xt )
@@ -428,3 +549,51 @@ def jiggle(img, background=0, quiet=True):
     #return _shift_image
 
 #jiggle(img, quiet=False)
+
+
+
+def get_image_features(image):
+    """Return image data as a list."""
+    return list(image.getdata())
+
+def get_images_features(images_list, normalise=True):
+    """Return list of image features lists"""
+
+    images_data = []
+
+    for image in images_list:
+        images_data.append(list(image.getdata()))
+
+    if normalise:
+        # The axis=1 arguments normalises each indivial image vector
+        images_data = normalize(images_data, axis=1)
+    return images_data
+
+
+""" LEGACY
+
+type(images_array), images_array.shape
+#(numpy.ndarray, (3000, 28, 28))
+
+from sklearn.preprocessing import normalize
+
+# Get the dimensions of the images array as the number of images
+# and each individual image array size
+(array_n, array_x, array_y) = images_array.shape
+
+# Create a list of "flat" images,
+# where each image is represented as one dimensional list
+# containing column*row individual pixel values
+flat_images = images_array.reshape(array_n, array_x*array_y)
+
+# We can normalise the values so they fall in the range 0..1
+normalised_flat_images = normalize(flat_images, norm='max', axis=1)
+
+
+test_limit = 100
+train_limit = len(normalised_flat_images) - test_limit
+
+# Train the MLP on a subset of the images
+
+MLP.fit(normalised_flat_images[:train_limit], labels[:train_limit])
+"""

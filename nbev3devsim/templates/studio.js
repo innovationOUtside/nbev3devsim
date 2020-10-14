@@ -911,6 +911,8 @@ function load_background() {
     init_background("thruxton_track.png", [457, 242, 120, true]);
   } else if (map == "MNIST_Digits") {
     init_background("_number_sheet.png", [400, 50, 90, true]);
+  } else if (map == "MNIST_Digits_Black") {
+    init_background("_number_sheet_black.png", [400, 50, 90, true]);
   } else if (map == "Obstacles_Test") {
     init_background("Obstacles_Test.png", [121, 125, 90, true]);
     sim.loadObstacles([

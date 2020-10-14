@@ -693,3 +693,66 @@ gyro = GyroSensor(INPUT_4)
         robotState = eds.RobotState(self.shell.user_ns[args.sim])
         robotState.update()
         return robotState
+
+    @line_cell_magic
+    @magic_arguments.magic_arguments()
+    @magic_arguments.argument(
+        "--sim", "-s", default="roboSim", help="Simulator object."
+    )
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument(
+        "--digitclass", "-d", action="store_true", help="Return digit class."
+    )
+    @magic_arguments.argument("--index", "-i", default=-1, help="Index")
+    @magic_arguments.argument("--threshold", "-t", default=127, help="Threshold (default 127)")
+    @magic_arguments.argument("--crop", "-c", default=None, help="Crop coords: x1,y1,x2,y2")
+    @magic_arguments.argument("--nocrop", "-n", action="store_true", help="Simulator object.")
+    @magic_arguments.argument("--random", "-r", action="store_true", help="Return random image.")
+    def sim_bw_image_data(self, line, cell=None):
+        """"Get image data."""
+        args = magic_arguments.parse_argstring(self.sim_bw_image_data, line)
+        if args.help:
+
+            help = """
+            Return robot image data from the simulator.
+
+            """
+            print(help)
+            return
+        _crop = None
+        if args.crop:
+            _c = args.crop.split(",")
+            if len(_c) == 4:
+                _crop = tuple([int(i) for i in _c])
+        elif not args.nocrop:
+            _crop = (3, 3, 17, 17)
+        image_data_df = self.shell.user_ns[args.sim].image_data()
+
+        index = int(args.index) if not args.random else random.randint(0, len(image_data_df))
+        # Generate a black and white image
+        return generate_bw_image(
+            image_data_df, index, threshold = int(args.threshold), crop=_crop
+        )
+
+    @line_cell_magic
+    @magic_arguments.magic_arguments()
+    @magic_arguments.argument(
+        "--sim", "-s", default="roboSim", help="Simulator object."
+    )
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument("--pairindex", "-p", default=-1, help="Pair index.")
+    def sim_image_pair(self, line, cell=None):
+        """Return an image pair."""
+        args = magic_arguments.parse_argstring(self.sim_image_pair, line)
+        if args.help:
+
+            help = """
+            Return a pair of images from the simulator.
+
+            """
+            print(help)
+            return
+
+        image_data_df = self.shell.user_ns[args.sim].image_data()
+        return get_sensor_image_pair(image_data_df, int(args.pairindex))
+        

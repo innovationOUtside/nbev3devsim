@@ -21,7 +21,7 @@ from sklearn.exceptions import ConvergenceWarning
 
 
 def how_did_I_do(MLP, df, samples, expected):
-    """Simple report iof expected inputs versus actual outputs."""
+    """Simple report of expected inputs versus actual outputs."""
     predictions = MLP.predict(df[samples].to_list())
     _df = pd.DataFrame({"Expected": df[expected], "Predicted": predictions})
     _df["Correct"] = _df["Expected"] == _df["Predicted"]
@@ -590,7 +590,7 @@ def cnn_load(fpath="./mnist.tflite", fpath_labels="./mnist_tflite_labels.txt"):
 # cnn = cnn_load()
 
 
-def cnn_get_details(cnn):
+def cnn_get_details(cnn, report=False):
     """Unpack details of tensorflow-lite model."""
     (interpreter, tf_labels) = cnn
 
@@ -603,7 +603,12 @@ def cnn_get_details(cnn):
     height = input_details[0]["shape"][1]
     width = input_details[0]["shape"][2]
 
-    return input_details, output_details, floating_model, height, width
+    if report:
+        print(f'''\n
+Input: {input_details}\n
+Output: {output_details}\n''')
+    else:
+        return input_details, output_details, floating_model, height, width
 
 
 # input_details, output_details, floating_model, height, width = cnn_get_details(cnn_interpreter)
@@ -618,7 +623,7 @@ def cnn_rank_results(results, tf_labels=None, rank=5):
 
     # This is a hack
     # We seem to be normalising wrt 255, so support that?
-    floating_model = max(sum(top_k, [])) > 1
+    floating_model = sum(top_k) > 1
 
     for i in top_k:
         label = tf_labels[i] if (tf_labels) else ""

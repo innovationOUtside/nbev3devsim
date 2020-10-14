@@ -90,14 +90,14 @@ def sensor_image_focus(img, centre=(3, 3, 17, 17),
 
 def get_sensor_image_pair(image_data, index=None, mode='L'):
     """Return a left right pair of images."""
-    if not index and len(image_data)>=2:
-         l_index = -2
-         r_index = -1
+    if index is None and len(image_data)>=2:
+        l_index = -2
+        r_index = -1
     else:
-        l_index = index
-        r_index = l_index+1
-    left_img = sensor_image_focus(generate_image(image_data, r_index))
-    right_img = sensor_image_focus(generate_image(image_data, l_index))
+        r_index = index
+        l_index = r_index-1
+    left_img = sensor_image_focus(generate_image(image_data, l_index))
+    right_img = sensor_image_focus(generate_image(image_data, r_index))
     return left_img.convert(mode), right_img.convert(mode)
 
 # Generic?

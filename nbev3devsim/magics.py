@@ -2,7 +2,7 @@ from IPython.core.magic import magics_class, line_cell_magic, Magics
 from IPython.core import magic_arguments
 from IPython.display import Javascript, clear_output, display, HTML
 
-# Note that we can access state on the simulator as per: 
+# Note that we can access state on the simulator as per:
 # sim.js_init("alert(sim.uiSettings.audio.enabled)")
 
 from pygments import highlight
@@ -10,6 +10,7 @@ from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 import time
+import random
 
 import io
 import sys
@@ -18,6 +19,8 @@ import tempfile
 from contextlib import redirect_stdout
 
 from nbev3devsim.load_nbev3devwidget import eds
+from nn_tools.sensor_data import generate_image, generate_bw_image
+from nn_tools.sensor_data import get_sensor_image_pair
 
 
 @magics_class
@@ -39,7 +42,7 @@ class NbEv3DevSimMagic(Magics):
             display(report)
 
     def download_ping(self, sim):
-        #display(
+        # display(
         #    Javascript(
         _js = """
       //https://stackoverflow.com/a/29373891/454773
@@ -61,7 +64,7 @@ class NbEv3DevSimMagic(Magics):
         download_tone(1.5, 600);}"""
         self.shell.user_ns[sim].js_init(_js)
         #    )
-        #)
+        # )
         clear_output()
 
     # The focus is grabbed back to the cell after the run cell in the notebook
@@ -77,7 +80,7 @@ class NbEv3DevSimMagic(Magics):
         else document.getElementById("{item}").style.display = 'block';
         """
         self.shell.user_ns[sim].js_init(_js)
-    
+
     def check_element(self, sim, arg, item):
         """Show a specified element."""
         _state = "true" if arg else "false"
@@ -90,7 +93,7 @@ class NbEv3DevSimMagic(Magics):
         document.getElementById("{item}").dispatchEvent(toggleCheckEvent);
       """
         self.shell.user_ns[sim].js_init(_js)
-    
+
     def updateCode(self, sim):
         # fire an event
         _js = 'document.getElementById("rs_code_updater").click()'
@@ -109,10 +112,9 @@ class NbEv3DevSimMagic(Magics):
             const event = new Event('input');
             {_slider}.dispatchEvent(event);
             """
-            #const event = new CustomEvent('value-slider:change', {{ detail: {{ value: {int(arg)} }} }});
+                # const event = new CustomEvent('value-slider:change', {{ detail: {{ value: {int(arg)} }} }});
             )
 
-    
     def handle_args(self, args):
         """Handle arguments passed in via magic."""
         if args.robotSetup is not None:
@@ -191,15 +193,13 @@ Parameters requiring an argument:
       document.getElementById("obstaclesConfiguratorApply").click();
       """
             )
-        
+
         self.sliderUpdate(args.sim, args.xpos, "rs-display-xPos", mover=True)
         self.sliderUpdate(args.sim, args.ypos, "rs-display-yPos", mover=True)
         self.sliderUpdate(args.sim, args.angle, "rs-display-angle", mover=True)
-        self.sliderUpdate(
-            args.sim, args.sensornoise, "rs-display-lightSensorNoise"
-        )
+        self.sliderUpdate(args.sim, args.sensornoise, "rs-display-lightSensorNoise")
         self.sliderUpdate(args.sim, args.motornoise, "rs-display-wheelNoise")
-        
+
         '''
         if args.xpos is not None:
             self.shell.user_ns[args.sim].js_init(
@@ -278,21 +278,24 @@ Parameters requiring an argument:
         self.check_element(args.sim, args.pendown, "roboSim-pen-updown")
         self.check_element(args.sim, args.output, "roboSim-display-output")
         self.check_element(args.sim, args.array, "roboSim-display-sensor-array")
-        self.check_element(args.sim, args.instrumentation, "roboSim-display-instrumentation")
+        self.check_element(
+            args.sim, args.instrumentation, "roboSim-display-instrumentation"
+        )
         self.check_element(args.sim, args.world, "roboSim-display-world")
-        self.check_element(args.sim, args.noisecontrols, "roboSim-display-noise-controls")
+        self.check_element(
+            args.sim, args.noisecontrols, "roboSim-display-noise-controls"
+        )
         self.check_element(args.sim, args.settings, "roboSim-display-config-controls")
         self.check_element(args.sim, args.hide, "roboSim-display-sim-controls")
         self.check_element(args.sim, args.positioning, "roboSim-display-positioning")
         self.check_element(args.sim, args.code, "roboSim-display-code")
-
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
         "--sim", "-s", default="roboSim", help="Simulator object."
     )
-    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--background", "-b", default=None, help="Background selection"
     )
@@ -321,12 +324,20 @@ Parameters requiring an argument:
     @magic_arguments.argument(
         "--array", "-A", action="store_true", help="Show sensor array"
     )
-    @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
-    @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument(
+        "--noisecontrols", "-z", action="store_true", help="Show noise controls"
+    )
+    @magic_arguments.argument(
+        "--settings", "-Z", action="store_true", help="Show config controls"
+    )
+    @magic_arguments.argument(
+        "--positioning", "-X", action="store_true", help="Show positioning controls"
+    )
     @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
-    @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
+    @magic_arguments.argument(
+        "--hide", "-H", action="store_false", help="Hide simulator controls"
+    )
     @magic_arguments.argument(
         "--instrumentation", "-i", action="store_true", help="Show sensor values"
     )
@@ -337,7 +348,7 @@ Parameters requiring an argument:
         "--preview", "-v", action="store_true", help="Preview preloaded code"
     )
     @magic_arguments.argument(
-        "--stop", "-S", action="store_true", help="Stop simulator code execution"
+        "--stop", "-S", action="store_false", help="Stop simulator code execution"
     )
     @magic_arguments.argument(
         "--move", "-m", action="store_true", help="Move robot back to start"
@@ -373,21 +384,19 @@ Parameters requiring an argument:
         if args.autorun:
             self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
 
-        if args.stop:
-            _js = "document.getElementById('stop').click();"
-            self.shell.user_ns[args.sim].js_init(_js)
+        # if args.stop:
+        #    self.check_element(args.sim, args.stop, "roboSim-display-runstop")
 
         if args.preview:
-            #print(cell)
-            display(HTML(highlight(cell, PythonLexer(),
-               HtmlFormatter())))
+            # print(cell)
+            display(HTML(highlight(cell, PythonLexer(), HtmlFormatter())))
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
         "--sim", "-s", default="roboSim", help="Simulator object."
     )
-    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--background", "-b", default=None, help="Background selection"
     )
@@ -416,12 +425,20 @@ Parameters requiring an argument:
     @magic_arguments.argument(
         "--array", "-A", action="store_true", help="Show sensor array"
     )
-    @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
-    @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument(
+        "--noisecontrols", "-z", action="store_true", help="Show noise controls"
+    )
+    @magic_arguments.argument(
+        "--settings", "-Z", action="store_true", help="Show config controls"
+    )
+    @magic_arguments.argument(
+        "--positioning", "-X", action="store_true", help="Show positioning controls"
+    )
     @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
-    @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
+    @magic_arguments.argument(
+        "--hide", "-H", action="store_false", help="Hide simulator controls"
+    )
     @magic_arguments.argument(
         "--instrumentation", "-i", action="store_true", help="Show sensor values"
     )
@@ -460,9 +477,8 @@ from ev3dev2_glue import get_clock
         elif not cell and not args.preview:
             return
         elif args.preview and cell is None:
-            #print(preload)
-            display(HTML(highlight(preload, PythonLexer(),
-               HtmlFormatter())))
+            # print(preload)
+            display(HTML(highlight(preload, PythonLexer(), HtmlFormatter())))
             return
         try:
             cell = preload + cell
@@ -480,16 +496,15 @@ from ev3dev2_glue import get_clock
             self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
 
         if args.preview:
-            #print(cell)
-            display(HTML(highlight(cell, PythonLexer(),
-               HtmlFormatter())))
+            # print(cell)
+            display(HTML(highlight(cell, PythonLexer(), HtmlFormatter())))
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
         "--sim", "-s", default="roboSim", help="Simulator object."
     )
-    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--background", "-b", default=None, help="Background selection"
     )
@@ -518,12 +533,20 @@ from ev3dev2_glue import get_clock
     @magic_arguments.argument(
         "--array", "-A", action="store_true", help="Show sensor array"
     )
-    @magic_arguments.argument("--noisecontrols", "-z", action="store_true", help="Show noise controls")
-    @magic_arguments.argument("--settings", "-Z", action="store_true", help="Show config controls")
-    @magic_arguments.argument("--positioning", "-X", action="store_true", help="Show positioning controls")
+    @magic_arguments.argument(
+        "--noisecontrols", "-z", action="store_true", help="Show noise controls"
+    )
+    @magic_arguments.argument(
+        "--settings", "-Z", action="store_true", help="Show config controls"
+    )
+    @magic_arguments.argument(
+        "--positioning", "-X", action="store_true", help="Show positioning controls"
+    )
     @magic_arguments.argument("--code", "-D", action="store_true", help="Show code")
     @magic_arguments.argument("--world", "-W", action="store_false", help="Hide world")
-    @magic_arguments.argument("--hide", "-H", action="store_false", help="Hide simulator controls")
+    @magic_arguments.argument(
+        "--hide", "-H", action="store_false", help="Hide simulator controls"
+    )
     @magic_arguments.argument(
         "--instrumentation", "-i", action="store_true", help="Show sensor values"
     )
@@ -578,9 +601,8 @@ gyro = GyroSensor(INPUT_4)
         elif not cell and not args.preview:
             return
         elif args.preview and cell is None:
-            #print(preload)
-            display(HTML(highlight(preload, PythonLexer(),
-               HtmlFormatter())))
+            # print(preload)
+            display(HTML(highlight(preload, PythonLexer(), HtmlFormatter())))
             return
 
         try:
@@ -605,30 +627,28 @@ gyro = GyroSensor(INPUT_4)
             # self.give_focus_to_run()
             if args.autorun:
                 self.check_element(args.sim, args.autorun, "roboSim-display-runstop")
-            
+
             if args.preview:
-                #print(cell)
-                display(HTML(highlight(cell, PythonLexer(),
-               HtmlFormatter())))
+                # print(cell)
+                display(HTML(highlight(cell, PythonLexer(), HtmlFormatter())))
 
         except:
 
             print(f"There seems to be a problem... Is {args.sim} defined?")
             return
 
-
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
-            "--sim", "-s", default="roboSim", help="Simulator object."
-        )
-    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+        "--sim", "-s", default="roboSim", help="Simulator object."
+    )
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--clear", "-c", action="store_true", help="Clear data log."
     )
     def sim_data(self, line, cell=None):
         """Return data from simulator datalog as a pandas dataframe."""
-        args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
+        args = magic_arguments.parse_argstring(self.sim_data, line)
         if args.help:
 
             help = """
@@ -638,7 +658,7 @@ gyro = GyroSensor(INPUT_4)
             """
             print(help)
             return
-        
+
         if args.clear:
             self.shell.user_ns[args.sim].clear_datalog()
             return
@@ -652,15 +672,15 @@ gyro = GyroSensor(INPUT_4)
     @line_cell_magic
     @magic_arguments.magic_arguments()
     @magic_arguments.argument(
-            "--sim", "-s", default="roboSim", help="Simulator object."
-        )
-    @magic_arguments.argument( "--help", "-h", action="store_true", help="Display help.")
+        "--sim", "-s", default="roboSim", help="Simulator object."
+    )
+    @magic_arguments.argument("--help", "-h", action="store_true", help="Display help.")
     @magic_arguments.argument(
         "--clear", "-c", action="store_true", help="Clear data log."
     )
     def sim_robot_state(self, line, cell=None):
         """Return robot state data."""
-        args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)
+        args = magic_arguments.parse_argstring(self.sim_robot_state, line)
         if args.help:
 
             help = """

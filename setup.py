@@ -12,7 +12,8 @@ setup(
         'nest_asyncio',
         'pandas',
         'seaborn',
-        'tqdm'
+        'tqdm',
+        'nb-extension-empinken'
     ],
     data_files=[
         # like `jupyter nbextension install --sys-prefix`

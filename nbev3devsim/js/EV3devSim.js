@@ -741,8 +741,38 @@ function EV3devSim(id) {
     self.displaySensorValues();
   };
 
+  this.collabResponse = function () {
+    if ((self.collaborative)) {
+      var element = self._element;
+      var mypre = document.getElementById("output");
+      if (typeof element !== 'undefined') {
+        if (typeof element.response !== 'undefined') {
+          // The response element contains state sent from the Python environment
+          var response = element.response;
+          if (response != '') {
+            // For now, just show what we've got back from py
+            mypre.innerHTML = mypre.innerHTML + "<br/><hr/>-- PY RESPONSE --<br/>"+response+ "<br/><hr/><br/>";
+            mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+            if (response.startsWith("JSON::")){
+              //self.pyState = response;
+              pyState = Sk.ffi.remapToJs(self.pyState);
+              pyState["messages"].push(JSON.parse(response.substring(6)));
+              self.pyState = Sk.ffi.remapToPy(pyState);
+              //The sim.pyState can be then referenced in sim py code:
+              //import ev3dev2_glue as glue
+              //print('gs',glue.pyState())
+            }
+          }
+          element.response = '';
+        }
+      }
+    }
+  }
+
   this.animate = function () {
     self.clock++;
+
+    self.collabResponse();
 
     self.setWheelSpeed(self.robotStates.leftWheel);
     self.setWheelSpeed(self.robotStates.rightWheel);
@@ -936,6 +966,8 @@ function EV3devSim(id) {
   this.startAnimation = function () {
     if (self.timer == null) {
       //console.log('start animation');
+      //Clear message queue
+      self.pyState = Sk.ffi.remapToPy({messages: []});
       self.clock = 0;
       self.timer = setInterval(self.animate, 1000 / self.fps);
     }
@@ -1326,6 +1358,8 @@ function EV3devSim(id) {
 
   console.debug("Final setup");
   
+  self.pyState = Sk.ffi.remapToPy({messages: []});
+
   self.loadCanvas(id);
   self.setWallsPresent(true);
   self.clearBackground();

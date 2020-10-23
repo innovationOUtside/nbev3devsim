@@ -152,6 +152,9 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
         self.results_log = []
         self.raw_image_data = [] # log of image data records
 
+        self.pyresponder = lambda obj: f'pingpong {obj}'
+        self.live_image_handler = lambda i: ''
+
         self.count = 0
     
     def _process_robot_image_data(self, data, mode='rgb'):
@@ -201,6 +204,9 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
     def comms_image_data(self, obj):
         """Grab image data into a log."""
         self.raw_image_data.append(obj.replace('image_data','').strip())
+        response = self.live_image_handler(len(self.raw_image_data))
+        if response:
+            self.set_element("response", response)
         #self.raw_image_data.append({'index': datetime.utcnow(), 'simtime': clock, typ: val})
 
     def print_repr(self, obj):
@@ -221,6 +227,7 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
     def responder(self, obj):
         """ Callback function that tries to respond to widget."""
         response = f'pingpong {obj}'
+        response = self.pyresponder(obj)
         self.set_element("response", response)
 
     def ready(self):

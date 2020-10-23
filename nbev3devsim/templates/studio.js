@@ -300,6 +300,8 @@ function setPos(x, y, angle, init = false, reset = false) {
 
 var sim = new EV3devSim('field');
 
+sim._element = element;
+
 var uiSettings = sim.uiSettings;
 
 sim.audioCtx = ctx;
@@ -643,6 +645,9 @@ function setupArrayConfigView(obj) {
     sim.displaySensorValues();
   }
 }
+function setupCollabMode(obj){
+  obj.collaborative = document.getElementById("int--roboSim-state-collaborative").getAttribute("aria-checked") === "true";
+}
 
 function setupAudioConfigView(obj) {
   obj.uiSettings.audio.enabled = document.getElementById("int--roboSim-state-audio").getAttribute("aria-checked") === "true";
@@ -724,7 +729,8 @@ setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstac
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
 setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView, sim, null, "toggle");
-setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
+//setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
+setupFunctionToggleHandler("roboSim-state-collaborative", setupCollabMode, sim, "collaborative", "toggle");
 setupToggleHandler("roboSim-display-sim-controls");
 setupFunctionToggleHandler("roboSim-state-audio", setupAudioConfigView, sim, null, "toggle");
 //setupToggleHandler('roboSim-display-display-controls');
@@ -1035,6 +1041,30 @@ function rand() {
   return Math.random();
 }
 
+/*
+// Handled in ev3devsim.js
+function collabResponse(){
+  if ((sim.collaborative)) {
+    var mypre = document.getElementById("output");
+    if (typeof element !== 'undefined') {
+      if (typeof element.response !== 'undefined') {
+        // The response element contains state sent from the Python environment
+        var response = element.response;
+        if (response != '') {
+          // For now, just show what we've got back from py
+          mypre.innerHTML = mypre.innerHTML + "<br/><hr/>-- PY RESPONSE --<br/>"+response+ "<br/><hr/><br/>";
+          mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+          sim.pyState = response;
+          //The sim.pyState can be then referenced in sim py code:
+          //import ev3dev2_glue as glue
+          //print('gs',glue.pyState())
+        }
+        element.response = '';
+      }
+    }
+  }
+}
+*/
 
 //Plotly.newPlot('plotlyDiv', chart_lines);
 
@@ -1048,9 +1078,15 @@ function outf(text) {
 
   // Can we somehow stream data back to py context?
   report_callback(text);
+  if ((sim.collaborative) && (text.startsWith('PY::'))) {
+    report_callback_responder(text);
+  } else if ((sim.collaborative) && (text.startsWith('IMG_DATA'))) {
+    _sd1 = sim.robotStates.sensor1dataArray;
+    _sd2 = sim.robotStates.sensor2dataArray;
+    report_callback_responder('IMG_DATA::'+JSON.stringify({'left': _sd1, 'right': _sd2}));
+  }
   // Can we also send something back to py context and then get something back from py in return?
   // Note there are quite a lot of delays in round trip
-  if ((sim.collaborative) && (text.trim() != '')) report_callback_responder(text);
   if (text.startsWith('image_data')) {
     // TO DO  - channel left or right
     // pass the image array
@@ -1097,24 +1133,8 @@ function outf(text) {
 
   mypre.innerHTML = mypre.innerHTML + text;
   mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
-  if (sim.collaborative) {
-    if (typeof element !== 'undefined') {
-      if (typeof element.response !== 'undefined') {
-        // The response element contains state sent from the Python environment
-        var response = element.response;
-        if (response != '') {
-          // For now, just show what we've got back from py
-          mypre.innerHTML = mypre.innerHTML + response;
-          mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
-          sim.pyState = response;
-          //The sim.pyState can be then referenced in sim py code:
-          //import ev3dev2_glue as glue
-          //print('gs',glue.pyState())
-        }
-        element.response = '';
-      }
-    }
-  }
+  
+  //collabResponse();
 
 }
 

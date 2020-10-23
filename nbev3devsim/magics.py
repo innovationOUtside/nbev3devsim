@@ -18,7 +18,8 @@ import subprocess
 import tempfile
 from contextlib import redirect_stdout
 
-from nbev3devsim.load_nbev3devwidget import eds
+#from nbev3devsim.load_nbev3devwidget import eds
+from nbev3devsim import ev3devsim_nb as eds
 from nn_tools.sensor_data import generate_image, generate_bw_image
 from nn_tools.sensor_data import get_sensor_image_pair
 
@@ -143,6 +144,7 @@ Boolean flags (no arguments):
 --clear / -C [C] : clear trace
 --ultrasound / -u [U]: show ultrasound rays
 --quiet / -q : no download audio confirmation
+--collab / -L : collaboration mode
 
 --world / -W [W] : hide world (default: displayed)
 --hide / -H [H] : hide simulator controls (default: displayed)
@@ -289,6 +291,7 @@ Parameters requiring an argument:
         self.check_element(args.sim, args.hide, "roboSim-display-sim-controls")
         self.check_element(args.sim, args.positioning, "roboSim-display-positioning")
         self.check_element(args.sim, args.code, "roboSim-display-code")
+        self.check_element(args.sim, args.collab, "roboSim-state-collaborative")
 
     @line_cell_magic
     @magic_arguments.magic_arguments()
@@ -359,9 +362,19 @@ Parameters requiring an argument:
     @magic_arguments.argument(
         "--motornoise", "-M", default=None, help="Motor noise, 0..500"
     )
+    @magic_arguments.argument(
+        "--refresh", "-F", action="store_true", help="Refresh (used in collab mode)."
+    )
+    @magic_arguments.argument( "--collab", "-L", action="store_true", help="Collaboration mode.")
     def sim_magic(self, line, cell=None):
         "Send code to simulator."
         args = magic_arguments.parse_argstring(self.sim_magic, line)
+
+        if args.refresh:
+            self.shell.user_ns[args.sim].set_element("prog", "print('Colab reset executed.')")
+            self.check_element(args.sim, True, "roboSim-display-runstop")
+            self.download_ping(args.sim)
+            return
 
         try:
             if cell is not None:
@@ -457,6 +470,7 @@ Parameters requiring an argument:
     @magic_arguments.argument(
         "--previewcode", action="store_true", help="Return preloaded code"
     )
+    @magic_arguments.argument( "--collab", "-L", action="store_true", help="Collaboration mode.")
     def sim_magic_imports(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_imports, line)
@@ -565,6 +579,7 @@ from ev3dev2_glue import get_clock
     @magic_arguments.argument(
         "--previewcode", action="store_true", help="Return preloaded code"
     )
+    @magic_arguments.argument( "--collab", "-L", action="store_true", help="Collaboration mode.")
     def sim_magic_preloaded(self, line, cell=None):
         "Send code to simulator with imports and common definitions."
         args = magic_arguments.parse_argstring(self.sim_magic_preloaded, line)

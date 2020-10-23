@@ -666,7 +666,7 @@ function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type
   else target = null;
   toggleElement.addEventListener('x-switch:on', function (e) {
     if ((obj) && (attr)) obj[attr] = true;
-    fn(obj);
+    if (fn!=null) fn(obj);
     if (target) document.querySelector(target).style.display = 'block';
   });
 
@@ -674,13 +674,13 @@ function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type
     //console.debug("toggle", el, fn)
     toggleElement.addEventListener('x-switch:off', function (e) {
       if ((obj) && (attr)) obj[attr] = false;
-      fn(obj);
+      if (fn!=null) fn(obj);
       if (target) document.querySelector(target).style.display = 'none';
     });
     toggleElement.addEventListener('x-switch:update', function (e) {
       var target = rs_display_lookup[e.target.id];
       var button = "#int--" + e.target.id;
-      fn(obj);
+      if (fn!=null) fn(obj);
       if (target) {
         var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
         if (flag) {

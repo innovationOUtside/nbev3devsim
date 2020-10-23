@@ -331,8 +331,10 @@ setPos(200, 800, 0);
 
 document.getElementById('codeFromClipboard').addEventListener('click', function () {
   navigator.clipboard.readText().then(text => element.prog = text);
-  console.log('can we paste?')
-  navigator.clipboard.readText().then(text => console.log(text));
+  //update the code view
+  setupCodeView();
+  //console.log('can we paste?')
+  //navigator.clipboard.readText()//.then(text => console.log(text));
 });
 
 /* to delete

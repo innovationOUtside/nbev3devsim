@@ -298,7 +298,7 @@ def class_predict_from_image(
     MLP, img, quiet=True, zoomview=False, confidence=False, signature=False
 ):
     """Class prediction from an image."""
-    flat_image = array_from_image(img).reshape(1, img.size[0] * img.size[1])
+    flat_image = array_from_image(img, size=img.size).reshape(1, img.size[0] * img.size[1])
 
     if signature:
         _signature = generate_signature(img, linear=True)

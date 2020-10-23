@@ -88,17 +88,25 @@ def sensor_image_focus(img, centre=(3, 3, 17, 17),
     return cropped_image
 
 
-def get_sensor_image_pair(image_data, index=None, mode='L'):
+def get_sensor_image_pair(image_data, index=None, mode='greyscale', threshold=127):
     """Return a left right pair of images."""
+    if image_data.empty:
+        return
     if index is None and len(image_data)>=2:
         l_index = -2
         r_index = -1
     else:
-        r_index = index
-        l_index = r_index-1
+        l_index =  (2 * index)
+        r_index = l_index + 1      
     left_img = sensor_image_focus(generate_image(image_data, l_index))
     right_img = sensor_image_focus(generate_image(image_data, r_index))
-    return left_img.convert(mode), right_img.convert(mode)
+    if mode=='greyscale':
+        left_img = left_img.convert("L")
+        right_img = right_img.convert("L")
+    elif mode=='bw':
+        left_img = make_image_black_and_white(left_img, threshold=threshold)
+        right_img = make_image_black_and_white(right_img, threshold=threshold)
+    return left_img, right_img
 
 # Generic?
 
@@ -265,7 +273,7 @@ def collected_image(df, index=0, size=(20, 20, 3)):
 def generate_image(image_data_df, index=0,
                    size=(20, 20, 3), mode='greyscale',
                    crop=None,
-                   resize=None, fill=255):
+                   resize=None, fill=255, threshold=127):
     """Generate image from each row of dataframe."""
     #  TO DO: len(pixels) == x * y assume we have greyscale
     #  TO DO: len(pixel) ==  x * y * 3 then we have RGB
@@ -274,6 +282,8 @@ def generate_image(image_data_df, index=0,
         resize = _img.size
     if mode=='greyscale':
         _img = _img.convert("L")
+    elif mode=='bw':
+        _img = make_image_black_and_white(_img, threshold=threshold)
     if crop:
         _img = _img.crop(crop)
     if resize:
@@ -496,14 +506,13 @@ def trim_image(bw_df, background=255, reindex=False,
 #trim_image( df_from_image (img))
 
 
-# TO DO  - this is incomplete and untested
 def crop_and_pad_to_fit(img, background=255, scale=1, quiet=True, threshold=None):
     """Crop an image then pad it back to fit the original image size."""
     if not quiet:
         display("Original image:")
         zoom_img(img)
 
-    _trimmed_image_df = trim_image( df_from_image(img, show=True), background=background, show=False)
+    _trimmed_image_df = trim_image( df_from_image(img, show=False), background=background, show=False)
     _cropped_image = image_from_df(_trimmed_image_df)
     
     _image_mode = 'L' #greyscale image mode

@@ -2,6 +2,8 @@ from setuptools import setup
 
 setup(
     name="nbev3devsim",
+    author='Tony Hirst',
+    author_email='tony.hirst@open.ac.uk',
     packages=['nbev3devsim', 'nb_cell_tools', 'nn_tools'],
     version='0.0.4',
     include_package_data=True,

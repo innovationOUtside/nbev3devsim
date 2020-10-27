@@ -42,6 +42,20 @@ setup(
 import subprocess
 import sys
 
+from os import path
+
+def get_requirements(fn='requirements.txt', nogit=True):
+   """Get requirements."""
+   if path.exists(fn):
+      with open(fn, 'r') as f:
+        requirements = f.read().splitlines()
+   else:
+     requirements = []
+   requirements = [r.split()[0].strip() for r in requirements if r and not r.startswith('#')]
+   if nogit:
+       requirements = [r for r in requirements if not r.startswith('git+')]
+   return requirements
+
 def install_external_requirements(fn="external_requirements.txt"):
    """Install additional requiremments eg including installs from github."""
    print(f"Installing external requirements from {fn}")

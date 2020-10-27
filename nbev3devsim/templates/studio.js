@@ -300,6 +300,8 @@ function setPos(x, y, angle, init = false, reset = false) {
 
 var sim = new EV3devSim('field');
 
+sim._element = element;
+
 var uiSettings = sim.uiSettings;
 
 sim.audioCtx = ctx;
@@ -329,8 +331,10 @@ setPos(200, 800, 0);
 
 document.getElementById('codeFromClipboard').addEventListener('click', function () {
   navigator.clipboard.readText().then(text => element.prog = text);
-  console.log('can we paste?')
-  navigator.clipboard.readText().then(text => console.log(text));
+  //update the code view
+  setupCodeView();
+  //console.log('can we paste?')
+  //navigator.clipboard.readText()//.then(text => console.log(text));
 });
 
 /* to delete
@@ -643,6 +647,9 @@ function setupArrayConfigView(obj) {
     sim.displaySensorValues();
   }
 }
+function setupCollabMode(obj){
+  obj.collaborative = document.getElementById("int--roboSim-state-collaborative").getAttribute("aria-checked") === "true";
+}
 
 function setupAudioConfigView(obj) {
   obj.uiSettings.audio.enabled = document.getElementById("int--roboSim-state-audio").getAttribute("aria-checked") === "true";
@@ -659,7 +666,7 @@ function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type
   else target = null;
   toggleElement.addEventListener('x-switch:on', function (e) {
     if ((obj) && (attr)) obj[attr] = true;
-    fn(obj);
+    if (fn!=null) fn(obj);
     if (target) document.querySelector(target).style.display = 'block';
   });
 
@@ -667,13 +674,13 @@ function setupFunctionToggleHandler(el, fn = null, obj = null, attr = null, type
     //console.debug("toggle", el, fn)
     toggleElement.addEventListener('x-switch:off', function (e) {
       if ((obj) && (attr)) obj[attr] = false;
-      fn(obj);
+      if (fn!=null) fn(obj);
       if (target) document.querySelector(target).style.display = 'none';
     });
     toggleElement.addEventListener('x-switch:update', function (e) {
       var target = rs_display_lookup[e.target.id];
       var button = "#int--" + e.target.id;
-      fn(obj);
+      if (fn!=null) fn(obj);
       if (target) {
         var flag = document.querySelector(button).getAttribute('aria-checked') === 'true';
         if (flag) {
@@ -724,7 +731,8 @@ setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstac
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
 setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView, sim, null, "toggle");
-setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
+//setupToggleHandler("roboSim-state-collaborative", sim, "collaborative");
+setupFunctionToggleHandler("roboSim-state-collaborative", setupCollabMode, sim, "collaborative", "toggle");
 setupToggleHandler("roboSim-display-sim-controls");
 setupFunctionToggleHandler("roboSim-state-audio", setupAudioConfigView, sim, null, "toggle");
 //setupToggleHandler('roboSim-display-display-controls');
@@ -911,6 +919,8 @@ function load_background() {
     init_background("thruxton_track.png", [457, 242, 120, true]);
   } else if (map == "MNIST_Digits") {
     init_background("_number_sheet.png", [400, 50, 90, true]);
+  } else if (map == "MNIST_Digits_Black") {
+    init_background("_number_sheet_black.png", [400, 50, 90, true]);
   } else if (map == "Obstacles_Test") {
     init_background("Obstacles_Test.png", [121, 125, 90, true]);
     sim.loadObstacles([
@@ -1033,6 +1043,30 @@ function rand() {
   return Math.random();
 }
 
+/*
+// Handled in ev3devsim.js
+function collabResponse(){
+  if ((sim.collaborative)) {
+    var mypre = document.getElementById("output");
+    if (typeof element !== 'undefined') {
+      if (typeof element.response !== 'undefined') {
+        // The response element contains state sent from the Python environment
+        var response = element.response;
+        if (response != '') {
+          // For now, just show what we've got back from py
+          mypre.innerHTML = mypre.innerHTML + "<br/><hr/>-- PY RESPONSE --<br/>"+response+ "<br/><hr/><br/>";
+          mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
+          sim.pyState = response;
+          //The sim.pyState can be then referenced in sim py code:
+          //import ev3dev2_glue as glue
+          //print('gs',glue.pyState())
+        }
+        element.response = '';
+      }
+    }
+  }
+}
+*/
 
 //Plotly.newPlot('plotlyDiv', chart_lines);
 
@@ -1046,9 +1080,15 @@ function outf(text) {
 
   // Can we somehow stream data back to py context?
   report_callback(text);
+  if ((sim.collaborative) && (text.startsWith('PY::'))) {
+    report_callback_responder(text);
+  } else if ((sim.collaborative) && (text.startsWith('IMG_DATA'))) {
+    _sd1 = sim.robotStates.sensor1dataArray;
+    _sd2 = sim.robotStates.sensor2dataArray;
+    report_callback_responder('IMG_DATA::'+JSON.stringify({'left': _sd1, 'right': _sd2}));
+  }
   // Can we also send something back to py context and then get something back from py in return?
   // Note there are quite a lot of delays in round trip
-  if ((sim.collaborative) && (text.trim() != '')) report_callback_responder(text);
   if (text.startsWith('image_data')) {
     // TO DO  - channel left or right
     // pass the image array
@@ -1095,24 +1135,8 @@ function outf(text) {
 
   mypre.innerHTML = mypre.innerHTML + text;
   mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
-  if (sim.collaborative) {
-    if (typeof element !== 'undefined') {
-      if (typeof element.response !== 'undefined') {
-        // The response element contains state sent from the Python environment
-        var response = element.response;
-        if (response != '') {
-          // For now, just show what we've got back from py
-          mypre.innerHTML = mypre.innerHTML + response;
-          mypre.scrollTop = mypre.scrollHeight - mypre.clientHeight;
-          sim.pyState = response;
-          //The sim.pyState can be then referenced in sim py code:
-          //import ev3dev2_glue as glue
-          //print('gs',glue.pyState())
-        }
-        element.response = '';
-      }
-    }
-  }
+  
+  //collabResponse();
 
 }
 

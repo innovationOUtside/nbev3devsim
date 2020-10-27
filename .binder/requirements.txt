@@ -10,7 +10,13 @@ pandas
 matplotlib
 seaborn
 
+
+# For NN tools
+scikit-learn
+
 #Workflow
 myst-nb
 jupytext
 nbgitpuller
+
+https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_x86_64.whl

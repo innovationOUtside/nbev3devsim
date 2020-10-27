@@ -72,7 +72,7 @@ Full reflected light intensity (%): {state[side+'_light_full']}
 
 # Specific to simulator 
 
-def sensor_image_focus(img, centre=(3, 3, 18, 18),
+def sensor_image_focus(img, centre=(3, 3, 17, 17),
                        resize=None, bw=False):
     """Extract the focal point of the sensor image."""
     if resize=='auto':
@@ -88,17 +88,25 @@ def sensor_image_focus(img, centre=(3, 3, 18, 18),
     return cropped_image
 
 
-def get_sensor_image_pair(image_data, index=None, mode='L'):
+def get_sensor_image_pair(image_data, index=None, mode='greyscale', threshold=127):
     """Return a left right pair of images."""
-    if not index and len(image_data)>=2:
-         l_index = -2
-         r_index = -1
+    if image_data.empty:
+        return
+    if index is None and len(image_data)>=2:
+        l_index = -2
+        r_index = -1
     else:
-        l_index = index
-        r_index = l_index+1
-    left_img = sensor_image_focus(generate_image(image_data, r_index))
-    right_img = sensor_image_focus(generate_image(image_data, l_index))
-    return left_img.convert(mode), right_img.convert(mode)
+        l_index =  (2 * index)
+        r_index = l_index + 1      
+    left_img = sensor_image_focus(generate_image(image_data, l_index))
+    right_img = sensor_image_focus(generate_image(image_data, r_index))
+    if mode=='greyscale':
+        left_img = left_img.convert("L")
+        right_img = right_img.convert("L")
+    elif mode=='bw':
+        left_img = make_image_black_and_white(left_img, threshold=threshold)
+        right_img = make_image_black_and_white(right_img, threshold=threshold)
+    return left_img, right_img
 
 # Generic?
 
@@ -265,7 +273,7 @@ def collected_image(df, index=0, size=(20, 20, 3)):
 def generate_image(image_data_df, index=0,
                    size=(20, 20, 3), mode='greyscale',
                    crop=None,
-                   resize=None):
+                   resize=None, fill=255, threshold=127):
     """Generate image from each row of dataframe."""
     #  TO DO: len(pixels) == x * y assume we have greyscale
     #  TO DO: len(pixel) ==  x * y * 3 then we have RGB
@@ -274,6 +282,8 @@ def generate_image(image_data_df, index=0,
         resize = _img.size
     if mode=='greyscale':
         _img = _img.convert("L")
+    elif mode=='bw':
+        _img = make_image_black_and_white(_img, threshold=threshold)
     if crop:
         _img = _img.crop(crop)
     if resize:
@@ -437,12 +447,12 @@ def zoom_img(img, size=(5, 5), grid=True):
 # from left/right/upper/lower edge of dataframe
 
 #https://stackoverflow.com/a/54405767/454773
-def background_column(s, background=255):
-    """Report wether all values in a column are the same."""
+def background_column(s, background=255, threshold=None):
+    """Report whether all values in a column are the same."""
     a = s.to_numpy()
     return (a[0] == a).all() and a[0] == background
 
-def clear_columns(df, reverse=False, transpose=False, background=255):
+def clear_columns(df, reverse=False, transpose=False, background=255, threshold=None):
     """Clear edge columns / rows in dataframe
     where all values the same."""
     
@@ -452,6 +462,7 @@ def clear_columns(df, reverse=False, transpose=False, background=255):
     if reverse:
         df = df.loc[:, ::-1].copy()
     
+    # TO DO  - clear edge columns that are above/below a specified threshold
     for c in df:
         if background_column(df[c], background):
             df.drop(columns=[c], inplace=True)
@@ -469,7 +480,7 @@ def clear_columns(df, reverse=False, transpose=False, background=255):
     
 #bw_df = pd.DataFrame(np.reshape(list(bw.getdata()), (20,20)))
 def trim_image(bw_df, background=255, reindex=False,
-               show=True, colorTheme='Blues', image=False):
+               show=True, colorTheme='Blues', image=False, threshold=False):
     """Take an image dataframe and trim its edges."""
     if isinstance(bw_df, Image.Image):
         bw_df = df_from_image(bw_df, show=show)
@@ -493,6 +504,25 @@ def trim_image(bw_df, background=255, reindex=False,
     return bw_dfx
 
 #trim_image( df_from_image (img))
+
+
+def crop_and_pad_to_fit(img, background=255, scale=1, quiet=True, threshold=None):
+    """Crop an image then pad it back to fit the original image size."""
+    if not quiet:
+        display("Original image:")
+        zoom_img(img)
+
+    _trimmed_image_df = trim_image( df_from_image(img, show=False), background=background, show=False)
+    _cropped_image = image_from_df(_trimmed_image_df)
+    
+    _image_mode = 'L' #greyscale image mode
+    _shift_image = Image.new(_image_mode, img.size, background)
+    _csize = _cropped_image.size
+    display(_cropped_image)
+    _xy_offset = (int((img.size[0] - _csize[0])/2),
+                 int((img.size[1] - _csize[1])/2))
+    _shift_image.paste(_cropped_image, _xy_offset)
+    return _shift_image
 
 
 def crop_and_zoom_to_fit(img, background=0, scale=1, quiet=True):

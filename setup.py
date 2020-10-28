@@ -18,7 +18,7 @@ setup(
     long_description_content_type="text/markdown",
     license='MIT License',
     packages=['nbev3devsim', 'nb_cell_tools', 'nn_tools'],
-    version='0.0.6',
+    version='0.0.7',
     include_package_data=True,
     package_data = {
         'nbev3devsim' : ['progs/*.py', 'js/*.js', 'css/*.css', 'backgrounds/*', 'templates/*']},

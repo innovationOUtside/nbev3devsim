@@ -1,12 +1,20 @@
 from setuptools import setup
 
+def get_long_description():
+    with open(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "README.md"),
+        encoding="utf8",
+    ) as fp:
+        return fp.read()
+
 setup(
     name="nbev3devsim",
     author='Tony Hirst',
     author_email='tony.hirst@open.ac.uk',
     url='https://github.com/innovationOUtside/innovationOUtside/nbev3devsim',
     description='nbevdevsim - ev3devsim extension for Jupyter notebooks',
-    long_description='',
+    long_description=get_long_description(),
+    long_description_content_type="text/markdown",
     license='MIT License',
     packages=['nbev3devsim', 'nb_cell_tools', 'nn_tools'],
     version='0.0.6',

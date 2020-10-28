@@ -2,6 +2,12 @@ from setuptools import setup
 
 setup(
     name="nbev3devsim",
+    author='Tony Hirst',
+    author_email='tony.hirst@open.ac.uk',
+    url='https://github.com/innovationOUtside/innovationOUtside/nbev3devsim',
+    description='nbevdevsim - ev3devsim extension for Jupyter notebooks',
+    long_description='',
+    license='MIT License',
     packages=['nbev3devsim', 'nb_cell_tools', 'nn_tools'],
     version='0.0.6',
     include_package_data=True,
@@ -36,15 +42,29 @@ setup(
 import subprocess
 import sys
 
+from os import path
+
+def get_requirements(fn='requirements.txt', nogit=True):
+   """Get requirements."""
+   if path.exists(fn):
+      with open(fn, 'r') as f:
+        requirements = f.read().splitlines()
+   else:
+     requirements = []
+   requirements = [r.split()[0].strip() for r in requirements if r and not r.startswith('#')]
+   if nogit:
+       requirements = [r for r in requirements if not r.startswith('git+')]
+   return requirements
+
 def install_external_requirements(fn="external_requirements.txt"):
    """Install additional requiremments eg including installs from github."""
    print(f"Installing external requirements from {fn}")
-   try:
-      subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", "-r", fn ])
-   except:
-      print(f"Failed to install {fn}")
-   #requirements = get_requirements(fn, nogit=True)
-   #for r in requirements:
-   #   print(subprocess.check_output([sys.executable, "-m", "pip", "install", "--no-cache-dir", r ]))
+   #try:
+   #   subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", "-r", fn ])
+   #except:
+   #   print(f"Failed to install {fn}")
+   requirements = get_requirements(fn, nogit=False)
+   for r in requirements:
+      print(subprocess.check_output([sys.executable, "-m", "pip", "install", "--upgrade", "--no-cache-dir", r ]))
  
 install_external_requirements("external_requirements.txt")

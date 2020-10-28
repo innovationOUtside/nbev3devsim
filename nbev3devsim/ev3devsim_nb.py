@@ -157,30 +157,39 @@ class Ev3DevWidget(jp_proxy_widget.JSProxyWidget):
 
         self.count = 0
     
+    def process_raw_image_data(self, _r, mode='rgb', to_str=True):
+        """Process the raw image data and return a dataframe."""
+        tmp=_r.split(',')
+        k=4
+        # Remove every fourth item in the list
+        del tmp[k-1::k]
+        
+        if mode=='reflected' or mode=='greyscale':
+            # Get the first R component of the RGB signal
+            tmp = tmp[0::3]
+        elif mode=='bw':
+            # Get the first R component of the RGB signal
+            tmp = tmp[0::3]
+            # and convert it to a boolean value
+            tmp = [str(int(int(x)>3)) for x in tmp]
+        else:
+            if mode.upper()!='RGB':
+                print('Unrecognised mode.')
+        if to_str:
+            return ','.join(tmp)
+        return tmp
+                                    
     def _process_robot_image_data(self, data, mode='rgb'):
         """Process the robot image data and return a dataframe."""
         df = pd.DataFrame(columns=['side', 'vals', 'clock'])
         for r in data:
             _r = r.split()
             if len(_r)==3:
-                tmp=_r[1].split(',')
-                k=4
-                del tmp[k-1::k]
-                
-                if mode=='reflected' or mode=='greyscale':
-                    # Get the first R component of the RGB signal
-                    tmp = tmp[0::3]
-                elif mode=='bw':
-                    # Get the first R component of the RGB signal
-                    tmp = tmp[0::3]
-                    # and convert it to a boolean value
-                    tmp = [str(int(int(x)>3)) for x in tmp]
-                else:
-                    if mode.upper()!='RGB':
-                        print('Unrecognised mode.')
+                tmp = self.process_raw_image_data(_r[1], mode=mode)
                 df = pd.concat([df, pd.DataFrame([{'side':_r[0],
-                                                'vals': ','.join(tmp),
-                                                'clock':_r[2]}])])
+                                        'vals': tmp,
+                                        'clock':_r[2]}])])
+               
         df.reset_index(drop=True,inplace=True)
         return df
 

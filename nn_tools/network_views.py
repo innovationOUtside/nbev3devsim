@@ -194,7 +194,7 @@ def reshape_data(img, n_images=3000, size=(28, 28)):
     # of 3000 separate 28 x 28 arrays
     images_array = np.array(img)
 
-    flat_images = np.array(img).reshape(n_images, size[0] * size[1])
+    flat_images = np.array(img).reshape((n_images, size[0] * size[1]))
 
     normalised_flat_images = normalize(flat_images, norm="max", axis=1)
 

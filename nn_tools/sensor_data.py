@@ -3,6 +3,7 @@ import numpy as np
 
 import pandas as pd
 from IPython.display import display
+from tqdm import tqdm
 
 from sklearn.preprocessing import normalize
 
@@ -37,7 +38,7 @@ def load_MNIST_images_array(fn='mnist_batch_0.png'):
     img = Image.open(fn)
     # Turn the image data into a multidimensional array
     # of 3000 separate 28 x 28 arrays
-    images_array = np.array(img).reshape(3000, 28, 28)
+    images_array = np.array(img).reshape((3000, 28, 28))
 
     return images_array
 
@@ -115,7 +116,7 @@ def predict_from_image(MLP, _image_image):
     """Test a trained MLP against a single image / class."""
     # Linearise the raw image data
     # as one dimensional list of values
-    flat_image = array_from_image(_image_image).reshape(1, _image_image.size[0]*_image_image.size[1])
+    flat_image = array_from_image(_image_image).reshape((1, _image_image.size[0], _image_image.size[1]))
 
     # Normalise the values in the list
     # to bring them into the range 0..1
@@ -172,7 +173,7 @@ def style_df(df, bw=False, colorTheme='Blues', threshold=127):
 
 def image_data_to_array(image_data, index=0, size=(20, 20, 3)):
     """Convert the image data string to a numpy array."""
-    image_array = np.array(image_data).reshape(size[0], size[1], size[2]).astype(np.uint8)
+    image_array = np.array(image_data).reshape(size).astype(np.uint8)
     return image_array
 
 def get_resized_images_array(images_array, size=(20, 20)):
@@ -186,7 +187,7 @@ def array_from_image(img, size=(28, 28)):
     """Get array from image."""
     _array = np.array(image_data_from_image(img)).astype(np.uint8)
     # Reshape as a 28x28 array
-    image_array = _array.reshape(size[0], size[1])
+    image_array = _array.reshape((size[0], size[1]))
     return image_array
 
 def get_images_list_from_images_array(images_array):
@@ -360,7 +361,7 @@ def generate_signature(img, threshold=127, normalise=None,
         if show:
             zoom_img(bw_img)
         _rows, _cols = bw_img.size
-        _array = np.array(list(bw_img.getdata())).reshape(_rows, _cols)
+        _array = np.array(list(bw_img.getdata())).reshape((_rows, _cols))
         _df = pd.DataFrame(_array)
     elif isinstance(img, pd.DataFrame):
         _df = img

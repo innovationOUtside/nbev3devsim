@@ -11,6 +11,11 @@ var AudioContext = window.AudioContext // Default
 // Would it make sense to give the simulator access to one, perhaps?
 var ctx = new AudioContext();
 /*---- Custom elements ---*/
+// 
+
+// Allow output window to be resizable
+$("#output").resizable();
+
 
 // ---- CHART
 

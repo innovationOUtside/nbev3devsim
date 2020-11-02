@@ -4,7 +4,7 @@
 from .magics import NbEv3DevSimMagic
 
 
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 
 def load_ipython_extension(ipython):
     ipython.register_magics(NbEv3DevSimMagic)

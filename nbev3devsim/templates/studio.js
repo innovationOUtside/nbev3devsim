@@ -325,8 +325,8 @@ function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
 //------
 
 // Initialise additional components
-initSliderVal('rs-display-wheelNoise', sim.robotStates, "wheelNoise_")
-initSliderVal('rs-display-lightSensorNoise', sim.robotStates, "sensorNoise_", arrayview = true)
+initSliderVal('rs-display-wheelNoise', sim.robotStates, "_wheelNoise")
+initSliderVal('rs-display-lightSensorNoise', sim.robotStates, "_sensorNoise", arrayview = true)
 initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover = true)
 initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
 initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)

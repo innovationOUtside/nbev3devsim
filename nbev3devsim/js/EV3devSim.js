@@ -1101,6 +1101,7 @@ function EV3devSim(id) {
     return raw;
   }
 
+
   this.getSensorValues = function (x, y, diameter = SENSOR_DIAMETER, sensor = '') {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
@@ -1156,11 +1157,11 @@ function EV3devSim(id) {
         let offset = (row * (diameter * 4) + col * 4);
         if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
 
-          redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotState._sensorNoise);
+          redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotStates._sensorNoise);
           redTotal += redNoise;
-          greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotState._sensorNoise);
+          greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotStates._sensorNoise);
           greenTotal += greenNoise;
-          blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotState._sensorNoise);
+          blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotStates._sensorNoise);
           blueTotal += blueNoise;
           sensorView.data[offset] = redNoise;
           sensorView.data[offset + 1] = greenNoise;

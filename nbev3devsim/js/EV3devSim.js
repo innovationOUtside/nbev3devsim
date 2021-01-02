@@ -729,9 +729,11 @@ function EV3devSim(id) {
     }
     // The max speed seems to be set to 1050 in motor.py 
     // Can we access it programmatically?
-    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise);
-    if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
-    else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
+    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise)
+    wheel.speed = Math.min(Math.max(Math.round(_tmp), 0), 1050)
+    //var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise);
+    //if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
+    //else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
   };
 
   this.bigDraw = function () {

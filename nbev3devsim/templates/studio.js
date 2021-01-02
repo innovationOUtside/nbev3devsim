@@ -827,6 +827,9 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
   }
 
   sim.loadRobot(robotSpecs);
+
+  initSliderVal('rs-display-wheelNoise', sim.robotStates, "_wheelNoise")
+  initSliderVal('rs-display-lightSensorNoise', sim.robotStates, "_sensorNoise", arrayview = true)
   sim.drawAll();
 });
 

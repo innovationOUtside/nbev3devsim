@@ -778,39 +778,39 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
     robotSpecs = sim.default_robot_spec;
   } else if ((preconfig == "Small_Robot") || (preconfig == "Small_Robot_Wide_Eyes")) {
     robotSpecs = {
-      "wheeldiameter": 28,
-      "wheelSpacing": 90,
-      "wheelNoise": 0,
-      "back": -60,
-      "pen": {
-        "x": 0,
-        "y": 0,
-        "color": "red",
-        "width": 6
+      wheeldiameter: 28,
+      wheelSpacing: 90,
+      wheelNoise: 0,
+      back: -60,
+      pen: {
+        x: 0,
+        y: 0,
+        color: "red",
+        width: 6
       },
-      "weight": "weightless",
-      "sensorNoise": 0,
-      "sensor1": {
-        "enabled": true,
-        "x": -10,
-        "y": 15,
-        "diameter": 10
+      weight: "weightless",
+      sensorNoise: 0,
+      sensor1: {
+        enabled: true,
+        x: -10,
+        y: 15,
+        diameter: 10
       },
-      "sensor2": {
-        "enabled": true,
-        "x": 10,
-        "y": 15,
-        "diameter": 10
+      sensor2: {
+        enabled: true,
+        x: 10,
+        y: 15,
+        diameter: 10
       },
-      "ultrasonic": {
-        "enabled": true,
-        "x": 0,
-        "y": 10,
-        "angle": 0,
-        "noise": 0
+      ultrasonic: {
+        enabled: true,
+        x: 0,
+        y: 10,
+        angle: 0,
+        noise: 0
       },
-      "gyro": {
-        "enabled": true
+      gyro: {
+        enabled: true
       }
     };
   } else robotSpecs = sim.default_robot_spec;

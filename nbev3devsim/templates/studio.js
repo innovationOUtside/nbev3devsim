@@ -104,7 +104,7 @@ class ValueSlider extends HTMLElement {
 }
 
 if (!(customElements.get('value-slider'))) {
-  customElements.define('value-slider', ValueSlider, { extends: null });
+  customElements.define('value-slider', ValueSlider);
 }
 
 //this function is duplicated in ev3devsim.js
@@ -262,7 +262,7 @@ class ToggleSwitch extends HTMLElement {
   }
 }
 
-if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch', ToggleSwitch, { extends: null });
+if (!(customElements.get('toggle-switch'))) customElements.define('toggle-switch', ToggleSwitch);
 
 /* --- */
 

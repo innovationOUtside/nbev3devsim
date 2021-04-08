@@ -982,6 +982,7 @@ document.getElementById('robotConfiguratorOpen').addEventListener('click', funct
 document.getElementById('robotConfiguratorCancel').addEventListener('click', function () {
   document.getElementById('robotConfigurator').classList.add('closed');
 });
+*/
 
 document.getElementById('robotConfiguratorApply').addEventListener('click', function () {
   var robotSpecs = JSON.parse(document.getElementById('robotConfiguratorEditor').value);
@@ -995,11 +996,11 @@ document.getElementById('robotConfiguratorApply').addEventListener('click', func
   sim.bigDraw();
   document.getElementById('robotConfigurator').classList.add('closed');
 });
-*/
+
 
 function updateRobotConfig(setup) {
   var bgSelector = document.getElementById("robotPreconfig");
-  // TO DO  - go defenseive and check it exists
+  // TO DO  - go defensive and check it exists
   bgSelector.value = setup;
   const event = new Event('change');
   bgSelector.dispatchEvent(event);

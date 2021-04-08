@@ -511,6 +511,8 @@ function EV3devSim(id) {
       angle: 0,
       _angle: 0,
       penDown: false,
+      _wheelNoise: robotSpecs.wheelNoise,
+      _sensorNoise: robotSpecs.sensorNoise,
       leftWheel: {
         polarity: 'normal',
         pos: 0,
@@ -729,9 +731,11 @@ function EV3devSim(id) {
     }
     // The max speed seems to be set to 1050 in motor.py 
     // Can we access it programmatically?
-    var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise);
-    if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
-    else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
+    var _tmp = wheel.speed + self.simpleNoise(self.robotStates._wheelNoise)
+    wheel.speed = Math.min(Math.max(Math.round(_tmp), 0), 1050)
+    //var _tmp = wheel.speed + self.simpleNoise(self.robotSpecs.wheelNoise);
+    //if (_tmp > 0) wheel.speed = Math.min(Math.round(_tmp), 1050);
+    //else if (_tmp > 0) wheel.speed = Math.max(Math.round(_tmp), -1050);
   };
 
   this.bigDraw = function () {
@@ -1097,6 +1101,7 @@ function EV3devSim(id) {
     return raw;
   }
 
+
   this.getSensorValues = function (x, y, diameter = SENSOR_DIAMETER, sensor = '') {
     // Image data is an array of values, in sequence RGBA for each pixel
     // Values are in range 0..255
@@ -1152,11 +1157,11 @@ function EV3devSim(id) {
         let offset = (row * (diameter * 4) + col * 4);
         if (((row - radius) ** 2 + (col - radius) ** 2) < radiusSquare) {
 
-          redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotSpecs.sensorNoise);
+          redNoise = self.addLightSensorNoise(sensorBox.data[offset], self.robotStates._sensorNoise);
           redTotal += redNoise;
-          greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotSpecs.sensorNoise);
+          greenNoise = self.addLightSensorNoise(sensorBox.data[offset + 1], self.robotStates._sensorNoise);
           greenTotal += greenNoise;
-          blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotSpecs.sensorNoise);
+          blueNoise = self.addLightSensorNoise(sensorBox.data[offset + 2], self.robotStates._sensorNoise);
           blueTotal += blueNoise;
           sensorView.data[offset] = redNoise;
           sensorView.data[offset + 1] = greenNoise;

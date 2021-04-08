@@ -325,8 +325,8 @@ function rs_tone(duration = 1.5, frequency = 400, type = 'sin') {
 //------
 
 // Initialise additional components
-initSliderVal('rs-display-wheelNoise', sim.robotSpecs, "wheelNoise")
-initSliderVal('rs-display-lightSensorNoise', sim.robotSpecs, "sensorNoise", arrayview = true)
+initSliderVal('rs-display-wheelNoise', sim.robotStates, "_wheelNoise")
+initSliderVal('rs-display-lightSensorNoise', sim.robotStates, "_sensorNoise", arrayview = true)
 initSliderVal('rs-display-xPos', sim.robotStates, "_x", mover = true)
 initSliderVal('rs-display-yPos', sim.robotStates, "_y", mover = true)
 initSliderVal('rs-display-angle', sim.robotStates, "_angle", mover = true)
@@ -733,6 +733,7 @@ setupToggleHandler("roboSim-display-positioning");
 setupFunctionToggleHandler("roboSim-display-code", setupCodeView);
 setupFunctionToggleHandler("roboSim-display-robot-configurator", setupRobotConfigView, sim);
 setupFunctionToggleHandler("roboSim-display-obstacles-configurator", setupObstaclesConfigView, sim);
+//Do the noise controls need to attach to a new robot profile somehow?
 setupToggleHandler("roboSim-display-noise-controls");
 setupToggleHandler("roboSim-display-config-controls");
 setupFunctionToggleHandler("roboSim-pen-updown", setupPendownView, sim, null, "toggle");
@@ -778,39 +779,39 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
     robotSpecs = sim.default_robot_spec;
   } else if ((preconfig == "Small_Robot") || (preconfig == "Small_Robot_Wide_Eyes")) {
     robotSpecs = {
-      "wheeldiameter": 28,
-      "wheelSpacing": 90,
-      "wheelNoise": 0,
-      "back": -60,
-      "pen": {
-        "x": 0,
-        "y": 0,
-        "color": "red",
-        "width": 6
+      wheeldiameter: 28,
+      wheelSpacing: 90,
+      wheelNoise: 0,
+      back: -60,
+      pen: {
+        x: 0,
+        y: 0,
+        color: "red",
+        width: 6
       },
-      "weight": "weightless",
-      "sensorNoise": 0,
-      "sensor1": {
-        "enabled": true,
-        "x": -10,
-        "y": 15,
-        "diameter": 10
+      weight: "weightless",
+      sensorNoise: 0,
+      sensor1: {
+        enabled: true,
+        x: -10,
+        y: 15,
+        diameter: 10
       },
-      "sensor2": {
-        "enabled": true,
-        "x": 10,
-        "y": 15,
-        "diameter": 10
+      sensor2: {
+        enabled: true,
+        x: 10,
+        y: 15,
+        diameter: 10
       },
-      "ultrasonic": {
-        "enabled": true,
-        "x": 0,
-        "y": 10,
-        "angle": 0,
-        "noise": 0
+      ultrasonic: {
+        enabled: true,
+        x: 0,
+        y: 10,
+        angle: 0,
+        noise: 0
       },
-      "gyro": {
-        "enabled": true
+      gyro: {
+        enabled: true
       }
     };
   } else robotSpecs = sim.default_robot_spec;
@@ -826,6 +827,9 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
   }
 
   sim.loadRobot(robotSpecs);
+
+  initSliderVal('rs-display-wheelNoise', sim.robotStates, "_wheelNoise")
+  initSliderVal('rs-display-lightSensorNoise', sim.robotStates, "_sensorNoise", arrayview = true)
   sim.drawAll();
 });
 

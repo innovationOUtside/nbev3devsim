@@ -402,6 +402,17 @@ document.getElementById('obstaclesConfiguratorApply').addEventListener('click', 
   document.getElementById('obstaclesConfigurator').classList.add('closed');
 });
 
+
+document.getElementById('weightless').addEventListener('click', function () {
+  if (document.getElementById('weightless').checked) {
+    sim.robotSpecs.weight = 'weightless';
+  } else {
+    sim.robotSpecs.weight  = sim.robotSpecs.baseWeight ;
+  }
+  sim.drawAll();
+});
+
+
 /*
 document.getElementById('obstaclesConfiguratorClose').addEventListener('click', function () {
   document.getElementById('obstaclesConfigurator').classList.add('closed');
@@ -790,6 +801,7 @@ document.getElementById("robotPreconfig").addEventListener("change", function ()
         width: 6
       },
       weight: "weightless",
+      baseWeight: "weightless",
       sensorNoise: 0,
       sensor1: {
         enabled: true,

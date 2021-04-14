@@ -71,6 +71,7 @@ function EV3devSim(id) {
       width: 6
     },
     weight: 'medium',
+    baseWeight: 'medium',
     // This is a convenience value generic to sensor1 and sensor2
     sensorNoise: 0,
     sensor1: {

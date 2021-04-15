@@ -286,6 +286,12 @@ function setPos(x, y, angle, init = false, reset = false) {
     sim.robotStates._x = x;
     sim.robotStates._y = y;
     sim.robotStates._angle = angle;
+
+    // Messed up somewhere: _x etc are updated w/ current co-ords?
+    // Rather than break things, use a new default pos
+    sim.robotStates._init_x = x;
+    sim.robotStates._init_y = y;
+    sim.robotStates._init_angle = angle;
   }
 
   sim.setRobotPos(x, y, angleRadian);
@@ -516,9 +522,9 @@ document.getElementById('rs-button-reset').addEventListener('click', function ()
   sim.robotStates.penDown = false;
 
   setPos(
-    sim.robotStates._x,
-    sim.robotStates._y,
-    sim.robotStates._angle,
+    sim.robotStates._init_x,
+    sim.robotStates._init_y,
+    sim.robotStates._init_angle,
     reset = true
   );
   sim.robotStates.penDown = tmp;

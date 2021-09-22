@@ -7,6 +7,8 @@ Click the Binder button to launch a demo:
 
 ![](.images/ev3devsim_demo_screenshot.png)
 
+Install as: `pip install nbev3devsim`
+
 Launch simulator window as:
 
 ```python

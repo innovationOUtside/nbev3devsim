@@ -7,6 +7,14 @@ Click the Binder button to launch a demo:
 
 ![](.images/ev3devsim_demo_screenshot.png)
 
+Launch simulator window as:
+
+```python
+from nbev3devsim.load_nbev3devwidget import roboSim, eds
+
+%load_ext nbev3devsim
+```
+
 ### About `ev3devsim`
 
 `ev3devsim` is a "browser based simulator for ev3dev-lang-python" [[repo](https://github.com/QuirkyCort/ev3dev-sim), [demo](https://www.aposteriori.com.sg/Ev3devSim/index.html)]. The original demostration provides a browser based terminal for writing ev3dev-lang-pyhton code that is then executed in a Javascript based Skulpt Python environment and used to control a simulated robot via a simple 2D simulator implemented using Javascript and HTML canvas elements.

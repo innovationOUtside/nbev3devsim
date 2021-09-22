@@ -14,7 +14,9 @@ var ctx = new AudioContext();
 // 
 
 // Allow output window to be resizable
-$("#output").resizable();
+if (typeof $("#output").resizable === 'function') {
+  $("#output").resizable();
+}
 
 
 // ---- CHART

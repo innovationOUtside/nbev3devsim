@@ -1,5 +1,10 @@
+node_modules
+.venv
+dist
 .DS_Store
+
+# Python
+__pycache__
 .ipynb_checkpoints
-*.pyc
-*/.md
-.Rhistory
+
+src/nbev3devsim/static

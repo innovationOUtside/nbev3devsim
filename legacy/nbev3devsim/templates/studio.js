@@ -311,7 +311,7 @@ function setPos(x, y, angle, init = false, reset = false) {
   //sim.displaySensorValues();
 }
 
-var sim = new EV3devSim('field');
+var sim = new EV3devSim("field");
 
 sim._element = element;
 

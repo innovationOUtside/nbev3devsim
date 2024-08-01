@@ -1,0 +1,9 @@
+{
+	"scripts": {
+		"dev": "npm run build -- --sourcemap=inline --watch",
+		"build": "esbuild js/*.js --minify --format=esm --bundle --loader:.html=text --outdir=src/nbev3devsim/static"
+	},
+	"devDependencies": {
+		"esbuild": "^0.23.0"
+	}
+}
